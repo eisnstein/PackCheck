@@ -20,7 +20,7 @@ namespace PackCheck.Commands
         public CheckCommand()
         {
             _csProjFileService = new CsProjFileService();
-            _nuGetPackagesService = new NuGetPackagesService();
+            _nuGetPackagesService = new NuGetPackagesService(new NuGetVersionService());
             _packages = new List<Package>();
         }
 

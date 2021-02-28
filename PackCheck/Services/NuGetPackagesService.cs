@@ -14,6 +14,13 @@ namespace PackCheck.Services
 {
     public class NuGetPackagesService
     {
+        private readonly NuGetVersionService _nuGetVersionService;
+
+        public NuGetPackagesService(NuGetVersionService nuGetVersionService)
+        {
+            _nuGetVersionService = nuGetVersionService;
+        }
+
         public async Task GetPackagesDataFromCsProjFile(string pathToCsProjFile, List<Package> packages)
         {
             var settings = new XmlReaderSettings { Async = true };
@@ -98,25 +105,11 @@ namespace PackCheck.Services
                     continue;
                 }
 
-                p.LatestStableVersion = GetLatestStableVersion(p, versions);
-                p.LatestVersion = GetLatestVersion(p, versions);
+                p.LatestStableVersion = _nuGetVersionService.GetLatestStableVersion(p, versions);
+                p.LatestVersion = _nuGetVersionService.GetLatestVersion(p, versions);
 
                 task.Increment(incrementBy);
             }
-        }
-
-        public NuGetVersion GetLatestStableVersion(Package package, IEnumerable<NuGetVersion> versions)
-        {
-            var majorVersions = versions
-                .Where(v => v.Major == package.CurrentVersion.Major)
-                .Where(v => v.IsPrerelease == false);
-
-            return majorVersions.Last();
-        }
-
-        public NuGetVersion GetLatestVersion(Package package, IEnumerable<NuGetVersion> versions)
-        {
-            return versions.Last();
         }
     }
 }
