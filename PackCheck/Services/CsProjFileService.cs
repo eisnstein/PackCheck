@@ -11,10 +11,13 @@ namespace PackCheck.Services
             var cwd = Directory.GetCurrentDirectory();
 
             // The user provided a path to the .csproj file
-            if (!string.IsNullOrEmpty(pathToCsProjFile)) {
-                if (!File.Exists(pathToCsProjFile)) {
+            if (!string.IsNullOrEmpty(pathToCsProjFile))
+            {
+                var fullPath = Path.Combine(cwd, pathToCsProjFile);
+                if (!File.Exists(fullPath))
+                {
                     throw new CsProjFileNotFoundException(
-                        $"File [white]{pathToCsProjFile}[/] does not exists in the current directory [white]{cwd}[/]"
+                        $"File [white]{pathToCsProjFile}[/] does not exist in the current directory [white]{cwd}[/]"
                     );
                 }
 
