@@ -46,6 +46,7 @@ namespace PackCheck.Commands
 
         private void PrintResult()
         {
+            var service = new PackageVersionHighlighterService();
             var table = new Table();
 
             table.AddColumn("Package Name");
@@ -58,8 +59,8 @@ namespace PackCheck.Commands
                 table.AddRow(
                     p.PackageName,
                     p.CurrentVersion.ToString(),
-                    p.LatestStableVersion?.ToString() ?? "k.A.",
-                    p.LatestVersion?.ToString() ?? "k.A."
+                    service.HighlightLatestStableVersion(p),
+                    service.HighlightLatestVersion(p)
                 );
             }
 
@@ -77,7 +78,7 @@ namespace PackCheck.Commands
             AnsiConsole.MarkupLine(
                 "[dim]INFO:[/] Run [blue]pack-check -u -p <Package Name>[/] to update only the specified package to the latest stable version.");
             AnsiConsole.MarkupLine(
-                "[dim]INFO:[/] Run [blue]pack-check -u --pre -p <Package Name>[/] to update only the specified package to the latest version.");
+                "[dim]INFO:[/] Run [blue]pack-check -u -p <Package Name> --pre[/] to update only the specified package to the latest version.");
             Console.WriteLine();
         }
     }
