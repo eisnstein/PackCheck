@@ -31,28 +31,76 @@ namespace PackCheck.Services
                 : HighlightVersion(p.CurrentVersion, p.LatestVersion);
         }
 
-        private string HighlightVersion(NuGetVersion current, NuGetVersion other)
+        private string HighlightVersion(NuGetVersion current, NuGetVersion newer)
         {
+            // If the newer major version is greater than the current major
+            // version we have a breaking change and can return all red.
+            if (newer.Major > current.Major)
+            {
+                return $"[red]{newer.ToString()}[/]";
+            }
+
             var highlightedVersion = new StringBuilder();
-            if (current.Major == other.Major)
+            highlightedVersion
+                .Append(newer.Major)
+                .Append('.');
+
+            // New features
+            if (newer.Minor > current.Minor)
             {
                 highlightedVersion
-                    .Append(other.Major)
-                    .Append('.');
+                    .Append("[lime]")
+                    .Append(newer.Minor)
+                    .Append('.')
+                    .Append(newer.Patch);
 
-                if (current.Minor == other.Minor)
+                if (newer.IsPrerelease)
                 {
                     highlightedVersion
-                        .Append(other.Minor)
-                        .Append('.')
-                        .Append("[green]")
-                        .Append(other.Patch)
-                        .Append("[/]");
+                        .Append('-')
+                        .Append(newer.Release);
                 }
+
+                highlightedVersion
+                    .Append("[/]");
+
+                return highlightedVersion.ToString();
             }
-            else
+
+            // Bug fixes
+            if (newer.Patch > current.Patch)
             {
-                return $"[red]{other.ToString()}[/]";
+                highlightedVersion
+                    .Append(newer.Minor)
+                    .Append('.')
+                    .Append("[green]")
+                    .Append(newer.Patch);
+
+                if (newer.IsPrerelease)
+                {
+                    highlightedVersion
+                        .Append('-')
+                        .Append(newer.Release);
+                }
+
+                highlightedVersion
+                    .Append("[/]");
+
+                return highlightedVersion.ToString();
+            }
+
+            highlightedVersion
+                .Append(newer.Minor)
+                .Append('.')
+                .Append(newer.Patch);
+
+            if (newer.IsPrerelease)
+            {
+                highlightedVersion
+                    .Append("[green]")
+                    .Append('-')
+                    .Append(newer.Release)
+                    .Append("[/]");
             }
 
             return highlightedVersion.ToString();

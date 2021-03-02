@@ -6,7 +6,7 @@ using Xunit;
 
 namespace PackCheck.Tests
 {
-    public class NuGetPackagesServiceTests
+    public class NuGetVersionServiceTests
     {
         [Fact]
         public void GetsLatestVersion()
