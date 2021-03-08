@@ -16,7 +16,7 @@ app.Configure(
 
         config.AddCommand<CheckCommand>("check")
             .WithDescription("Check for newer versions.")
-            .WithExample(new[] { "check", "--path", ".\\examples\\csproj.xml" });
+            .WithExample(new[] { "check", "--csprojFile", ".\\examples\\csproj.xml" });
     });
 
 return await app.RunAsync(args);

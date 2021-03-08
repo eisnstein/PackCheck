@@ -79,7 +79,7 @@ namespace PackCheck.Services
                 })
                 .StartAsync(async ctx =>
                 {
-                    var task = ctx.AddTask("Fetching data");
+                    var task = ctx.AddTask(">");
                     var incrementBy = 100d / packages.Count;
 
                     while (!ctx.IsFinished)
