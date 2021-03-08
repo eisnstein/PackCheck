@@ -1,4 +1,3 @@
-using System;
 using System.IO;
 using PackCheck.Exceptions;
 
@@ -21,7 +20,7 @@ namespace PackCheck.Services
                     );
                 }
 
-                return pathToCsProjFile;
+                return fullPath;
             }
 
             // No path was provided, we try to find a .csproj file
@@ -32,7 +31,7 @@ namespace PackCheck.Services
                 0 => throw new CsProjFileNotFoundException(
                     $"Could not find a .csproj file in the current directory [white]{cwd}[/]"
                 ),
-                _ => files[0]
+                _ => Path.Combine(cwd, files[0])
             };
         }
     }
