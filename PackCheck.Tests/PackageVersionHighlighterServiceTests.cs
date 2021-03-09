@@ -62,8 +62,8 @@ namespace PackCheck.Tests
             var highlightedStableVersion = service.HighlightLatestStableVersion(package);
             var highlightedVersion = service.HighlightLatestVersion(package);
 
-            Assert.Equal("1.[lime]1.0[/]", highlightedStableVersion);
-            Assert.Equal("1.[lime]1.0[/]", highlightedVersion);
+            Assert.Equal("1.[yellow]1.0[/]", highlightedStableVersion);
+            Assert.Equal("1.[yellow]1.0[/]", highlightedVersion);
         }
 
         [Fact]
