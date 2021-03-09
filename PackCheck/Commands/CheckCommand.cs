@@ -81,11 +81,11 @@ namespace PackCheck.Commands
             AnsiConsole.MarkupLine(
                 "[dim]INFO:[/] Run [blue]pack-check -u[/] to upgrade the .csproj file with the latest stable versions.");
             AnsiConsole.MarkupLine(
-                "[dim]INFO:[/] Run [blue]pack-check -u --target latest[/] to upgrade the .csproj file with the latest versions.");
+                "[dim]INFO:[/] Run [blue]pack-check -u --version latest[/] to upgrade the .csproj file with the latest versions.");
             AnsiConsole.MarkupLine(
                 "[dim]INFO:[/] Run [blue]pack-check <Package Name> -u[/] to upgrade only the specified package to the latest stable version.");
             AnsiConsole.MarkupLine(
-                "[dim]INFO:[/] Run [blue]pack-check <Package Name> -u --target latest[/] to upgrade only the specified package to the latest version.");
+                "[dim]INFO:[/] Run [blue]pack-check <Package Name> -u --version latest[/] to upgrade only the specified package to the latest version.");
             Console.WriteLine();
         }
     }

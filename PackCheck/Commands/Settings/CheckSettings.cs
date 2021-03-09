@@ -15,13 +15,13 @@ namespace PackCheck.Commands.Settings
         [Description(@"Path to *.csproj file. (default .\*.csproj)")]
         public string? PathToCsProjFile { get; set; }
 
-        [CommandOption("--target <target_version>")]
+        [CommandOption("--version <target_version>")]
         [Description("Upgrade version number to latest stable version (stable) or latest version (latest)")]
         [ValidateTargetVersion]
-        public string Target { get; set; } = "stable";
+        public string Version { get; set; } = "stable";
 
         [CommandOption("-u|--upgrade")]
-        [Description("Upgrade all version numbers in your *.csproj file")]
+        [Description("Upgrade version numbers in the *.csproj file")]
         public bool Upgrade { get; set; } = false;
     }
 }

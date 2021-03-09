@@ -45,11 +45,10 @@ namespace PackCheck.Services
                 .Append(newer.Major)
                 .Append('.');
 
-            // New features
             if (newer.Minor > current.Minor)
             {
                 highlightedVersion
-                    .Append("[lime]")
+                    .Append("[yellow]")
                     .Append(newer.Minor)
                     .Append('.')
                     .Append(newer.Patch);
@@ -67,7 +66,6 @@ namespace PackCheck.Services
                 return highlightedVersion.ToString();
             }
 
-            // Bug fixes
             if (newer.Patch > current.Patch)
             {
                 highlightedVersion
