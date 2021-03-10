@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Collections.Generic;
@@ -80,17 +81,24 @@ namespace PackCheck.Services
                 .StartAsync(async ctx =>
                 {
                     var task = ctx.AddTask(">");
-                    var incrementBy = 100d / packages.Count;
 
                     while (!ctx.IsFinished)
                     {
-                        await FetchPackagesData(task, incrementBy, packages);
+                        await FetchPackagesData(task, packages);
                     }
                 });
         }
 
-        private async Task FetchPackagesData(ProgressTask task, double incrementBy, List<Package> packages)
+        private async Task FetchPackagesData(ProgressTask task, List<Package> packages)
         {
+            // Number of concurrent requests
+            // TODO: make variable via settings
+            var numberConcurrentRequests = 4;
+            // Number of total runs needed to make all requests
+            var numberRunsTotal = Math.Ceiling((double)packages.Count / numberConcurrentRequests);
+            // Number to increment progress bar = 100% / number of runs
+            var incrementBy = 100d / numberRunsTotal;
+
             ILogger logger = NullLogger.Instance;
             CancellationToken cancellationToken = CancellationToken.None;
 
@@ -98,18 +106,28 @@ namespace PackCheck.Services
             SourceRepository repository = Repository.Factory.GetCoreV3("https://api.nuget.org/v3/index.json");
             FindPackageByIdResource resource = await repository.GetResourceAsync<FindPackageByIdResource>();
 
-            foreach (Package p in packages)
+            for (var i = 0; i < numberRunsTotal; i++)
             {
-                var versions = await resource.GetAllVersionsAsync(p.PackageName, cache, logger, cancellationToken);
+                // Only take "number of allowed concurrent requests" packages at a time
+                var currentRunPackages = packages
+                    .Skip(i * numberConcurrentRequests)
+                    .Take(numberConcurrentRequests)
+                    .Select(p => p);
 
-                if (versions is null || !versions.Any())
+                var tasks = currentRunPackages
+                    .Select(p => resource.GetAllVersionsAsync(p.PackageName, cache, logger, cancellationToken));
+
+                await Task.WhenAll(tasks);
+
+                foreach (var (p, index) in currentRunPackages.Select((item, index) => (item, index)))
                 {
-                    task.Increment(incrementBy);
-                    continue;
+                    var versions = tasks.ElementAt(index).Result;
+                    if (versions.Any())
+                    {
+                        p.LatestStableVersion = _nuGetVersionService.GetLatestStableVersion(p, versions);
+                        p.LatestVersion = _nuGetVersionService.GetLatestVersion(p, versions);
+                    }
                 }
-
-                p.LatestStableVersion = _nuGetVersionService.GetLatestStableVersion(p, versions);
-                p.LatestVersion = _nuGetVersionService.GetLatestVersion(p, versions);
 
                 task.Increment(incrementBy);
             }
