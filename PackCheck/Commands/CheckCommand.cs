@@ -39,14 +39,7 @@ namespace PackCheck.Commands
             await _nuGetPackagesService.GetPackagesDataFromCsProjFile(_pathToCsProjFile, _packages);
             await _nuGetPackagesService.GetPackagesDataFromNugetRepository(_pathToCsProjFile, _packages);
 
-            if (!settings.Upgrade)
-            {
-                PrintResult();
-            }
-            else
-            {
-                AnsiConsole.Markup("upgrade");
-            }
+            PrintResult();
 
             return await Task.FromResult(0);
         }
@@ -79,13 +72,13 @@ namespace PackCheck.Commands
 
             Console.WriteLine();
             AnsiConsole.MarkupLine(
-                "[dim]INFO:[/] Run [blue]pack-check -u[/] to upgrade the .csproj file with the latest stable versions.");
+                "[dim]INFO:[/] Run [blue]pack-check upgrade[/] to upgrade the .csproj file with the latest stable versions.");
             AnsiConsole.MarkupLine(
-                "[dim]INFO:[/] Run [blue]pack-check -u --version latest[/] to upgrade the .csproj file with the latest versions.");
+                "[dim]INFO:[/] Run [blue]pack-check upgrade --version latest[/] to upgrade the .csproj file with the latest versions.");
             AnsiConsole.MarkupLine(
-                "[dim]INFO:[/] Run [blue]pack-check <Package Name> -u[/] to upgrade only the specified package to the latest stable version.");
+                "[dim]INFO:[/] Run [blue]pack-check upgrade <Package Name>[/] to upgrade only the specified package to the latest stable version.");
             AnsiConsole.MarkupLine(
-                "[dim]INFO:[/] Run [blue]pack-check <Package Name> -u --version latest[/] to upgrade only the specified package to the latest version.");
+                "[dim]INFO:[/] Run [blue]pack-check upgrade <Package Name> --version latest[/] to upgrade only the specified package to the latest version.");
             Console.WriteLine();
         }
     }

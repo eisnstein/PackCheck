@@ -9,7 +9,6 @@ using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
 using PackCheck.Data;
-using PackCheck.Utils;
 using Spectre.Console;
 
 namespace PackCheck.Services
@@ -17,12 +16,10 @@ namespace PackCheck.Services
     public class NuGetPackagesService
     {
         private readonly NuGetVersionService _nuGetVersionService;
-        private readonly Cache _cache;
 
         public NuGetPackagesService(NuGetVersionService nuGetVersionService)
         {
             _nuGetVersionService = nuGetVersionService;
-            _cache = new Cache();
         }
 
         public async Task GetPackagesDataFromCsProjFile(string pathToCsProjFile, List<Package> packages)
@@ -111,8 +108,7 @@ namespace PackCheck.Services
                 // Only take "number of allowed concurrent requests" packages at a time
                 var currentRunPackages = packages
                     .Skip(i * numberConcurrentRequests)
-                    .Take(numberConcurrentRequests)
-                    .Select(p => p);
+                    .Take(numberConcurrentRequests);
 
                 var tasks = currentRunPackages
                     .Select(p => resource.GetAllVersionsAsync(p.PackageName, cache, logger, cancellationToken));
