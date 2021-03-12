@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using PackCheck.Commands.Settings;
@@ -35,8 +36,16 @@ namespace PackCheck.Commands
                 return await Task.FromResult(-1);
             }
 
-            await _nuGetPackagesService.GetPackagesDataFromCsProjFile(_pathToCsProjFile, _packages);
-            await _nuGetPackagesService.GetPackagesDataFromNugetRepository(_pathToCsProjFile, _packages);
+            Console.WriteLine($"Package name: {settings.PackageToUpgrade}");
+            AnsiConsole.MarkupLine($"Upgrading to [silver]{settings.Version}[/] versions in [silver]{_pathToCsProjFile}[/]");
+
+            await _nuGetPackagesService.GetPackagesDataFromCsProjFileAsync(_pathToCsProjFile, _packages);
+            await _nuGetPackagesService.GetPackagesDataFromNugetRepositoryAsync(_pathToCsProjFile, _packages);
+            await _csProjFileService.UpgradePackageVersionsAsync(_pathToCsProjFile, _packages, settings.Version);
+
+            AnsiConsole.MarkupLine(
+                "[dim]INFO:[/] Run [blue]dotnet restore[/] to upgrade packages.");
+            Console.WriteLine();
 
             return await Task.FromResult(0);
         }

@@ -22,7 +22,7 @@ namespace PackCheck.Services
             _nuGetVersionService = nuGetVersionService;
         }
 
-        public async Task GetPackagesDataFromCsProjFile(string pathToCsProjFile, List<Package> packages)
+        public async Task GetPackagesDataFromCsProjFileAsync(string pathToCsProjFile, List<Package> packages)
         {
             var settings = new XmlReaderSettings { Async = true };
             XmlReader reader = XmlReader.Create(pathToCsProjFile, settings);
@@ -62,11 +62,12 @@ namespace PackCheck.Services
 
                 packages.Add(new Package(packageName, NuGetVersion.Parse(currentVersion)));
             }
+
+            reader.Close();
         }
 
-        public async Task GetPackagesDataFromNugetRepository(string pathToCsProjFile, List<Package> packages)
+        public async Task GetPackagesDataFromNugetRepositoryAsync(string pathToCsProjFile, List<Package> packages)
         {
-            AnsiConsole.MarkupLine($"Checking newest versions for [silver]{pathToCsProjFile}[/]");
 
             await AnsiConsole.Progress()
                 .Columns(new ProgressColumn[]
@@ -81,12 +82,12 @@ namespace PackCheck.Services
 
                     while (!ctx.IsFinished)
                     {
-                        await FetchPackagesData(task, packages);
+                        await FetchPackagesDataAsync(task, packages);
                     }
                 });
         }
 
-        private async Task FetchPackagesData(ProgressTask task, List<Package> packages)
+        private async Task FetchPackagesDataAsync(ProgressTask task, List<Package> packages)
         {
             // Number of concurrent requests
             // TODO: make variable via settings

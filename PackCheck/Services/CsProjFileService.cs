@@ -1,4 +1,12 @@
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Xml;
+using System.Xml.Linq;
+using PackCheck.Data;
 using PackCheck.Exceptions;
 
 namespace PackCheck.Services
@@ -33,6 +41,42 @@ namespace PackCheck.Services
                 ),
                 _ => Path.Combine(cwd, files[0])
             };
+        }
+
+        public async Task UpgradePackageVersionsAsync(string pathToCsProjFile, List<Package> packages, string target)
+        {
+            XmlReaderSettings settings = new XmlReaderSettings { Async = true };
+            XmlReader reader = XmlReader.Create(pathToCsProjFile, settings);
+
+            XElement csProjFile = await XElement.LoadAsync(
+                reader, LoadOptions.PreserveWhitespace, CancellationToken.None
+            );
+
+            reader.Close();
+
+            IEnumerable<XElement> items = csProjFile
+                .Descendants("PackageReference")
+                .Select(el => el);
+
+            foreach (var item in items)
+            {
+                var packageName = item.Attribute("Include")?.Value;
+                if (!string.IsNullOrEmpty(packageName))
+                {
+                    var package = packages.Single(p => p.PackageName == packageName);
+                    if (item.Attribute("Version") is not null)
+                    {
+                        item.SetAttributeValue("Version", package.LatestVersion);
+                    }
+                }
+            }
+
+            XmlWriterSettings wSettings = new XmlWriterSettings { Async = true, OmitXmlDeclaration = true };
+            XmlWriter writer = XmlWriter.Create(pathToCsProjFile, wSettings);
+
+            await csProjFile.SaveAsync(writer, CancellationToken.None);
+            await writer.FlushAsync();
+            writer.Close();
         }
     }
 }
