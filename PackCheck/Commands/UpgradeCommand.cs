@@ -41,10 +41,14 @@ namespace PackCheck.Commands
 
             await _nuGetPackagesService.GetPackagesDataFromCsProjFileAsync(_pathToCsProjFile, _packages);
             await _nuGetPackagesService.GetPackagesDataFromNugetRepositoryAsync(_pathToCsProjFile, _packages);
-            await _csProjFileService.UpgradePackageVersionsAsync(_pathToCsProjFile, _packages, settings.Version);
+            await _csProjFileService.UpgradePackageVersionsAsync(_pathToCsProjFile, _packages, settings.Version, settings.DryRun);
 
-            AnsiConsole.MarkupLine(
-                "[dim]INFO:[/] Run [blue]dotnet restore[/] to upgrade packages.");
+            if (!settings.DryRun)
+            {
+                AnsiConsole.MarkupLine(
+                    "[dim]INFO:[/] Run [blue]dotnet restore[/] to upgrade packages.");
+            }
+
             Console.WriteLine();
 
             return await Task.FromResult(0);

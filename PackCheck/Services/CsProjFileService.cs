@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Threading;
@@ -43,7 +44,7 @@ namespace PackCheck.Services
             };
         }
 
-        public async Task UpgradePackageVersionsAsync(string pathToCsProjFile, List<Package> packages, string target)
+        public async Task UpgradePackageVersionsAsync(string pathToCsProjFile, List<Package> packages, string target, bool dryRun)
         {
             XmlReaderSettings settings = new XmlReaderSettings { Async = true };
             XmlReader reader = XmlReader.Create(pathToCsProjFile, settings);
@@ -66,9 +67,22 @@ namespace PackCheck.Services
                     var package = packages.Single(p => p.PackageName == packageName);
                     if (item.Attribute("Version") is not null)
                     {
-                        item.SetAttributeValue("Version", package.LatestVersion);
+                        var version = target switch
+                        {
+                            "stable" => package.LatestStableVersion,
+                            "latest" => package.LatestVersion,
+                            _ => throw new ArgumentException(nameof(target))
+                        };
+
+                        item.SetAttributeValue("Version", version);
                     }
                 }
+            }
+
+            if (dryRun)
+            {
+                Console.WriteLine(csProjFile);
+                return;
             }
 
             XmlWriterSettings wSettings = new XmlWriterSettings { Async = true, OmitXmlDeclaration = true };

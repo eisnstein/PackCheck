@@ -20,7 +20,9 @@ app.Configure(
 
         config.AddCommand<UpgradeCommand>("upgrade")
             .WithDescription("Upgrade the *.csproj file")
+            .WithExample(new[] { "upgrade" })
             .WithExample(new[] { "upgrade", "Microsoft.Extensions.Logging", "--version", "latest"});
     });
 
-return await app.RunAsync(args);
+return await app.RunAsync(args)
+    .ConfigureAwait(false);
