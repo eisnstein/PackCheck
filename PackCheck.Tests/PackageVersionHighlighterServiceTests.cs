@@ -22,6 +22,21 @@ namespace PackCheck.Tests
         }
 
         [Fact]
+        public void HighlightsGreenWhenOlderVersionIsPrelease()
+        {
+            var service = new PackageVersionHighlighterService();
+            var package = new Package("test.package", new("5.0.0-rc.2.20475.5"));
+            package.LatestStableVersion = new("5.0.0");
+            package.LatestVersion = new("6.0.0-preview.2.21154.6");
+
+            var highlightedStableVersion = service.HighlightLatestStableVersion(package);
+            var highlightedLatestVersion = service.HighlightLatestVersion(package);
+
+            Assert.Equal("[green]5.0.0[/]", highlightedStableVersion);
+            Assert.Equal("[red]6.0.0-preview.2.21154.6[/]", highlightedLatestVersion);
+        }
+
+        [Fact]
         public void HighlightsThePatchPart()
         {
             var service = new PackageVersionHighlighterService();

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using NuGet.Versioning;
@@ -9,11 +10,7 @@ namespace PackCheck.Services
     {
         public NuGetVersion GetLatestStableVersion(Package package, IEnumerable<NuGetVersion> versions)
         {
-            var majorVersions = versions
-                .Where(v => v.Major == package.CurrentVersion.Major)
-                .Where(v => v.IsPrerelease == false);
-
-            return majorVersions.Last();
+            return versions.Last(v => v.IsPrerelease == false);
         }
 
         public NuGetVersion GetLatestVersion(Package package, IEnumerable<NuGetVersion> versions)

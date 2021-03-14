@@ -100,6 +100,12 @@ namespace PackCheck.Services
                     .Append(newer.Release)
                     .Append("[/]");
             }
+            else if (current.IsPrerelease)
+            {
+                highlightedVersion
+                    .Insert(0, "[green]")
+                    .Append("[/]");
+            }
 
             return highlightedVersion.ToString();
         }

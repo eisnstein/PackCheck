@@ -36,7 +36,7 @@ namespace PackCheck.Commands
                 return await Task.FromResult(-1);
             }
 
-            AnsiConsole.MarkupLine($"Checking newest versions for [silver]{_pathToCsProjFile}[/]");
+            AnsiConsole.MarkupLine($"Checking versions for [silver]{_pathToCsProjFile}[/]");
 
             await _nuGetPackagesService.GetPackagesDataFromCsProjFileAsync(_pathToCsProjFile, _packages);
             await _nuGetPackagesService.GetPackagesDataFromNugetRepositoryAsync(_pathToCsProjFile, _packages);

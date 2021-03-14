@@ -89,5 +89,32 @@ namespace PackCheck.Tests
             Assert.Equal("2.2.0", latestVersion1.ToString());
             Assert.Equal("1.1.1", latestVersion2.ToString());
         }
+
+        [Fact]
+        public void GetsLatestStableVersionWhenPackageOnLatestPreleaseVersion()
+        {
+            var service = new NuGetVersionService();
+            var versions = new List<NuGetVersion>
+            {
+                new NuGetVersion("1.0.0"),
+                new NuGetVersion("1.1.0"),
+                new NuGetVersion("1.1.1"),
+                new NuGetVersion("1.1.1-preview.1.21102.12"),
+                new NuGetVersion("2.0.0"),
+                new NuGetVersion("2.1.9-preview.2"),
+                new NuGetVersion("2.1.9-rc.1.2334.2"),
+                new NuGetVersion("2.1.9"),
+                new NuGetVersion("2.2.0"),
+                new NuGetVersion("3.0.1"),
+                new NuGetVersion("4.0.1"),
+                new NuGetVersion("4.0.2"),
+                new NuGetVersion("5.0.0-preview.1"),
+            };
+            var package1 = new Package("some.package.name", new NuGetVersion("5.0.0-preview.1"));
+
+            var latestStableVersion1 = service.GetLatestStableVersion(package1, versions);
+
+            Assert.Equal("4.0.2", latestStableVersion1.ToString());
+        }
     }
 }
