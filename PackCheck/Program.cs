@@ -8,6 +8,7 @@ app.SetDefaultCommand<CheckCommand>();
 app.Configure(
     config =>
     {
+        config.SetApplicationName("packcheck");
         config.ValidateExamples();
 
         config.AddCommand<CheckCommand>("check")

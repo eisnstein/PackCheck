@@ -1,7 +1,5 @@
-using System;
 using System.ComponentModel;
 using PackCheck.Commands.Validation;
-using PackCheck.Data;
 using Spectre.Console.Cli;
 
 namespace PackCheck.Commands.Settings
@@ -10,7 +8,6 @@ namespace PackCheck.Commands.Settings
     {
         [CommandArgument(0, "[package_name]")]
         [Description("Name of package to upgrade")]
-        //[ValidatePackageName]
         public string? PackageToUpgrade { get; set; }
 
         [CommandOption("--csprojFile <path>")]
