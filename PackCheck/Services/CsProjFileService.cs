@@ -7,6 +7,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
+using PackCheck.Commands.Settings;
 using PackCheck.Data;
 using PackCheck.Exceptions;
 
@@ -44,10 +45,10 @@ namespace PackCheck.Services
             };
         }
 
-        public async Task UpgradePackageVersionsAsync(string pathToCsProjFile, List<Package> packages, string target, bool dryRun)
+        public async Task UpgradePackageVersionsAsync(string pathToCsProjFile, List<Package> packages, UpgradeSettings settings)
         {
-            XmlReaderSettings settings = new XmlReaderSettings { Async = true };
-            XmlReader reader = XmlReader.Create(pathToCsProjFile, settings);
+            XmlReaderSettings readerSettings = new XmlReaderSettings { Async = true };
+            XmlReader reader = XmlReader.Create(pathToCsProjFile, readerSettings);
 
             XElement csProjFile = await XElement.LoadAsync(
                 reader, LoadOptions.PreserveWhitespace, CancellationToken.None
@@ -64,14 +65,14 @@ namespace PackCheck.Services
                 var packageName = item.Attribute("Include")?.Value;
                 if (!string.IsNullOrEmpty(packageName))
                 {
-                    var package = packages.Single(p => p.PackageName == packageName);
-                    if (item.Attribute("Version") is not null)
+                    var package = packages.SingleOrDefault(p => p.PackageName == packageName);
+                    if (item.Attribute("Version") is not null && package is not null)
                     {
-                        var version = target switch
+                        var version = settings.Version switch
                         {
                             "stable" => package.LatestStableVersion,
                             "latest" => package.LatestVersion,
-                            _ => throw new ArgumentException(nameof(target))
+                            _ => throw new ArgumentException(nameof(settings.Version))
                         };
 
                         item.SetAttributeValue("Version", version);
@@ -79,7 +80,7 @@ namespace PackCheck.Services
                 }
             }
 
-            if (dryRun)
+            if (settings.DryRun)
             {
                 Console.WriteLine(csProjFile);
                 return;

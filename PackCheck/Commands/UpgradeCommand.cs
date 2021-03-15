@@ -36,12 +36,19 @@ namespace PackCheck.Commands
                 return await Task.FromResult(-1);
             }
 
-            Console.WriteLine($"Package name: {settings.PackageToUpgrade}");
             AnsiConsole.MarkupLine($"Upgrading to [silver]{settings.Version}[/] versions in [silver]{_pathToCsProjFile}[/]");
 
             await _nuGetPackagesService.GetPackagesDataFromCsProjFileAsync(_pathToCsProjFile, _packages);
+
+            // If only a specific package should be upgraded,
+            // ignore all the others
+            if (!string.IsNullOrEmpty(settings.PackageToUpgrade))
+            {
+                _packages.RemoveAll(p => p.PackageName != settings.PackageToUpgrade);
+            }
+
             await _nuGetPackagesService.GetPackagesDataFromNugetRepositoryAsync(_pathToCsProjFile, _packages);
-            await _csProjFileService.UpgradePackageVersionsAsync(_pathToCsProjFile, _packages, settings.Version, settings.DryRun);
+            await _csProjFileService.UpgradePackageVersionsAsync(_pathToCsProjFile, _packages, settings);
 
             if (!settings.DryRun)
             {
