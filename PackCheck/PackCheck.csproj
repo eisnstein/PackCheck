@@ -1,12 +1,27 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <Authors>Daniel Höflehner</Authors>
+  
+  <PropertyGroup Label="Settings">
+    <LangVersion>9.0</LangVersion>
     <Nullable>enable</Nullable>
     <OutputType>Exe</OutputType>
+    <PackAsTool>true</PackAsTool>
+    <PackageOutputPath>./nupkg</PackageOutputPath>
     <RootNamespace>PackCheck</RootNamespace>
     <TargetFramework>net5.0</TargetFramework>
+    <ToolCommandName>packcheck</ToolCommandName>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Package Information">
+    <Authors>Daniel Höflehner</Authors>
+    <Copyright>Copyright © 2021 Daniel Höflehner</Copyright>
+    <Description>Check for newer versions of installed NuGet Packages in your Terminal.</Description>
+    <PackageId>PackCheck</PackageId>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageVersion>0.0.1-alpha.1</PackageVersion>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/eisnstein/PackCheck</RepositoryUrl>
+    <PackageTags>tool package version update</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,6 +29,10 @@
     <PackageReference Include="NuGet.Versioning" Version="5.8.1" />
     <PackageReference Include="Spectre.Cli.Extensions.DependencyInjection" Version="0.3.0" />
     <PackageReference Include="Spectre.Console" Version="0.37.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="nupkg" />
   </ItemGroup>
 
 </Project>
