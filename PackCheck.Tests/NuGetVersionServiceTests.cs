@@ -83,11 +83,15 @@ namespace PackCheck.Tests
             var package1 = new Package("some.package.name", new NuGetVersion("2.1.9"));
             var package2 = new Package("some.package.name", new NuGetVersion("1.0.0"));
 
-            var latestVersion1 = service.GetLatestStableVersion(package1, versions);
-            var latestVersion2 = service.GetLatestStableVersion(package2, versions);
+            var stableVersion1 = service.GetLatestStableVersion(package1, versions);
+            var latestVersion1 = service.GetLatestVersion(package1, versions);
+            var stableVersion2 = service.GetLatestStableVersion(package2, versions);
+            var latestVersion2 = service.GetLatestVersion(package2, versions);
 
-            Assert.Equal("2.2.0", latestVersion1.ToString());
-            Assert.Equal("1.1.1", latestVersion2.ToString());
+            Assert.Equal("4.0.2", stableVersion1.ToString());
+            Assert.Equal("4.0.2", latestVersion1.ToString());
+            Assert.Equal("4.0.2", stableVersion2.ToString());
+            Assert.Equal("4.0.2", latestVersion2.ToString());
         }
 
         [Fact]

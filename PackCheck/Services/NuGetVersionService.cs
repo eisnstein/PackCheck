@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using NuGet.Versioning;
@@ -10,7 +9,10 @@ namespace PackCheck.Services
     {
         public NuGetVersion GetLatestStableVersion(Package package, IEnumerable<NuGetVersion> versions)
         {
-            return versions.Last(v => v.IsPrerelease == false);
+            // ReSharper disable once ReplaceWithSingleCallToLast
+            return versions
+                .Where(v => v.IsPrerelease == false)
+                .Last();
         }
 
         public NuGetVersion GetLatestVersion(Package package, IEnumerable<NuGetVersion> versions)

@@ -1,11 +1,7 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using PackCheck.Commands;
+﻿using PackCheck.Commands;
 using Spectre.Console.Cli;
-using Spectre.Cli.Extensions.DependencyInjection;
 
-var serviceCollection = new ServiceCollection();
-using var registrar = new DependencyInjectionRegistrar(serviceCollection);
-var app = new CommandApp(registrar);
+var app = new CommandApp();
 
 app.SetDefaultCommand<CheckCommand>();
 
