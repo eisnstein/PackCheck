@@ -1,5 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  
+
   <PropertyGroup Label="Settings">
     <LangVersion>9.0</LangVersion>
     <Nullable>enable</Nullable>
@@ -16,9 +16,10 @@
     <Authors>Daniel Höflehner</Authors>
     <Copyright>Copyright © 2021 Daniel Höflehner</Copyright>
     <Description>Check for newer versions of installed NuGet Packages in your Terminal.</Description>
+    <PackageIcon>icon.png</PackageIcon>
     <PackageId>PackCheck</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageVersion>0.0.1-alpha.1</PackageVersion>
+    <PackageVersion>0.0.1-alpha.2</PackageVersion>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/eisnstein/PackCheck</RepositoryUrl>
     <PackageTags>tool package version update</PackageTags>
@@ -33,6 +34,7 @@
 
   <ItemGroup>
     <Folder Include="nupkg" />
+    <None Include="Assets\icon.png" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>
