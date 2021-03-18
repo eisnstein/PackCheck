@@ -19,17 +19,17 @@
     <PackageIcon>icon.png</PackageIcon>
     <PackageId>PackCheck</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageVersion>0.0.1-alpha.3</PackageVersion>
+    <PackageVersion>0.0.1-alpha.4</PackageVersion>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/eisnstein/PackCheck</RepositoryUrl>
     <PackageTags>tool package version update</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NuGet.Protocol" Version="5.8.1" />
-    <PackageReference Include="NuGet.Versioning" Version="5.8.1" />
-    <PackageReference Include="Spectre.Cli.Extensions.DependencyInjection" Version="0.3.0" />
-    <PackageReference Include="Spectre.Console" Version="0.37.0" />
+    <PackageReference Include="NuGet.Protocol" Version="5.9.0" />
+    <PackageReference Include="NuGet.Versioning" Version="5.9.0" />
+    <PackageReference Include="Spectre.Cli.Extensions.DependencyInjection" Version="0.4.0" />
+    <PackageReference Include="Spectre.Console" Version="0.38.0" />
   </ItemGroup>
 
   <ItemGroup>
