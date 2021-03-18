@@ -40,6 +40,12 @@ namespace PackCheck.Commands
 
             await _nuGetPackagesService.GetPackagesDataFromCsProjFileAsync(_pathToCsProjFile, _packages);
 
+            if (_packages.Count == 0)
+            {
+                AnsiConsole.MarkupLine($"Could not find any packages in [silver]{_pathToCsProjFile}[/]");
+                return await Task.FromResult(0);
+            }
+
             // If only a specific package should be upgraded,
             // ignore all the others
             if (!string.IsNullOrEmpty(settings.PackageToUpgrade))

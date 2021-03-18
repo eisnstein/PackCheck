@@ -39,6 +39,13 @@ namespace PackCheck.Commands
             AnsiConsole.MarkupLine($"Checking versions for [silver]{_pathToCsProjFile}[/]");
 
             await _nuGetPackagesService.GetPackagesDataFromCsProjFileAsync(_pathToCsProjFile, _packages);
+
+            if (_packages.Count == 0)
+            {
+                AnsiConsole.MarkupLine($"Could not find any packages in [silver]{_pathToCsProjFile}[/]");
+                return await Task.FromResult(0);
+            }
+
             await _nuGetPackagesService.GetPackagesDataFromNugetRepositoryAsync(_pathToCsProjFile, _packages);
 
             PrintResult();
