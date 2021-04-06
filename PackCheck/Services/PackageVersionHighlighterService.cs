@@ -33,9 +33,9 @@ namespace PackCheck.Services
 
         private string HighlightVersion(NuGetVersion current, NuGetVersion newer)
         {
-            // If the newer major version is greater than the current major
+            // If the newer major version is greater or lower than the current major
             // version we have a breaking change and can return all red.
-            if (newer.Major > current.Major)
+            if (newer.Major != current.Major)
             {
                 return $"[red]{newer.ToString()}[/]";
             }

@@ -95,5 +95,20 @@ namespace PackCheck.Tests
             Assert.Equal("[red]2.0.0[/]", highlightedStableVersion);
             Assert.Equal("[red]2.0.0[/]", highlightedLatestVersion);
         }
+
+        [Fact]
+        public void HighlightsTheMajorPartWhenCurrentVersionIsHigherThanStableVersion()
+        {
+            var service = new PackageVersionHighlighterService();
+            var package = new Package("test.package", new("6.0.0-preview.2.21154.6"));
+            package.LatestStableVersion = new("5.0.5");
+            package.LatestVersion = new("6.0.0-preview.2.21154.6");
+
+            var highlightedStableVersion = service.HighlightLatestStableVersion(package);
+            var highlightedLatestVersion = service.HighlightLatestVersion(package);
+
+            Assert.Equal("[red]5.0.5[/]", highlightedStableVersion);
+            Assert.Equal("6.0.0-preview.2.21154.6", highlightedLatestVersion);
+        }
     }
 }
