@@ -121,8 +121,8 @@ namespace PackCheck.Services
                     var versions = tasks.ElementAt(index).Result;
                     if (versions.Any())
                     {
-                        p.LatestStableVersion = _nuGetVersionService.GetLatestStableVersion(p, versions);
-                        p.LatestVersion = _nuGetVersionService.GetLatestVersion(p, versions);
+                        p.LatestStableVersion = _nuGetVersionService.GetLatestStableVersion(versions);
+                        p.LatestVersion = _nuGetVersionService.GetLatestVersion(versions);
                     }
                 }
 

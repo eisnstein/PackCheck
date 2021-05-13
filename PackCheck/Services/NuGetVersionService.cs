@@ -7,15 +7,15 @@ namespace PackCheck.Services
 {
     public class NuGetVersionService
     {
-        public NuGetVersion GetLatestStableVersion(Package package, IEnumerable<NuGetVersion> versions)
+        public NuGetVersion? GetLatestStableVersion(IEnumerable<NuGetVersion> versions)
         {
-            // ReSharper disable once ReplaceWithSingleCallToLast
+            // ReSharper disable once ReplaceWithSingleCallToLastOrDefault
             return versions
                 .Where(v => v.IsPrerelease == false)
-                .Last();
+                .LastOrDefault();
         }
 
-        public NuGetVersion GetLatestVersion(Package package, IEnumerable<NuGetVersion> versions)
+        public NuGetVersion GetLatestVersion(IEnumerable<NuGetVersion> versions)
         {
             return versions.Last();
         }

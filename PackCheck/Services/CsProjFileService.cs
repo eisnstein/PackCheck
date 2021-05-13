@@ -21,6 +21,8 @@ namespace PackCheck.Services
             // The user provided a path to the .csproj file
             if (!string.IsNullOrEmpty(pathToCsProjFile))
             {
+                // If pathToCsProjFile is already a full path, it will not
+                // be combined with the current directory.
                 var fullPath = Path.Combine(cwd, pathToCsProjFile);
                 if (!File.Exists(fullPath))
                 {

@@ -26,10 +26,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NuGet.Protocol" Version="5.9.0" />
-    <PackageReference Include="NuGet.Versioning" Version="5.9.0" />
+    <PackageReference Include="NuGet.Protocol" Version="5.9.1" />
+    <PackageReference Include="NuGet.Versioning" Version="5.9.1" />
     <PackageReference Include="Spectre.Cli.Extensions.DependencyInjection" Version="0.4.0" />
-    <PackageReference Include="Spectre.Console" Version="0.38.0" />
+    <PackageReference Include="Spectre.Console" Version="0.39.0" />
   </ItemGroup>
 
   <ItemGroup>
