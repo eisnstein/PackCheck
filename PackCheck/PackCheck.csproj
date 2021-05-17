@@ -19,9 +19,10 @@
     <PackageIcon>icon.png</PackageIcon>
     <PackageId>PackCheck</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageVersion>0.0.1-rc.1</PackageVersion>
+    <PackageVersion>0.0.1</PackageVersion>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/eisnstein/PackCheck</RepositoryUrl>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
     <PackageTags>tool package version update</PackageTags>
   </PropertyGroup>
 
@@ -35,6 +36,7 @@
   <ItemGroup>
     <Folder Include="nupkg" />
     <None Include="Assets\icon.png" Pack="true" PackagePath="\" />
+    <None Include="README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>
