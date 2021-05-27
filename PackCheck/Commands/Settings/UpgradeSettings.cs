@@ -14,13 +14,16 @@ namespace PackCheck.Commands.Settings
         [Description(@"Path to *.csproj file. (default .\*.csproj)")]
         public string? PathToCsProjFile { get; set; }
 
+#nullable disable
         [CommandOption("--version <target_version>")]
         [Description("Upgrade version number to latest stable version (stable) or latest version (latest)")]
+        [DefaultValue("stable")]
         [ValidateTargetVersion]
-        public string Version { get; set; } = "stable";
+        public string Version { get; set; }
+#nullable enable
 
         [CommandOption("--dry-run")]
         [Description("Only show the result without actually changing the .csproj file")]
-        public bool DryRun { get; set; } = false;
+        public bool DryRun { get; set; }
     }
 }
