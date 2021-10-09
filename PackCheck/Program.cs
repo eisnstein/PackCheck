@@ -18,7 +18,11 @@ app.Configure(
         config.AddCommand<UpgradeCommand>("upgrade")
             .WithDescription("Upgrade the *.csproj file")
             .WithExample(new[] { "upgrade" })
-            .WithExample(new[] { "upgrade", "Microsoft.Extensions.Logging", "--version", "latest"});
+            .WithExample(new[] { "upgrade", "--version", "stable" })
+            .WithExample(new[] { "upgrade", "--version", "latest" })
+            .WithExample(new[] { "upgrade", "Microsoft.Extensions.Logging", "--version", "stable" })
+            .WithExample(new[] { "upgrade", "Microsoft.Extensions.Logging", "--version", "latest" })
+            .WithExample(new[] { "upgrade", "--dry-run" });
     });
 
 return await app.RunAsync(args)

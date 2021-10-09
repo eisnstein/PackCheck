@@ -77,7 +77,7 @@ namespace PackCheck.Commands
             table.Columns[2].RightAligned();
             table.Columns[3].RightAligned();
 
-            AnsiConsole.Render(table);
+            AnsiConsole.Write(table);
 
             Console.WriteLine();
             AnsiConsole.MarkupLine(

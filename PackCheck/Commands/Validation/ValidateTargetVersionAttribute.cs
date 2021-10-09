@@ -1,27 +1,31 @@
+using System;
 using System.Linq;
 using Spectre.Console;
 using Spectre.Console.Cli;
 
 namespace PackCheck.Commands.Validation
 {
-    public class ValidateTargetVersionAttribute : ParameterValidationAttribute
+    [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
+    public sealed class ValidateTargetVersionAttribute : ParameterValidationAttribute
     {
         private static readonly string[] PossibleValues = { "stable", "latest" };
 
-#nullable disable
-        public ValidateTargetVersionAttribute() : base(errorMessage: null)
+        public ValidateTargetVersionAttribute(string errorMessage) : base(errorMessage)
         {
         }
-#nullable enable
 
-        public override ValidationResult Validate(ICommandParameterInfo info, object? value)
+        public override ValidationResult Validate(CommandParameterContext context)
         {
-            if (PossibleValues.Contains(value as string))
-            {
-                return ValidationResult.Success();
-            }
-
-            return ValidationResult.Error($"Value {value} for {info.PropertyName} is not valid. Valid values are: {string.Join(", ", PossibleValues)}");
+            return PossibleValues.Contains(context.Value as string)
+                ? ValidationResult.Success()
+                : ValidationResult.Error(
+                    string.Format(
+                        "Value '{0}' for {1} is not valid. Valid values are: {2}",
+                        context.Value,
+                        context.Parameter.PropertyName,
+                        string.Join(", ", PossibleValues)
+                    )
+                );
         }
     }
 }
