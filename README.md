@@ -12,7 +12,7 @@ Check for newer versions of installed NuGet Packages in your Terminal.
 PackCheck is a dotnet tool for checking versions of installed NuGet packages in your .NET projects in your terminal.
 The `check` command (default) shows you all NuGet packages in a nice table with the *current*, *latest stable* and *latest* versions of each package.
 You can upgrade the .csproj file with the `upgrade` command to your desired versions. Whether to the *latest stable* or *latest* version, only a specific
-package or all at once.      
+package or all at once.
 
 
 ## Installation
@@ -24,24 +24,37 @@ You can install PackCheck as a dotnet tool via NuGet:
 
 ## Usage
 
-In your terminal cd to a .NET project and:
+In your terminal `cd` into a .NET project which contains a _.csproj_ file and run:
 
 ```
 packcheck
 ```
 
+or
+
+```
+packcheck check
+```
+
+
 This should give you something like this:
 
 ![PackCheck check example](https://github.com/eisnstein/PackCheck/blob/main/PackCheck/Assets/packcheck-check.png)
 
-After that you can upgrade the package versions in the .csproj file by running:
+After that you can upgrade the package versions in the _.csproj_ file to their corresponding stable versions by running:
 > This changes your .csproj file!
 
 ```
 packcheck upgrade
 ```
 
-For a dry-run, which outputs the .csproj file into the terminal without actually changing the .csproj file, run:
+To upgrade to the latest versions run:
+
+```
+packcheck upgrade --version latest
+```
+
+For a dry-run, which outputs the _.csproj_ file into the terminal without actually changing the .csproj file, run:
 
 ```
 packcheck upgrade --dry-run
