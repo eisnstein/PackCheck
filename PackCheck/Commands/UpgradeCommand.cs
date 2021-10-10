@@ -26,6 +26,7 @@ namespace PackCheck.Commands
 
         public override async Task<int> ExecuteAsync(CommandContext context, UpgradeSettings settings)
         {
+            // Get the path to the *.csproj file
             try
             {
                 _pathToCsProjFile = _csProjFileService.GetPathToCsProjFile(settings.PathToCsProjFile);
@@ -38,8 +39,8 @@ namespace PackCheck.Commands
 
             AnsiConsole.MarkupLine($"Upgrading to [silver]{settings.Version}[/] versions in [silver]{_pathToCsProjFile}[/]");
 
+            // Check that packages are defined in the *.csproj file
             await _nuGetPackagesService.GetPackagesDataFromCsProjFileAsync(_pathToCsProjFile, _packages);
-
             if (_packages.Count == 0)
             {
                 AnsiConsole.MarkupLine($"Could not find any packages in [silver]{_pathToCsProjFile}[/]");
@@ -58,6 +59,11 @@ namespace PackCheck.Commands
 
             if (!settings.DryRun)
             {
+                if (settings.Interactive)
+                {
+                    Console.WriteLine();
+                }
+
                 AnsiConsole.MarkupLine(
                     "[dim]INFO:[/] Run [blue]dotnet restore[/] to upgrade packages.");
             }

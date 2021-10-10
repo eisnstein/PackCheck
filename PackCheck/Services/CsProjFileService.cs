@@ -6,9 +6,11 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
+using NuGet.Versioning;
 using PackCheck.Commands.Settings;
 using PackCheck.Data;
 using PackCheck.Exceptions;
+using Spectre.Console;
 
 namespace PackCheck.Services
 {
@@ -57,28 +59,74 @@ namespace PackCheck.Services
 
             reader.Close();
 
-            IEnumerable<XElement> items = csProjFile
+            // Find all <PackageReference .../> items
+            IEnumerable<XElement> packageReferences = csProjFile
                 .Descendants("PackageReference")
                 .Select(el => el);
 
-            foreach (var item in items)
+            foreach (var packageReference in packageReferences)
             {
-                var packageName = item.Attribute("Include")?.Value;
-                if (!string.IsNullOrEmpty(packageName))
+                // Get name of current package
+                var packageName = packageReference.Attribute("Include")?.Value;
+                if (string.IsNullOrEmpty(packageName))
                 {
-                    var package = packages.SingleOrDefault(p => p.PackageName == packageName);
-                    if (item.Attribute("Version") is not null && package is not null)
-                    {
-                        var version = settings.Version switch
-                        {
-                            "stable" => package.LatestStableVersion,
-                            "latest" => package.LatestVersion,
-                            _ => throw new ArgumentException(nameof(settings.Version))
-                        };
-
-                        item.SetAttributeValue("Version", version);
-                    }
+                    continue;
                 }
+
+                // Get version of current package
+                var currentVersionStr = packageReference.Attribute("Version")?.Value;
+                if (string.IsNullOrEmpty(currentVersionStr))
+                {
+                    continue;
+                }
+
+                // Find corresponding package information for the current package reference
+                var package = packages.SingleOrDefault(p => p.PackageName == packageName);
+                if (package is null)
+                {
+                    continue;
+                }
+
+                var currentVersion = NuGetVersion.Parse(currentVersionStr);
+
+                // Depending to which target version the user wants to upgrade,
+                // select the right package version
+                var newVersion = settings.Version switch
+                {
+                    "stable" => package.LatestStableVersion,
+                    "latest" => package.LatestVersion,
+                    _ => throw new ArgumentException(nameof(settings.Version))
+                };
+
+                // If the current version and new version are equal
+                // we dont need to proceed here
+                if (currentVersion == newVersion)
+                {
+                    continue;
+                }
+
+                // Interactive mode = User decides for each package
+                // if it should be upgraded
+                if (settings.Interactive)
+                {
+                    var question = string.Format(
+                        "Upgrade {0} from {1} -> {2}",
+                        packageName,
+                        currentVersion,
+                        newVersion
+                    );
+
+                    if (AnsiConsole.Confirm(question))
+                    {
+                        // Set the new package version
+                        packageReference.SetAttributeValue("Version", newVersion);
+                    }
+
+                    continue;
+                }
+
+                // Set the new package version
+                packageReference.SetAttributeValue("Version", newVersion);
             }
 
             if (settings.DryRun)

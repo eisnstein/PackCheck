@@ -98,6 +98,7 @@ namespace PackCheck.Tests
             Assert.NotNull(settings!.Version);
             Assert.Equal("latest", settings!.Version);
             Assert.False(settings!.DryRun);
+            Assert.False(settings!.Interactive);
         }
 
         [Fact]
@@ -127,6 +128,76 @@ namespace PackCheck.Tests
             Assert.NotNull(settings!.Version);
             Assert.Equal("latest", settings!.Version);
             Assert.True(settings!.DryRun);
+            Assert.False(settings!.Interactive);
+        }
+
+        [Fact]
+        public void InteractiveIsNotSet()
+        {
+            var app = new CommandAppTester();
+            app.Configure(config =>
+            {
+                config.PropagateExceptions();
+                config.AddCommand<UpgradeCommand>("upgrade");
+            });
+
+            CommandAppResult result = app.Run(new[]
+            {
+                "upgrade"
+            });
+
+            // No .csproj file is given or can be found, so we expect -1
+            Assert.Equal(-1, result.ExitCode);
+            Assert.NotNull(result.Settings);
+            Assert.IsType<UpgradeSettings>(result.Settings);
+            UpgradeSettings settings = result.Settings as UpgradeSettings;
+            Assert.False(settings!.Interactive);
+        }
+
+        [Fact]
+        public void InteractiveIsSetByShortCode()
+        {
+            var app = new CommandAppTester();
+            app.Configure(config =>
+            {
+                config.PropagateExceptions();
+                config.AddCommand<UpgradeCommand>("upgrade");
+            });
+
+            CommandAppResult result = app.Run(new[]
+            {
+                "upgrade", "-i"
+            });
+
+            // No .csproj file is given or can be found, so we expect -1
+            Assert.Equal(-1, result.ExitCode);
+            Assert.NotNull(result.Settings);
+            Assert.IsType<UpgradeSettings>(result.Settings);
+            UpgradeSettings settings = result.Settings as UpgradeSettings;
+            Assert.True(settings!.Interactive);
+        }
+
+        [Fact]
+        public void InteractiveIsSetByLongCode()
+        {
+            var app = new CommandAppTester();
+            app.Configure(config =>
+            {
+                config.PropagateExceptions();
+                config.AddCommand<UpgradeCommand>("upgrade");
+            });
+
+            CommandAppResult result = app.Run(new[]
+            {
+                "upgrade", "--interactive"
+            });
+
+            // No .csproj file is given or can be found, so we expect -1
+            Assert.Equal(-1, result.ExitCode);
+            Assert.NotNull(result.Settings);
+            Assert.IsType<UpgradeSettings>(result.Settings);
+            UpgradeSettings settings = result.Settings as UpgradeSettings;
+            Assert.True(settings!.Interactive);
         }
     }
 }
