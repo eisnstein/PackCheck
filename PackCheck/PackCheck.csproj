@@ -23,7 +23,7 @@
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/eisnstein/PackCheck</RepositoryUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
-    <PackageReleaseNotes>CHANGELOG.md</PackageReleaseNotes>
+    <PackageReleaseNotes>https://github.com/eisnstein/PackCheck/blob/main/CHANGELOG.md</PackageReleaseNotes>
     <PackageTags>tool package version update</PackageTags>
   </PropertyGroup>
 
