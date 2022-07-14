@@ -33,7 +33,7 @@ namespace PackCheck.Tests
         }
 
         [Fact]
-        public void GetsLatestVersionWhenLatestVersionIsPrelease()
+        public void GetsLatestVersionWhenLatestVersionIsPrerelease()
         {
             var service = new NuGetVersionService();
             var versions = new List<NuGetVersion>
@@ -92,7 +92,7 @@ namespace PackCheck.Tests
         }
 
         [Fact]
-        public void GetsLatestStableVersionWhenPackageOnLatestPreleaseVersion()
+        public void GetsLatestStableVersionWhenPackageOnLatestPrereleaseVersion()
         {
             var service = new NuGetVersionService();
             var versions = new List<NuGetVersion>

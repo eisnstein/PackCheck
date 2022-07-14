@@ -16,7 +16,7 @@ namespace PackCheck.Services
 {
     public class CsProjFileService
     {
-        public string GetPathToCsProjFile(string? pathToCsProjFile)
+        public string GetPathToCsProjFile(string? pathToCsProjFile = null)
         {
             var cwd = Directory.GetCurrentDirectory();
 
@@ -39,13 +39,14 @@ namespace PackCheck.Services
             // No path was provided, we try to find a .csproj file
             var files = Directory.GetFiles(cwd, "*.csproj");
 
-            return files.Length switch
+            if (files.Length == 0)
             {
-                0 => throw new CsProjFileNotFoundException(
+                throw new CsProjFileNotFoundException(
                     $"Could not find a .csproj file in the current directory [white]{cwd}[/]"
-                ),
-                _ => Path.Combine(cwd, files[0])
-            };
+                );
+            }
+
+            return Path.Combine(cwd, files[0]);
         }
 
         public async Task UpgradePackageVersionsAsync(string pathToCsProjFile, List<Package> packages, UpgradeSettings settings)
