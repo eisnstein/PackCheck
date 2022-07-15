@@ -95,9 +95,16 @@ namespace PackCheck.Services
                 var newVersion = settings.Version switch
                 {
                     "stable" => package.LatestStableVersion,
-                    "latest" => package.LatestVersion,
+                    "latest" => package.LatestVersion ?? package.LatestStableVersion,
                     _ => throw new ArgumentException(nameof(settings.Version))
                 };
+
+                // If no version is available
+                // we skip that package
+                if (newVersion is null)
+                {
+                    continue;
+                }
 
                 // If the current version and new version are equal
                 // we dont need to proceed here

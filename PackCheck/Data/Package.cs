@@ -4,8 +4,8 @@ namespace PackCheck.Data
 {
     public class Package
     {
-        public string PackageName { get; private init; }
-        public NuGetVersion CurrentVersion { get; private init; }
+        public string PackageName { get; }
+        public NuGetVersion CurrentVersion { get; }
         public NuGetVersion? LatestStableVersion { get; set; }
         public NuGetVersion? LatestVersion { get; set; }
 
