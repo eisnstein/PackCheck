@@ -12,7 +12,11 @@ namespace PackCheck.Commands.Settings
 
         [CommandOption("--csprojFile <path>")]
         [Description(@"Path to *.csproj file. (default .\*.csproj)")]
-        public string? PathToCsProjFile { get; init; }
+        public string? PathToCsProjFile { get; set; }
+
+        [CommandOption("--slnFile <path>")]
+        [Description(@"Path to *.sln file. (default .\*.sln)")]
+        public string? PathToSlnFile { get; init; }
 
         [CommandOption("--version <target_version>")]
         [Description("Upgrade version number to latest stable version (stable) or latest version (latest)")]

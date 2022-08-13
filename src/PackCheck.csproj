@@ -8,7 +8,7 @@
     <PackageOutputPath>./nupkg</PackageOutputPath>
     <RootNamespace>PackCheck</RootNamespace>
     <TargetFramework>net5.0</TargetFramework>
-    <ToolCommandName>packcheck</ToolCommandName>
+    <ToolCommandName>packchecklocal</ToolCommandName>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
   </PropertyGroup>
 
@@ -17,9 +17,9 @@
     <Copyright>Copyright © 2022 Daniel Höflehner</Copyright>
     <Description>Check for newer versions of installed NuGet Packages in your Terminal.</Description>
     <PackageIcon>icon.png</PackageIcon>
-    <PackageId>PackCheck</PackageId>
+    <PackageId>PackCheckLocal</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageVersion>0.2.0</PackageVersion>
+    <PackageVersion>0.2.0-preview.1</PackageVersion>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/eisnstein/PackCheck</RepositoryUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>

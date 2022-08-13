@@ -28,7 +28,7 @@ namespace PackCheck.Services
                 var fullPath = Path.Combine(cwd, pathToCsProjFile);
                 if (!File.Exists(fullPath))
                 {
-                    throw new CsProjFileNotFoundException(
+                    throw new CsProjFileException(
                         $"File [white]{pathToCsProjFile}[/] does not exist in the current directory [white]{cwd}[/]"
                     );
                 }
@@ -39,14 +39,12 @@ namespace PackCheck.Services
             // No path was provided, we try to find a .csproj file
             var files = Directory.GetFiles(cwd, "*.csproj");
 
-            if (files.Length == 0)
+            return files.Length switch
             {
-                throw new CsProjFileNotFoundException(
-                    $"Could not find a .csproj file in the current directory [white]{cwd}[/]"
-                );
-            }
-
-            return Path.Combine(cwd, files[0]);
+                0 => throw new CsProjFileException($"Could not find a .csproj file in the current directory [white]{cwd}[/]"),
+                > 1 => throw new CsProjFileException($"Found more than 1 .csproj file. Please provide the .csproj file to use via the --csprojFile argument. [white]{cwd}[/]"),
+                _ => Path.Combine(cwd, files[0])
+            };
         }
 
         public async Task UpgradePackageVersionsAsync(string pathToCsProjFile, List<Package> packages, UpgradeSettings settings)

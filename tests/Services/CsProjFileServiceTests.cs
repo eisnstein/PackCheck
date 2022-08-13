@@ -27,13 +27,13 @@ public class CsProjFileServiceTests
 
         Action actual = () => _service.GetPathToCsProjFile(pathToFile);
 
-        Assert.Throws<CsProjFileNotFoundException>(actual);
+        Assert.Throws<CsProjFileException>(actual);
     }
 
     [Fact]
     public void CsProjFileExistsAtGivenPath()
     {
-        TestHelper.ResetTestCsProjFile();
+        TestHelper.LoadTestCsProjFile();
         var relativePath = "test.csproj";
 
         var fullPath = _service.GetPathToCsProjFile(relativePath);
@@ -44,7 +44,7 @@ public class CsProjFileServiceTests
     [Fact]
     public void CsProjFileExistsWithoutGivenPath()
     {
-        TestHelper.ResetTestCsProjFile();
+        TestHelper.LoadTestCsProjFile();
 
         var fullPath = _service.GetPathToCsProjFile();
 
@@ -54,7 +54,7 @@ public class CsProjFileServiceTests
     [Fact]
     public async void AllPackagesGetUpdatedToLatestStableVersion()
     {
-        TestHelper.ResetTestCsProjFile();
+        TestHelper.LoadTestCsProjFile();
         var pathToCsProjFile = "test.csproj";
         var packages = GeneratePackagesList();
         var settings = new UpgradeSettings
@@ -77,7 +77,7 @@ public class CsProjFileServiceTests
     [Fact]
     public async void OnePackageGetsUpdatedToLatestStableVersion()
     {
-        TestHelper.ResetTestCsProjFile();
+        TestHelper.LoadTestCsProjFile();
         var pathToCsProjFile = "test.csproj";
         var settings = new UpgradeSettings
         {
@@ -103,7 +103,7 @@ public class CsProjFileServiceTests
     [Fact]
     public async void AllPackagesGetUpdatedToLatestVersionIfAvailable()
     {
-        TestHelper.ResetTestCsProjFile();
+        TestHelper.LoadTestCsProjFile();
         var pathToCsProjFile = "test.csproj";
         var packages = GeneratePackagesList();
         var settings = new UpgradeSettings

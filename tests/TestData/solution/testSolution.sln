@@ -1,10 +1,10 @@
-﻿Microsoft Visual Studio Solution File, Format Version 12.00
+Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26124.0
 MinimumVisualStudioVersion = 15.0.26124.0
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "src", "src\PackCheck.csproj", "{74E0B439-9BC7-4CBD-A4C0-5E0248A70664}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolProj", "SolProj\SolProj.csproj", "{74E0B439-9BC7-4CBD-A4C0-5E0248A70664}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "tests", "tests\PackCheck.Tests.csproj", "{2EDA5EAD-8F7E-444E-A3DE-8D56C43636E3}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SolProj.Tests", "SolProj.Tests\SolProj.Tests.csproj", "{2EDA5EAD-8F7E-444E-A3DE-8D56C43636E3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
