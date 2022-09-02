@@ -1,4 +1,4 @@
-![PackCheck-Logo](https://github.com/eisnstein/PackCheck/blob/main/PackCheck/Assets/icon.png)
+![PackCheck-Logo](https://github.com/eisnstein/PackCheck/blob/main/src/Assets/icon.png)
 
 # PackCheck
 
@@ -39,7 +39,7 @@ packcheck check
 
 This should give you something like this:
 
-![PackCheck check example](https://github.com/eisnstein/PackCheck/blob/main/PackCheck/Assets/packcheck-check.png)
+![PackCheck check example](https://github.com/eisnstein/PackCheck/blob/main/src/Assets/packcheck-check.png)
 
 After that you can upgrade the package versions in the _.csproj_ file (or files in a solution) to their corresponding stable versions by running:
 > This changes your .csproj file!
