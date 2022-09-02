@@ -24,7 +24,7 @@ You can install PackCheck as a dotnet tool via NuGet:
 
 ## Usage
 
-In your terminal `cd` into a .NET project which contains a _.csproj_ file and run:
+In your terminal `cd` into a .NET project or .NET solution and run:
 
 ```
 packcheck
@@ -41,7 +41,7 @@ This should give you something like this:
 
 ![PackCheck check example](https://github.com/eisnstein/PackCheck/blob/main/PackCheck/Assets/packcheck-check.png)
 
-After that you can upgrade the package versions in the _.csproj_ file to their corresponding stable versions by running:
+After that you can upgrade the package versions in the _.csproj_ file (or files in a solution) to their corresponding stable versions by running:
 > This changes your .csproj file!
 
 ```
@@ -58,6 +58,12 @@ For a dry-run, which outputs the _.csproj_ file into the terminal without actual
 
 ```
 packcheck upgrade --dry-run
+```
+
+To use interactive mode, where you will be asked for each package if you want to upgrade, run:
+
+```
+packcheck upgrade -i
 ```
 
 For help run:

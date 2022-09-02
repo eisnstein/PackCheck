@@ -19,6 +19,8 @@ public class SolutionFileServiceTests
         TestHelper.LoadSolution();
 
         Assert.True(_service.HasSolution());
+
+        TestHelper.DeleteSolution();
     }
 
     [Fact]
@@ -33,6 +35,8 @@ public class SolutionFileServiceTests
         {
             Assert.StartsWith("Project(", projectDefinition);
         }
+
+        TestHelper.DeleteSolution();
     }
 
     [Fact]
@@ -50,5 +54,7 @@ public class SolutionFileServiceTests
 
         Assert.Equal(2, projectPaths.Count);
         Assert.Equal(expectedPaths, projectPaths);
+
+        TestHelper.DeleteSolution();
     }
 }

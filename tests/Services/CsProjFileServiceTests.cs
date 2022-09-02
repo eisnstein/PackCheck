@@ -39,6 +39,7 @@ public class CsProjFileServiceTests
         var fullPath = _service.GetPathToCsProjFile(relativePath);
 
         Assert.EndsWith(relativePath, fullPath);
+        TestHelper.DeleteTestCsProjFile();
     }
 
     [Fact]
@@ -49,6 +50,7 @@ public class CsProjFileServiceTests
         var fullPath = _service.GetPathToCsProjFile();
 
         Assert.EndsWith("test.csproj", fullPath);
+        TestHelper.DeleteTestCsProjFile();
     }
 
     [Fact]
@@ -72,6 +74,7 @@ public class CsProjFileServiceTests
         Assert.Contains($"<PackageReference Include=\"NuGet.Versioning\" Version=\"6.3.0\" />", fileContent);
         Assert.Contains($"<PackageReference Include=\"Spectre.Cli.Extensions.DependencyInjection\" Version=\"0.5.0\" />", fileContent);
         Assert.Contains($"<PackageReference Include=\"Spectre.Console\" Version=\"0.44.1\" />", fileContent);
+        TestHelper.DeleteTestCsProjFile();
     }
 
     [Fact]
@@ -98,6 +101,7 @@ public class CsProjFileServiceTests
         Assert.Contains($"<PackageReference Include=\"NuGet.Versioning\" Version=\"6.2.1\" />", fileContent);
         Assert.Contains($"<PackageReference Include=\"Spectre.Cli.Extensions.DependencyInjection\" Version=\"0.4.0\" />", fileContent);
         Assert.Contains($"<PackageReference Include=\"Spectre.Console\" Version=\"0.44.0\" />", fileContent);
+        TestHelper.LoadTestCsProjFile();
     }
 
     [Fact]
@@ -121,6 +125,7 @@ public class CsProjFileServiceTests
         Assert.Contains($"<PackageReference Include=\"NuGet.Versioning\" Version=\"6.3.0\" />", fileContent);
         Assert.Contains($"<PackageReference Include=\"Spectre.Cli.Extensions.DependencyInjection\" Version=\"0.5.0\" />", fileContent);
         Assert.Contains($"<PackageReference Include=\"Spectre.Console\" Version=\"0.44.1\" />", fileContent);
+        TestHelper.LoadTestCsProjFile();
     }
 
     private List<Package> GeneratePackagesList()
