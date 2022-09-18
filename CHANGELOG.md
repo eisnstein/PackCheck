@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.1 (2022-09-18)
+
+### Bug fixes
+* Update readme file
+
 ## 0.2.0 (2022-09-18)
 
 ### Bug fixes
