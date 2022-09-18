@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.0 (2022-09-18)
+
+### Bug fixes
+* Clear list of packages for each project to avoid showing wrong data
+
 ## 0.2.0-preview.1 (2022-09-02)
 
 ### Enhancements
