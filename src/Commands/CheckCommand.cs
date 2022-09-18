@@ -66,6 +66,8 @@ namespace PackCheck.Commands
                 PrintSolutionInfo();
                 Console.WriteLine();
 
+                packages.Clear();
+
                 return await Task.FromResult(0);
             }
 
@@ -101,7 +103,7 @@ namespace PackCheck.Commands
             return await Task.FromResult(0);
         }
 
-        private void PrintTable(List<Package> packages)
+        private void PrintTable(IReadOnlyList<Package> packages)
         {
             var service = new PackageVersionHighlighterService();
             var table = new Table();
