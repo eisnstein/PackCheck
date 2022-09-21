@@ -61,12 +61,12 @@ namespace PackCheck.Commands
 
                     PrintTable(packages);
                     Console.WriteLine();
+
+                    packages.Clear();
                 }
 
                 PrintSolutionInfo();
                 Console.WriteLine();
-
-                packages.Clear();
 
                 return await Task.FromResult(0);
             }
