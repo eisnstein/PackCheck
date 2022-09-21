@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.2 (2022-09-18)
+## 0.2.2 (2022-09-21)
 
 ### Bug fixes
 * Now really clear list of packages for each project to avoid showing wrong data in output
