@@ -26,6 +26,20 @@ namespace PackCheck.Commands
 
         public override async Task<int> ExecuteAsync(CommandContext context, UpgradeSettings settings)
         {
+            Result? result = null;
+
+            // Check if a path to a specific project is given
+            if (!string.IsNullOrEmpty(settings.PathToCsProjFile))
+            {
+                result = await UpgradeProject(settings);
+                if (result != Result.Success)
+                {
+                    return -1;
+                }
+
+                return 0;
+            }
+
             // Check if we are in a solution or a path to a solution file is given
             if (_solutionFileService.HasSolution() || !string.IsNullOrEmpty(settings.PathToSlnFile))
             {
@@ -36,21 +50,29 @@ namespace PackCheck.Commands
                 foreach (var projectCsProjFile in projectCsProjFiles)
                 {
                     settings.PathToCsProjFile = projectCsProjFile;
-                    int result = await UpgradeProject(context, settings);
 
-                    if (result == -1)
+                    result = await UpgradeProject(settings);
+                    if (result == Result.Error)
                     {
-                        return await Task.FromResult(-1);
+                        return -1;
                     }
                 }
 
-                return await Task.FromResult(0);
+                return 0;
             }
 
-            return await UpgradeProject(context, settings);
+            // No specific project file is given, no solution file given, also not in a solution
+            // Check if a project file exists
+            result = await UpgradeProject(settings);
+            if (result == Result.Error)
+            {
+                return -1;
+            }
+
+            return 0;
         }
 
-        private async Task<int> UpgradeProject(CommandContext context, UpgradeSettings settings)
+        private async Task<Result> UpgradeProject(UpgradeSettings settings)
         {
             // Get the path to the *.csproj file
             try
@@ -60,7 +82,7 @@ namespace PackCheck.Commands
             catch (CsProjFileException ex)
             {
                 AnsiConsole.Markup($"[dim]WARN:[/] [red]{ex.Message}[/]");
-                return await Task.FromResult(-1);
+                return Result.Error;
             }
 
             AnsiConsole.MarkupLine($"Upgrading to [silver]{settings.Version}[/] versions in [silver]{_pathToCsProjFile}[/]");
@@ -72,7 +94,7 @@ namespace PackCheck.Commands
             if (packages.Count == 0)
             {
                 AnsiConsole.MarkupLine($"Could not find any packages in [silver]{_pathToCsProjFile}[/]");
-                return await Task.FromResult(0);
+                return Result.Warning;
             }
 
             // If only a specific package should be upgraded,
@@ -82,7 +104,7 @@ namespace PackCheck.Commands
                 packages.RemoveAll(p => p.PackageName != settings.PackageToUpgrade);
             }
 
-            await _nuGetPackagesService.GetPackagesDataFromNugetRepositoryAsync(_pathToCsProjFile, packages);
+            await _nuGetPackagesService.GetPackagesDataFromNugetRepositoryAsync(packages);
             await _csProjFileService.UpgradePackageVersionsAsync(_pathToCsProjFile, packages, settings);
 
             if (!settings.DryRun)
@@ -98,7 +120,7 @@ namespace PackCheck.Commands
 
             Console.WriteLine();
 
-            return await Task.FromResult(0);
+            return Result.Success;
         }
     }
 }

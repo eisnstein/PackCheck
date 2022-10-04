@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using PackCheck.Exceptions;
 
@@ -18,7 +19,7 @@ namespace PackCheck.Services
         {
             var cwd = Directory.GetCurrentDirectory();
 
-            // The user provided a path to the .csproj file
+            // A path to the .sln file is given
             if (!string.IsNullOrEmpty(pathToSolutionFile))
             {
                 // If pathToSlnFile is already a full path, it will not
@@ -63,7 +64,18 @@ namespace PackCheck.Services
                     var match = rgx.Match(definition);
                     if (match.Success)
                     {
-                        return match.Groups["path"].Value;
+                        var path = match.Groups["path"].Value;
+
+                        // The directory separator in the project path is always the backslash,
+                        // which does not work on unix like systems
+                        if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                        {
+                            // We are on a unix like system, so replace
+                            // the backslash with the forward slash
+                            return path.Replace('\\', Path.DirectorySeparatorChar);
+                        }
+
+                        return path;
                     }
 
                     return string.Empty;

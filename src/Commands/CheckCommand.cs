@@ -26,7 +26,22 @@ namespace PackCheck.Commands
 
         public override async Task<int> ExecuteAsync(CommandContext context, CheckSettings settings)
         {
-            List<Package> packages = new();
+            Result? result = null;
+
+            // Check if a path to a specific project is given
+            if (!string.IsNullOrEmpty(settings.PathToCsProjFile))
+            {
+                result = await CheckProject(settings.PathToCsProjFile);
+                if (result != Result.Success)
+                {
+                    return -1;
+                }
+
+                PrintInfo();
+                Console.WriteLine();
+
+                return 0;
+            }
 
             // Check if we are in a solution or a path to a solution file is given
             if (_solutionFileService.HasSolution() || !string.IsNullOrEmpty(settings.PathToSlnFile))
@@ -37,50 +52,45 @@ namespace PackCheck.Commands
 
                 foreach (var projectCsProjFile in projectCsProjFiles)
                 {
-                    try
+                    result = await CheckProject(projectCsProjFile);
+                    if (result == Result.Error)
                     {
-                        _pathToCsProjFile = _csProjFileService.GetPathToCsProjFile(projectCsProjFile);
+                        return -1;
                     }
-                    catch (CsProjFileException ex)
-                    {
-                        AnsiConsole.Markup($"[dim]WARN:[/] [red]{ex.Message}[/]");
-                        return await Task.FromResult(-1);
-                    }
-
-                    AnsiConsole.MarkupLine($"Checking versions for [silver]{_pathToCsProjFile}[/]");
-
-                    await _nuGetPackagesService.GetPackagesDataFromCsProjFileAsync(_pathToCsProjFile, packages);
-
-                    if (packages.Count == 0)
-                    {
-                        AnsiConsole.MarkupLine($"Could not find any packages in [silver]{_pathToCsProjFile}[/]");
-                        continue;
-                    }
-
-                    await _nuGetPackagesService.GetPackagesDataFromNugetRepositoryAsync(_pathToCsProjFile, packages);
-
-                    PrintTable(packages);
-                    Console.WriteLine();
-
-                    packages.Clear();
                 }
 
                 PrintSolutionInfo();
                 Console.WriteLine();
 
-                return await Task.FromResult(0);
+                return 0;
             }
 
-            // Not in a solution, try project
+            // No specific project file is given, no solution file given, also not in a solution
+            // Check if a project file exists
+            result = await CheckProject();
+            if (result != Result.Success)
+            {
+                return -1;
+            }
+
+            PrintInfo();
+            Console.WriteLine();
+
+            return 0;
+        }
+
+        private async Task<Result> CheckProject(string? pathToCsProjFile = null)
+        {
+            List<Package> packages = new();
 
             try
             {
-                _pathToCsProjFile = _csProjFileService.GetPathToCsProjFile(settings.PathToCsProjFile);
+                _pathToCsProjFile = _csProjFileService.GetPathToCsProjFile(pathToCsProjFile);
             }
             catch (CsProjFileException ex)
             {
-                AnsiConsole.Markup($"[dim]WARN:[/] [red]{ex.Message}[/]");
-                return await Task.FromResult(-1);
+                AnsiConsole.MarkupLine($"[dim]WARN:[/] [red]{ex.Message}[/]");
+                return Result.Error;
             }
 
             AnsiConsole.MarkupLine($"Checking versions for [silver]{_pathToCsProjFile}[/]");
@@ -90,17 +100,15 @@ namespace PackCheck.Commands
             if (packages.Count == 0)
             {
                 AnsiConsole.MarkupLine($"Could not find any packages in [silver]{_pathToCsProjFile}[/]");
-                return await Task.FromResult(0);
+                return Result.Warning;
             }
 
-            await _nuGetPackagesService.GetPackagesDataFromNugetRepositoryAsync(_pathToCsProjFile, packages);
+            await _nuGetPackagesService.GetPackagesDataFromNugetRepositoryAsync(packages);
 
             PrintTable(packages);
             Console.WriteLine();
-            PrintInfo();
-            Console.WriteLine();
 
-            return await Task.FromResult(0);
+            return Result.Success;
         }
 
         private void PrintTable(IReadOnlyList<Package> packages)

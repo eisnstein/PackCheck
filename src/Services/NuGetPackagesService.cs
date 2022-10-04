@@ -66,7 +66,7 @@ namespace PackCheck.Services
             reader.Close();
         }
 
-        public async Task GetPackagesDataFromNugetRepositoryAsync(string pathToCsProjFile, List<Package> packages)
+        public async Task GetPackagesDataFromNugetRepositoryAsync(List<Package> packages)
         {
 
             await AnsiConsole.Progress()

@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.2.3 (2022-10-04)
+
+### Bug fixes
+* Replace backslash with forward slash on unix like environments in paths to projects from project definitions in solution file
+
 ## 0.2.2 (2022-09-21)
 
 ### Bug fixes
