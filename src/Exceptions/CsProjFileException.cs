@@ -1,12 +1,11 @@
 using System;
 
-namespace PackCheck.Exceptions
+namespace PackCheck.Exceptions;
+
+public class CsProjFileException : Exception
 {
-    public class CsProjFileException : Exception
+    public CsProjFileException(string message)
+        : base(message)
     {
-        public CsProjFileException(string message)
-            : base(message)
-        {
-        }
     }
 }

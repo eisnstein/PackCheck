@@ -1,9 +1,8 @@
-namespace PackCheck.Data
+namespace PackCheck.Data;
+
+public enum Result
 {
-    public enum Result
-    {
-        Error = -2,
-        Warning,
-        Success
-    }
+    Error = -2,
+    Warning,
+    Success
 }

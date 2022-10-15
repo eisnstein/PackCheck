@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup Label="Settings">
-    <LangVersion>9.0</LangVersion>
+    <LangVersion>10.0</LangVersion>
     <Nullable>enable</Nullable>
     <OutputType>Exe</OutputType>
     <PackAsTool>true</PackAsTool>
@@ -19,7 +19,7 @@
     <PackageIcon>icon.png</PackageIcon>
     <PackageId>PackCheck</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageVersion>0.2.3</PackageVersion>
+    <PackageVersion>0.3.0</PackageVersion>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/eisnstein/PackCheck</RepositoryUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -28,10 +28,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NuGet.Protocol" Version="6.3.0" />
-    <PackageReference Include="NuGet.Versioning" Version="6.3.0" />
+    <PackageReference Include="NuGet.Protocol" Version="6.3.1" />
+    <PackageReference Include="NuGet.Versioning" Version="6.3.1" />
     <PackageReference Include="Spectre.Cli.Extensions.DependencyInjection" Version="0.4.0" />
-    <PackageReference Include="Spectre.Console" Version="0.44.0" />
+    <PackageReference Include="Spectre.Console" Version="0.45.0" />
+    <PackageReference Include="Spectre.Console.Cli" Version="0.45.0" />
   </ItemGroup>
 
   <ItemGroup>

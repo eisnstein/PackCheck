@@ -2,7 +2,6 @@ using PackCheck.Commands;
 using PackCheck.Commands.Settings;
 using Spectre.Console.Cli;
 using Spectre.Console.Testing;
-using Xunit;
 
 namespace PackCheck.Tests.Settings;
 

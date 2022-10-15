@@ -2,12 +2,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using NuGet.Versioning;
 using PackCheck.Commands.Settings;
 using PackCheck.Data;
 using PackCheck.Exceptions;
 using PackCheck.Services;
-using Xunit;
+using PackCheck.Tests.Factories;
+using Version = PackCheck.Data.Version;
 
 namespace PackCheck.Tests.Services;
 
@@ -66,7 +66,9 @@ public class CsProjFileServiceTests
             Interactive = false
         };
 
-        await _service.UpgradePackageVersionsAsync(pathToCsProjFile, packages, settings);
+        var preparedPackages = PackagesService.PreparePackagesForUpgrade(packages, settings.Version);
+
+        await _service.UpgradePackageVersionsAsync(pathToCsProjFile, preparedPackages, settings.DryRun);
 
         var fileContent = await File.ReadAllTextAsync(pathToCsProjFile);
 
@@ -86,14 +88,16 @@ public class CsProjFileServiceTests
         {
             PackageToUpgrade = "NuGet.Protocol",
             DryRun = false,
-            Version = "stable",
+            Version = Version.Stable,
             Interactive = false
         };
         var packages = GeneratePackagesList()
             .Where(p => p.PackageName == settings.PackageToUpgrade)
             .ToList();
 
-        await _service.UpgradePackageVersionsAsync(pathToCsProjFile, packages, settings);
+        var preparedPackages = PackagesService.PreparePackagesForUpgrade(packages, settings.Version);
+
+        await _service.UpgradePackageVersionsAsync(pathToCsProjFile, preparedPackages, settings.DryRun);
 
         var fileContent = await File.ReadAllTextAsync(pathToCsProjFile);
 
@@ -113,11 +117,13 @@ public class CsProjFileServiceTests
         var settings = new UpgradeSettings
         {
             DryRun = false,
-            Version = "latest",
+            Version = Version.Latest,
             Interactive = false
         };
 
-        await _service.UpgradePackageVersionsAsync(pathToCsProjFile, packages, settings);
+        var preparedPackages = PackagesService.PreparePackagesForUpgrade(packages, settings.Version);
+
+        await _service.UpgradePackageVersionsAsync(pathToCsProjFile, preparedPackages, settings.DryRun);
 
         var fileContent = await File.ReadAllTextAsync(pathToCsProjFile);
 
@@ -131,14 +137,12 @@ public class CsProjFileServiceTests
     private List<Package> GeneratePackagesList()
     {
         // Packages und versions correspond to those in the test.csproj file
-        List<Package> packages = new()
+        return new()
         {
-            new("NuGet.Protocol", NuGetVersion.Parse("6.2.1")) { LatestStableVersion = NuGetVersion.Parse("6.3.0"), LatestVersion = NuGetVersion.Parse("7.0.0-preview.123")},
-            new("NuGet.Versioning", NuGetVersion.Parse("6.2.1")) { LatestStableVersion = NuGetVersion.Parse("6.3.0") },
-            new("Spectre.Cli.Extensions.DependencyInjection", NuGetVersion.Parse("0.4.0")) { LatestStableVersion = NuGetVersion.Parse("0.5.0") },
-            new("Spectre.Console", NuGetVersion.Parse("0.44.0")) { LatestStableVersion = NuGetVersion.Parse("0.44.1") },
+            PackageFactory.Create("NuGet.Protocol", "6.2.1", "6.3.0", "7.0.0-preview.123"),
+            PackageFactory.Create("NuGet.Versioning", "6.2.1", "6.3.0"),
+            PackageFactory.Create("Spectre.Cli.Extensions.DependencyInjection", "0.4.0", "0.5.0"),
+            PackageFactory.Create("Spectre.Console", "0.44.0", "0.44.1"),
         };
-
-        return packages;
     }
 }

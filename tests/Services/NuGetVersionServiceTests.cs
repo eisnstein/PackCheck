@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using NuGet.Versioning;
 using PackCheck.Services;
-using Xunit;
 
 namespace PackCheck.Tests.Services;
 

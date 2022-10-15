@@ -1,12 +1,11 @@
 using System;
 
-namespace PackCheck.Exceptions
+namespace PackCheck.Exceptions;
+
+public class SolutionFileException : Exception
 {
-    public class SolutionFileException : Exception
+    public SolutionFileException(string message)
+        : base(message)
     {
-        public SolutionFileException(string message)
-            : base(message)
-        {
-        }
     }
 }

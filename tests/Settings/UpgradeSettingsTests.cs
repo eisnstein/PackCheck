@@ -65,6 +65,19 @@ public class UpgradeSettingsTests
     }
 
     [Fact]
+    public void ThrowsOnWrongTargetVersion()
+    {
+        var app = new CommandAppTester();
+        app.Configure(config =>
+        {
+            config.PropagateExceptions();
+            config.AddCommand<UpgradeCommand>("upgrade");
+        });
+
+        Assert.Throws<CommandRuntimeException>(() => app.Run(new[] { "upgrade", "--version", "wrong" }));
+    }
+
+    [Fact]
     public void AllArgumentsWithoutDryRunGetSet()
     {
         var app = new CommandAppTester();
