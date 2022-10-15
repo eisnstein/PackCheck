@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0 (2022-10-15)
+
+### Enhancements
+* [packcheck upgrade -i] Update interactive mode to show a list of all updateable packages and make each selectable for upgrade
+* Add aliases to `check` and `upgrade` commands. You can now write `packcheck u` to upgrade
+
+Note: The fetching of package data from NuGet is now done serially and not concurrently anymore. That code was bit hacky and I wanted a saver version of it. The `check` now takes longer time.
+
 ## 0.2.3 (2022-10-04)
 
 ### Bug fixes

@@ -18,7 +18,8 @@ package or all at once.
 ## Installation
 
 You can install PackCheck as a dotnet tool via NuGet:
- ```
+
+ ```shell
  dotnet tool install --global PackCheck
  ```
 
@@ -26,13 +27,15 @@ You can install PackCheck as a dotnet tool via NuGet:
 
 In your terminal `cd` into a .NET project or .NET solution and run:
 
-```
+```shell
 packcheck
-```
 
-or
+# or
 
-```
+packcheck c
+
+# or
+
 packcheck check
 ```
 
@@ -44,31 +47,47 @@ This should give you something like this:
 After that you can upgrade the package versions in the _.csproj_ file (or files in a solution) to their corresponding stable versions by running:
 > This changes your .csproj file!
 
-```
+```shell
 packcheck upgrade
+
+# or
+
+packcheck u
 ```
 
 To upgrade to the latest versions run:
 
-```
+```shell
 packcheck upgrade --version latest
+
+# or
+
+packcheck u --version latest
 ```
 
 For a dry-run, which outputs the _.csproj_ file into the terminal without actually changing the .csproj file, run:
 
-```
+```shell
 packcheck upgrade --dry-run
+
+# or
+
+packcheck u --dry-run
 ```
 
-To use interactive mode, where you will be asked for each package if you want to upgrade, run:
+To use interactive mode, where you can select each package you want to upgrade, run:
 
-```
+```shell
 packcheck upgrade -i
+
+#or
+
+packcheck u -i
 ```
 
 For help run:
 
-```
+```shell
 packcheck -h
 ```
 
