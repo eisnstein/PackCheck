@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.3.1 (2022-11-20)
+
+### Enhancements
+* Add `net7.0` to target frameworks
+
 ## 0.3.0 (2022-10-15)
 
 ### Enhancements
