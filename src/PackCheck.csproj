@@ -14,12 +14,12 @@
 
   <PropertyGroup Label="Package Information">
     <Authors>Daniel Höflehner</Authors>
-    <Copyright>Copyright © 2022 Daniel Höflehner</Copyright>
+    <Copyright>Copyright © Daniel Höflehner</Copyright>
     <Description>Check for newer versions of installed NuGet Packages in your Terminal.</Description>
     <PackageIcon>icon.png</PackageIcon>
     <PackageId>PackCheck</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageVersion>0.3.1</PackageVersion>
+    <PackageVersion>$(Version)</PackageVersion>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/eisnstein/PackCheck</RepositoryUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -28,11 +28,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="NuGet.Protocol" Version="6.3.1" />
-    <PackageReference Include="NuGet.Versioning" Version="6.3.1" />
+    <PackageReference Include="NuGet.Protocol" Version="6.5.0" />
+    <PackageReference Include="NuGet.Versioning" Version="6.5.0" />
     <PackageReference Include="Spectre.Cli.Extensions.DependencyInjection" Version="0.4.0" />
-    <PackageReference Include="Spectre.Console" Version="0.45.0" />
-    <PackageReference Include="Spectre.Console.Cli" Version="0.45.0" />
+    <PackageReference Include="Spectre.Console" Version="0.46.0" />
+    <PackageReference Include="Spectre.Console.Cli" Version="0.46.0" />
   </ItemGroup>
 
   <ItemGroup>

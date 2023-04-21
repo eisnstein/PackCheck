@@ -14,6 +14,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
 {
     private readonly CsProjFileService _csProjFileService;
     private readonly SolutionFileService _solutionFileService;
+    private readonly NuGetApiService _nuGetApiService;
     private readonly NuGetPackagesService _nuGetPackagesService;
     private string _pathToCsProjFile = string.Empty;
 
@@ -21,11 +22,14 @@ public class CheckCommand : AsyncCommand<CheckSettings>
     {
         _csProjFileService = new CsProjFileService();
         _solutionFileService = new SolutionFileService();
-        _nuGetPackagesService = new NuGetPackagesService(new NuGetVersionService());
+        _nuGetApiService = new NuGetApiService();
+        _nuGetPackagesService = new NuGetPackagesService(_nuGetApiService);
     }
 
     public override async Task<int> ExecuteAsync(CommandContext context, CheckSettings settings)
     {
+        await PackCheckService.CheckForNewPackCheckVersion(_nuGetApiService);
+
         Result? result = null;
 
         // Check if a path to a specific project is given

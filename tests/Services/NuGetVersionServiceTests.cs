@@ -9,7 +9,6 @@ public class NuGetVersionServiceTests
     [Fact]
     public void GetsLatestVersion()
     {
-        var service = new NuGetVersionService();
         var versions = new List<NuGetVersion>
         {
             new ("1.0.0"),
@@ -26,7 +25,7 @@ public class NuGetVersionServiceTests
             new ("4.0.2"),
         };
 
-        var latestVersion = service.GetLatestVersion(versions);
+        var latestVersion = NuGetVersionService.GetLatestVersion(versions);
 
         Assert.Equal("4.0.2", latestVersion.ToString());
     }
@@ -34,7 +33,6 @@ public class NuGetVersionServiceTests
     [Fact]
     public void GetsLatestVersionWhenLatestVersionIsPrerelease()
     {
-        var service = new NuGetVersionService();
         var versions = new List<NuGetVersion>
         {
             new ("1.0.0"),
@@ -52,7 +50,7 @@ public class NuGetVersionServiceTests
             new ("4.0.2-preview.1.123.4"),
         };
 
-        var latestVersion = service.GetLatestVersion(versions);
+        var latestVersion = NuGetVersionService.GetLatestVersion(versions);
 
         Assert.Equal("4.0.2-preview.1.123.4", latestVersion.ToString());
     }
@@ -60,7 +58,6 @@ public class NuGetVersionServiceTests
     [Fact]
     public void GetsLatestStableVersion()
     {
-        var service = new NuGetVersionService();
         var versions = new List<NuGetVersion>
         {
             new ("1.0.0"),
@@ -77,10 +74,10 @@ public class NuGetVersionServiceTests
             new ("4.0.2"),
         };
 
-        var stableVersion1 = service.GetLatestStableVersion(versions);
-        var latestVersion1 = service.GetLatestVersion(versions);
-        var stableVersion2 = service.GetLatestStableVersion(versions);
-        var latestVersion2 = service.GetLatestVersion(versions);
+        var stableVersion1 = NuGetVersionService.GetLatestStableVersion(versions);
+        var latestVersion1 = NuGetVersionService.GetLatestVersion(versions);
+        var stableVersion2 = NuGetVersionService.GetLatestStableVersion(versions);
+        var latestVersion2 = NuGetVersionService.GetLatestVersion(versions);
 
         Assert.NotNull(stableVersion1);
         Assert.Equal("4.0.2", stableVersion1.ToString());
@@ -93,7 +90,6 @@ public class NuGetVersionServiceTests
     [Fact]
     public void GetsLatestStableVersionWhenPackageOnLatestPrereleaseVersion()
     {
-        var service = new NuGetVersionService();
         var versions = new List<NuGetVersion>
         {
             new ("1.0.0"),
@@ -111,7 +107,7 @@ public class NuGetVersionServiceTests
             new ("5.0.0-preview.1"),
         };
 
-        var latestStableVersion = service.GetLatestStableVersion(versions);
+        var latestStableVersion = NuGetVersionService.GetLatestStableVersion(versions);
 
         Assert.NotNull(latestStableVersion);
         Assert.Equal("4.0.2", latestStableVersion.ToString());
@@ -120,7 +116,6 @@ public class NuGetVersionServiceTests
     [Fact]
     public void GetLatestVersionWhenOnlyPrereleaseVersionsAvailable()
     {
-        var service = new NuGetVersionService();
         var versions = new List<NuGetVersion>
         {
             new ("4.0.0-preview"),
@@ -128,8 +123,8 @@ public class NuGetVersionServiceTests
             new ("4.0.0-preview3"),
         };
 
-        var latestStableVersion = service.GetLatestStableVersion(versions);
-        var latestVersion = service.GetLatestVersion(versions);
+        var latestStableVersion = NuGetVersionService.GetLatestStableVersion(versions);
+        var latestVersion = NuGetVersionService.GetLatestVersion(versions);
 
         Assert.Null(latestStableVersion);
         Assert.Equal("4.0.0-preview3", latestVersion.ToString());

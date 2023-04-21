@@ -23,7 +23,7 @@ public class UpgradeCommand : AsyncCommand<UpgradeSettings>
     {
         _csProjFileService = new CsProjFileService();
         _solutionFileService = new SolutionFileService();
-        _nuGetPackagesService = new NuGetPackagesService(new NuGetVersionService());
+        _nuGetPackagesService = new NuGetPackagesService(new NuGetApiService());
         _packageVersionHighlighterService = new PackageVersionHighlighterService();
     }
 

@@ -1,11 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 using System.Xml;
-using NuGet.Common;
-using NuGet.Protocol;
-using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
 using PackCheck.Data;
 using Spectre.Console;
@@ -14,11 +10,11 @@ namespace PackCheck.Services;
 
 public class NuGetPackagesService
 {
-    private readonly NuGetVersionService _nuGetVersionService;
+    private readonly NuGetApiService _nuGetApiService;
 
-    public NuGetPackagesService(NuGetVersionService nuGetVersionService)
+    public NuGetPackagesService(NuGetApiService nuGetApiService)
     {
-        _nuGetVersionService = nuGetVersionService;
+        _nuGetApiService = nuGetApiService;
     }
 
     public async Task GetPackagesDataFromCsProjFileAsync(string pathToCsProjFile, List<Package> packages)
@@ -84,22 +80,16 @@ public class NuGetPackagesService
 
     private async Task FetchPackagesDataAsync(ProgressTask task, List<Package> packages)
     {
-        var logger = NullLogger.Instance;
-        var cancellationToken = CancellationToken.None;
-
-        SourceCacheContext cache = new();
-        var repository = Repository.Factory.GetCoreV3("https://api.nuget.org/v3/index.json");
-        var resource = await repository.GetResourceAsync<FindPackageByIdResource>(cancellationToken);
-
         var incrementBy = 100 / packages.Count;
 
         foreach (var package in packages)
         {
-            var versions = await resource.GetAllVersionsAsync(package.PackageName, cache, logger, cancellationToken);
-            if (versions.Any())
+            IEnumerable<NuGetVersion> result = await _nuGetApiService.GetPackageVersions(package.PackageName);
+            List<NuGetVersion> versions = result.ToList();
+            if (versions is { Count: > 0 })
             {
-                package.LatestStableVersion = _nuGetVersionService.GetLatestStableVersion(versions);
-                package.LatestVersion = _nuGetVersionService.GetLatestVersion(versions);
+                package.LatestStableVersion = NuGetVersionService.GetLatestStableVersion(versions);
+                package.LatestVersion = NuGetVersionService.GetLatestVersion(versions);
             }
 
             task.Increment(incrementBy);

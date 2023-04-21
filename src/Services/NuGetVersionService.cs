@@ -4,9 +4,9 @@ using NuGet.Versioning;
 
 namespace PackCheck.Services;
 
-public class NuGetVersionService
+public static class NuGetVersionService
 {
-    public NuGetVersion? GetLatestStableVersion(IEnumerable<NuGetVersion> versions)
+    public static NuGetVersion? GetLatestStableVersion(IReadOnlyList<NuGetVersion> versions)
     {
         // ReSharper disable once ReplaceWithSingleCallToLastOrDefault
         return versions
@@ -14,7 +14,7 @@ public class NuGetVersionService
             .LastOrDefault();
     }
 
-    public NuGetVersion GetLatestVersion(IEnumerable<NuGetVersion> versions)
+    public static NuGetVersion GetLatestVersion(IReadOnlyList<NuGetVersion> versions)
     {
         return versions.Last();
     }

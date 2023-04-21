@@ -80,7 +80,7 @@ To use interactive mode, where you can select each package you want to upgrade, 
 ```shell
 packcheck upgrade -i
 
-#or
+# or
 
 packcheck u -i
 ```
