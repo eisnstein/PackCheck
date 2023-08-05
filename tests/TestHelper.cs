@@ -29,4 +29,17 @@ public static class TestHelper
             File.Delete("testSolution.sln");
         }
     }
+
+    public static void LoadCpm()
+    {
+        File.Copy("TestData/cpm/Directory.Packages.props", "Directory.Packages.props", true);
+    }
+
+    public static void DeleteCpm()
+    {
+        if (File.Exists("Directory.Packages.props"))
+        {
+            File.Delete("Directory.Packages.props");
+        }
+    }
 }

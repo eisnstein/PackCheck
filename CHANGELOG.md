@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.0 (2023-08-05)
+
+### Enhancements
+* Add support for Central Package Management
+
 ## 0.3.2 (2023-04-21)
 
 ### Enhancements

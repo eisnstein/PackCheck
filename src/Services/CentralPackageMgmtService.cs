@@ -12,47 +12,55 @@ using PackCheck.Exceptions;
 
 namespace PackCheck.Services;
 
-public static class CsProjFileService
+public static class CentralPackageMgmtService
 {
-    public static string GetPathToCsProjFile(string? pathToCsProjFile = null)
+    public static string CpmFileName = "Directory.Packages.props";
+
+    public static bool HasCentralPackageMgmt()
+    {
+        var cwd = Directory.GetCurrentDirectory();
+        var cpmFile = Path.Combine(cwd, CpmFileName);
+        return File.Exists(cpmFile);
+    }
+
+    public static string GetPathToCpmFile(string? pathToCpmFile = null)
     {
         var cwd = Directory.GetCurrentDirectory();
 
-        // The user provided a path to the .csproj file
-        if (!string.IsNullOrEmpty(pathToCsProjFile))
+        // A path to the cpm file is given
+        if (!string.IsNullOrEmpty(pathToCpmFile))
         {
-            // If pathToCsProjFile is already a full path, it will not
+            // If pathToCpmFile is already a full path, it will not
             // be combined with the current directory.
-            var fullPath = Path.Combine(cwd, pathToCsProjFile);
+            var fullPath = Path.Combine(cwd, pathToCpmFile);
             if (!File.Exists(fullPath))
             {
-                throw new CsProjFileException(
-                    $"File [white]{pathToCsProjFile}[/] does not exist in the current directory [white]{cwd}[/]"
+                throw new CpmFileException(
+                    $"File [white]{pathToCpmFile}[/] does not exist in the current directory [white]{cwd}[/]"
                 );
             }
 
             return fullPath;
         }
 
-        // No path was provided, we try to find a .csproj file
-        var files = Directory.GetFiles(cwd, "*.csproj");
-
-        return files.Length switch
+        // No path was provided, we try to find a Directory.Packages.props file
+        var cpmFilePath = Path.Combine(cwd, CpmFileName);
+        if (!File.Exists(cpmFilePath))
         {
-            0 => throw new CsProjFileException($"Could not find a .csproj file in the current directory [white]{cwd}[/]"),
-            > 1 => throw new CsProjFileException($"Found more than 1 .csproj file. Please provide the .csproj file to use via the --csprojFile argument. [white]{cwd}[/]"),
-            _ => Path.Combine(cwd, files[0])
-        };
+            throw new CpmFileException($"Could not find a {CpmFileName} file in the current directory [white]{cwd}[/]");
+        }
+
+        return cpmFilePath;
     }
 
-    public static async Task GetPackagesDataFromCsProjFileAsync(string pathToCsProjFile, List<Package> packages)
+    public static async Task GetPackagesDataFromCpmFileAsync(string pathToCpmFile, List<Package> packages)
     {
         var settings = new XmlReaderSettings { Async = true };
-        var reader = XmlReader.Create(pathToCsProjFile, settings);
+        var reader = XmlReader.Create(pathToCpmFile, settings);
 
         while (await reader.ReadAsync())
         {
-            if (reader.NodeType != XmlNodeType.Element || reader.Name != "PackageReference")
+            if (reader.NodeType != XmlNodeType.Element || reader.Name != "PackageVersion")
             {
                 continue;
             }
@@ -89,10 +97,10 @@ public static class CsProjFileService
         reader.Close();
     }
 
-    public static async Task UpgradePackageVersionsAsync(string pathToCsProjFile, List<Package> packages, bool dryRun)
+    public static async Task UpgradePackageVersionsAsync(string pathToCpmFile, List<Package> packages, bool dryRun)
     {
         XmlReaderSettings readerSettings = new XmlReaderSettings { Async = true };
-        XmlReader reader = XmlReader.Create(pathToCsProjFile, readerSettings);
+        XmlReader reader = XmlReader.Create(pathToCpmFile, readerSettings);
 
         XElement csProjFile = await XElement.LoadAsync(
             reader, LoadOptions.PreserveWhitespace, CancellationToken.None
@@ -100,22 +108,22 @@ public static class CsProjFileService
 
         reader.Close();
 
-        // Find all <PackageReference .../> items
-        IEnumerable<XElement> packageReferences = csProjFile
-            .Descendants("PackageReference")
+        // Find all <PackageVersion .../> items
+        IEnumerable<XElement> packageVersions = csProjFile
+            .Descendants("PackageVersion")
             .Select(el => el);
 
-        foreach (var packageReference in packageReferences)
+        foreach (var packageVersion in packageVersions)
         {
             // Get name of current package
-            var packageName = packageReference.Attribute("Include")?.Value;
+            var packageName = packageVersion.Attribute("Include")?.Value;
             if (string.IsNullOrEmpty(packageName))
             {
                 continue;
             }
 
             // Get version of current package
-            var currentVersionStr = packageReference.Attribute("Version")?.Value;
+            var currentVersionStr = packageVersion.Attribute("Version")?.Value;
             if (string.IsNullOrEmpty(currentVersionStr))
             {
                 continue;
@@ -145,7 +153,7 @@ public static class CsProjFileService
             }
 
             // Set the new package version
-            packageReference.SetAttributeValue("Version", package.NewVersion);
+            packageVersion.SetAttributeValue("Version", package.NewVersion);
         }
 
         if (dryRun)
@@ -155,7 +163,7 @@ public static class CsProjFileService
         }
 
         XmlWriterSettings wSettings = new XmlWriterSettings { Async = true, OmitXmlDeclaration = true };
-        XmlWriter writer = XmlWriter.Create(pathToCsProjFile, wSettings);
+        XmlWriter writer = XmlWriter.Create(pathToCpmFile, wSettings);
 
         await csProjFile.SaveAsync(writer, CancellationToken.None);
         await writer.FlushAsync();

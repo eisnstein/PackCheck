@@ -21,7 +21,7 @@ public class UpgradeSettingsTests
 
         Assert.NotNull(result.Settings);
         Assert.IsType<UpgradeSettings>(result.Settings);
-        UpgradeSettings settings = result.Settings as UpgradeSettings;
+        UpgradeSettings? settings = result.Settings as UpgradeSettings;
         Assert.NotNull(settings!.Version);
         Assert.Equal("stable", settings!.Version);
     }
@@ -40,7 +40,7 @@ public class UpgradeSettingsTests
 
         Assert.NotNull(result.Settings);
         Assert.IsType<UpgradeSettings>(result.Settings);
-        UpgradeSettings settings = result.Settings as UpgradeSettings;
+        UpgradeSettings? settings = result.Settings as UpgradeSettings;
         Assert.NotNull(settings!.Version);
         Assert.Equal("stable", settings!.Version);
     }
@@ -59,7 +59,7 @@ public class UpgradeSettingsTests
 
         Assert.NotNull(result.Settings);
         Assert.IsType<UpgradeSettings>(result.Settings);
-        UpgradeSettings settings = result.Settings as UpgradeSettings;
+        UpgradeSettings? settings = result.Settings as UpgradeSettings;
         Assert.NotNull(settings!.Version);
         Assert.Equal("latest", settings!.Version);
     }
@@ -95,7 +95,7 @@ public class UpgradeSettingsTests
         Assert.Equal(-1, result.ExitCode);
         Assert.NotNull(result.Settings);
         Assert.IsType<UpgradeSettings>(result.Settings);
-        UpgradeSettings settings = result.Settings as UpgradeSettings;
+        UpgradeSettings? settings = result.Settings as UpgradeSettings;
         Assert.NotNull(settings!.PackageToUpgrade);
         Assert.Equal("awesome-package", settings!.PackageToUpgrade);
         Assert.NotNull(settings!.PathToCsProjFile);
@@ -124,7 +124,7 @@ public class UpgradeSettingsTests
         Assert.Equal(-1, result.ExitCode);
         Assert.NotNull(result.Settings);
         Assert.IsType<UpgradeSettings>(result.Settings);
-        UpgradeSettings settings = result.Settings as UpgradeSettings;
+        UpgradeSettings? settings = result.Settings as UpgradeSettings;
         Assert.NotNull(settings!.PackageToUpgrade);
         Assert.Equal("awesome-package", settings!.PackageToUpgrade);
         Assert.NotNull(settings!.PathToCsProjFile);
@@ -152,7 +152,7 @@ public class UpgradeSettingsTests
 
         Assert.NotNull(result.Settings);
         Assert.IsType<UpgradeSettings>(result.Settings);
-        UpgradeSettings settings = result.Settings as UpgradeSettings;
+        UpgradeSettings? settings = result.Settings as UpgradeSettings;
         Assert.False(settings!.Interactive);
     }
 
@@ -173,7 +173,7 @@ public class UpgradeSettingsTests
 
         Assert.NotNull(result.Settings);
         Assert.IsType<UpgradeSettings>(result.Settings);
-        UpgradeSettings settings = result.Settings as UpgradeSettings;
+        UpgradeSettings? settings = result.Settings as UpgradeSettings;
         Assert.True(settings!.Interactive);
     }
 
@@ -194,7 +194,7 @@ public class UpgradeSettingsTests
 
         Assert.NotNull(result.Settings);
         Assert.IsType<UpgradeSettings>(result.Settings);
-        UpgradeSettings settings = result.Settings as UpgradeSettings;
+        UpgradeSettings? settings = result.Settings as UpgradeSettings;
         Assert.True(settings!.Interactive);
     }
 }

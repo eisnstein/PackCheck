@@ -7,15 +7,15 @@ using PackCheck.Exceptions;
 
 namespace PackCheck.Services;
 
-public class SolutionFileService
+public static class SolutionFileService
 {
-    public bool HasSolution()
+    public static bool HasSolution()
     {
         var cwd = Directory.GetCurrentDirectory();
         return Directory.EnumerateFiles(cwd, "*.sln").Any();
     }
 
-    public string GetPathToSolutionFile(string? pathToSolutionFile = null)
+    public static string GetPathToSolutionFile(string? pathToSolutionFile = null)
     {
         var cwd = Directory.GetCurrentDirectory();
 
@@ -46,13 +46,13 @@ public class SolutionFileService
         };
     }
 
-    public IEnumerable<string> GetProjectDefinitions(string pathToSolutionFile)
+    public static IEnumerable<string> GetProjectDefinitions(string pathToSolutionFile)
     {
         return File.ReadAllLines(pathToSolutionFile)
             .Where(line => line.StartsWith("Project("));
     }
 
-    public List<string> ParseProjectDefinitions(IEnumerable<string> projectDefinitions)
+    public static List<string> ParseProjectDefinitions(IEnumerable<string> projectDefinitions)
     {
         // A project definition looks like that: Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "src", "src\src.csproj", "{74E0B439-9BC7-4CBD-A4C0-5E0248A70664}"
         var pattern = @"^Project\(""\{[A-Za-z0-9\-]+\}""\) = "".+"", ""(?<path>.+\.csproj)"", ""\{[A-Za-z0-9\-]+\}""$";

@@ -1,10 +1,9 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
     <Nullable>enable</Nullable>
     <IsPackable>false</IsPackable>
-    <RootNamespace>PackCheck.Tests</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
@@ -22,12 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\PackCheck.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="TestData\**" CopyToOutputDirectory="PreserveNewest" />
-    <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+    <ProjectReference Include="..\CpmProj\CpmProj.csproj" />
   </ItemGroup>
 
 </Project>

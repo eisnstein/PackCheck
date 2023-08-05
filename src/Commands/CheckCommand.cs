@@ -12,16 +12,11 @@ namespace PackCheck.Commands;
 
 public class CheckCommand : AsyncCommand<CheckSettings>
 {
-    private readonly CsProjFileService _csProjFileService;
-    private readonly SolutionFileService _solutionFileService;
     private readonly NuGetApiService _nuGetApiService;
     private readonly NuGetPackagesService _nuGetPackagesService;
-    private string _pathToCsProjFile = string.Empty;
 
     public CheckCommand()
     {
-        _csProjFileService = new CsProjFileService();
-        _solutionFileService = new SolutionFileService();
         _nuGetApiService = new NuGetApiService();
         _nuGetPackagesService = new NuGetPackagesService(_nuGetApiService);
     }
@@ -47,12 +42,12 @@ public class CheckCommand : AsyncCommand<CheckSettings>
             return 0;
         }
 
-        // Check if we are in a solution or a path to a solution file is given
-        if (_solutionFileService.HasSolution() || !string.IsNullOrEmpty(settings.PathToSlnFile))
+        // Check if a path to a solution file is given
+        if (!string.IsNullOrEmpty(settings.PathToSlnFile))
         {
-            var pathToSolutionFile = _solutionFileService.GetPathToSolutionFile(settings.PathToSlnFile);
-            var projectDefinitions = _solutionFileService.GetProjectDefinitions(pathToSolutionFile);
-            var projectCsProjFiles = _solutionFileService.ParseProjectDefinitions(projectDefinitions);
+            var pathToSolutionFile = SolutionFileService.GetPathToSolutionFile(settings.PathToSlnFile);
+            var projectDefinitions = SolutionFileService.GetProjectDefinitions(pathToSolutionFile);
+            var projectCsProjFiles = SolutionFileService.ParseProjectDefinitions(projectDefinitions);
 
             foreach (var projectCsProjFile in projectCsProjFiles)
             {
@@ -69,7 +64,60 @@ public class CheckCommand : AsyncCommand<CheckSettings>
             return 0;
         }
 
-        // No specific project file is given, no solution file given, also not in a solution
+        // Check if a path to a Central Packages Mgmt file is given
+        if (!string.IsNullOrEmpty(settings.PathToCpmFile))
+        {
+            var pathToCpmFile = CentralPackageMgmtService.GetPathToCpmFile(settings.PathToCpmFile);
+
+            result = await CheckCpm(pathToCpmFile);
+            if (result != Result.Success)
+            {
+                return -1;
+            }
+
+            PrintInfo();
+            Console.WriteLine();
+
+            return 0;
+        }
+
+        // Check if Central Package Management is used
+        if (CentralPackageMgmtService.HasCentralPackageMgmt())
+        {
+            result = await CheckCpm();
+            if (result != Result.Success)
+            {
+                return -1;
+            }
+
+            PrintInfo();
+            Console.WriteLine();
+
+            return 0;
+        }
+
+        // Check if we are in a solution
+        if (SolutionFileService.HasSolution())
+        {
+            var pathToSolutionFile = SolutionFileService.GetPathToSolutionFile(settings.PathToSlnFile);
+            var projectDefinitions = SolutionFileService.GetProjectDefinitions(pathToSolutionFile);
+            var projectCsProjFiles = SolutionFileService.ParseProjectDefinitions(projectDefinitions);
+
+            foreach (var projectCsProjFile in projectCsProjFiles)
+            {
+                result = await CheckProject(projectCsProjFile);
+                if (result == Result.Error)
+                {
+                    return -1;
+                }
+            }
+
+            PrintSolutionInfo();
+            Console.WriteLine();
+
+            return 0;
+        }
+
         // Check if a project file exists
         result = await CheckProject();
         if (result != Result.Success)
@@ -85,11 +133,9 @@ public class CheckCommand : AsyncCommand<CheckSettings>
 
     private async Task<Result> CheckProject(string? pathToCsProjFile = null)
     {
-        List<Package> packages = new();
-
         try
         {
-            _pathToCsProjFile = _csProjFileService.GetPathToCsProjFile(pathToCsProjFile);
+            pathToCsProjFile = CsProjFileService.GetPathToCsProjFile(pathToCsProjFile);
         }
         catch (CsProjFileException ex)
         {
@@ -97,13 +143,47 @@ public class CheckCommand : AsyncCommand<CheckSettings>
             return Result.Error;
         }
 
-        AnsiConsole.MarkupLine($"Checking versions for [grey]{_pathToCsProjFile}[/]");
+        AnsiConsole.MarkupLine($"Checking versions for [grey]{pathToCsProjFile}[/]");
 
-        await _nuGetPackagesService.GetPackagesDataFromCsProjFileAsync(_pathToCsProjFile, packages);
+        List<Package> packages = new();
+
+        await CsProjFileService.GetPackagesDataFromCsProjFileAsync(pathToCsProjFile, packages);
 
         if (packages.Count == 0)
         {
-            AnsiConsole.MarkupLine($"Could not find any packages in [grey]{_pathToCsProjFile}[/]");
+            AnsiConsole.MarkupLine($"Could not find any packages in [grey]{pathToCsProjFile}[/]");
+            return Result.Warning;
+        }
+
+        await _nuGetPackagesService.GetPackagesDataFromNugetRepositoryAsync(packages);
+
+        PrintTable(packages);
+        Console.WriteLine();
+
+        return Result.Success;
+    }
+
+    private async Task<Result> CheckCpm(string? pathToCpmFile = null)
+    {
+        try
+        {
+            pathToCpmFile = CentralPackageMgmtService.GetPathToCpmFile(pathToCpmFile);
+        }
+        catch (CpmFileException ex)
+        {
+            AnsiConsole.MarkupLine($"[dim]WARN:[/] [red]{ex.Message}[/]");
+            return Result.Error;
+        }
+
+        AnsiConsole.MarkupLine($"Checking versions for [grey]{pathToCpmFile}[/]");
+
+        List<Package> packages = new();
+
+        await CentralPackageMgmtService.GetPackagesDataFromCpmFileAsync(pathToCpmFile, packages);
+
+        if (packages.Count == 0)
+        {
+            AnsiConsole.MarkupLine($"Could not find any packages in [grey]{pathToCpmFile}[/]");
             return Result.Warning;
         }
 
@@ -117,7 +197,6 @@ public class CheckCommand : AsyncCommand<CheckSettings>
 
     private void PrintTable(IReadOnlyList<Package> packages)
     {
-        var service = new PackageVersionHighlighterService();
         var table = new Table();
 
         table.AddColumn("Package Name");
@@ -130,8 +209,8 @@ public class CheckCommand : AsyncCommand<CheckSettings>
             table.AddRow(
                 p.PackageName,
                 p.CurrentVersion.ToString(),
-                service.HighlightLatestStableVersion(p),
-                service.HighlightLatestVersion(p)
+                PackageVersionHighlighterService.HighlightLatestStableVersion(p),
+                PackageVersionHighlighterService.HighlightLatestVersion(p)
             );
         }
 

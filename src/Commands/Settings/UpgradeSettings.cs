@@ -18,6 +18,10 @@ public sealed class UpgradeSettings : CommandSettings
     [Description(@"Path to *.sln file. (default .\*.sln)")]
     public string? PathToSlnFile { get; init; }
 
+    [CommandOption("--cpmFile <path>")]
+    [Description(@"Path to Directory.Packages.props file. (default .\Directory.Packages.props)")]
+    public string? PathToCpmFile { get; init; }
+
     [CommandOption("--version <target_version>")]
     [Description("Upgrade version number to latest stable version (stable) or latest version (latest)")]
     [ValidateTargetVersion("Target version has to be 'stable' or 'latest'.")]

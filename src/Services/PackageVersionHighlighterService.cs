@@ -4,11 +4,10 @@ using PackCheck.Data;
 
 namespace PackCheck.Services;
 
-public class PackageVersionHighlighterService
+public static class PackageVersionHighlighterService
 {
-    public string HighlightLatestStableVersion(Package p)
+    public static string HighlightLatestStableVersion(Package p)
     {
-
         if (p.LatestStableVersion is null)
         {
             return "-";
@@ -19,7 +18,7 @@ public class PackageVersionHighlighterService
             : HighlightVersion(p.CurrentVersion, p.LatestStableVersion);
     }
 
-    public string HighlightLatestVersion(Package p)
+    public static string HighlightLatestVersion(Package p)
     {
         if (p.LatestVersion is null)
         {
@@ -31,7 +30,7 @@ public class PackageVersionHighlighterService
             : HighlightVersion(p.CurrentVersion, p.LatestVersion);
     }
 
-    private string HighlightVersion(NuGetVersion current, NuGetVersion newer)
+    private static string HighlightVersion(NuGetVersion current, NuGetVersion newer)
     {
         // If the newer major version is greater or lower than the current major
         // version we have a breaking change and can return all red.

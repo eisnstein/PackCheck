@@ -1,5 +1,6 @@
 using PackCheck.Commands;
 using PackCheck.Commands.Settings;
+using PackCheck.Services;
 using Spectre.Console.Cli;
 using Spectre.Console.Testing;
 
@@ -21,7 +22,7 @@ public class CheckSettingsTests
 
         Assert.NotNull(result.Settings);
         Assert.IsType<CheckSettings>(result.Settings);
-        CheckSettings settings = result.Settings as CheckSettings;
+        CheckSettings? settings = result.Settings as CheckSettings;
         Assert.Null(settings!.PathToCsProjFile);
     }
 
@@ -31,7 +32,6 @@ public class CheckSettingsTests
         var app = new CommandAppTester();
         app.Configure(config =>
         {
-            // config.PropagateExceptions();
             config.AddCommand<CheckCommand>("check");
         });
 
@@ -51,18 +51,94 @@ public class CheckSettingsTests
         var app = new CommandAppTester();
         app.Configure(config =>
         {
-            // config.PropagateExceptions();
             config.AddCommand<CheckCommand>("check");
         });
 
         CommandAppResult result = app.Run(new[] { "check", "--csprojFile", @".\example.csproj" });
 
-        // Given .csproj file cannot be found
+        // Exit code is -1 because given .csproj file cannot be found
         Assert.Equal(-1, result.ExitCode);
         Assert.NotNull(result.Settings);
         Assert.IsType<CheckSettings>(result.Settings);
-        CheckSettings settings = result.Settings as CheckSettings;
+        CheckSettings? settings = result.Settings as CheckSettings;
         Assert.NotNull(settings!.PathToCsProjFile);
         Assert.Equal(@".\example.csproj", settings!.PathToCsProjFile);
+    }
+
+    [Fact]
+    public void PathToSolutionFileIsSetButNoValueGiven()
+    {
+        var app = new CommandAppTester();
+        app.Configure(config =>
+        {
+            config.AddCommand<CheckCommand>("check");
+        });
+
+        CommandAppResult result = app.Run(new[] { "check", "--slnFile" });
+
+        // No .sln file is given
+        Assert.Equal(-1, result.ExitCode);
+        Assert.StartsWith(
+            "Error: Option 'slnFile' is defined but no value has been provided.",
+            result.Output
+        );
+    }
+
+    [Fact]
+    public void PathToSlnFileIsSet()
+    {
+        var app = new CommandAppTester();
+        app.Configure(config =>
+        {
+            // config.PropagateExceptions();
+            config.AddCommand<CheckCommand>("check");
+        });
+
+        CommandAppResult result = app.Run(new[] { "check", "--slnFile", @".\example.sln" });
+
+        Assert.Equal(-1, result.ExitCode);
+        Assert.NotNull(result.Settings);
+        Assert.IsType<CheckSettings>(result.Settings);
+        CheckSettings? settings = result.Settings as CheckSettings;
+        Assert.NotNull(settings!.PathToSlnFile);
+        Assert.Equal(@".\example.sln", settings!.PathToSlnFile);
+    }
+
+    [Fact]
+    public void PathToCpmFileIsSetButNoValueGiven()
+    {
+        var app = new CommandAppTester();
+        app.Configure(config =>
+        {
+            config.AddCommand<CheckCommand>("check");
+        });
+
+        CommandAppResult result = app.Run(new[] { "check", "--cpmFile" });
+
+        // No Directory.Packages.props file is given
+        Assert.Equal(-1, result.ExitCode);
+        Assert.StartsWith(
+            "Error: Option 'cpmFile' is defined but no value has been provided.",
+            result.Output
+        );
+    }
+
+    [Fact]
+    public void PathToCpmFileIsSet()
+    {
+        var app = new CommandAppTester();
+        app.Configure(config =>
+        {
+            config.AddCommand<CheckCommand>("check");
+        });
+
+        CommandAppResult result = app.Run(new[] { "check", "--cpmFile", $".\\{CentralPackageMgmtService.CpmFileName}" });
+
+        Assert.Equal(-1, result.ExitCode);
+        Assert.NotNull(result.Settings);
+        Assert.IsType<CheckSettings>(result.Settings);
+        CheckSettings? settings = result.Settings as CheckSettings;
+        Assert.NotNull(settings!.PathToCpmFile);
+        Assert.Equal($".\\{CentralPackageMgmtService.CpmFileName}", settings!.PathToCpmFile);
     }
 }

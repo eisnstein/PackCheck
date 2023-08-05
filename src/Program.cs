@@ -22,7 +22,7 @@ app.Configure(
 
         config.AddCommand<UpgradeCommand>("upgrade")
             .WithAlias("u")
-            .WithDescription("Upgrade the *.csproj file")
+            .WithDescription("Upgrade the *.csproj (or Directory.Packages.props) file")
             .WithExample(new[] { "upgrade" })
             .WithExample(new[] { "upgrade", "--version", "stable" })
             .WithExample(new[] { "upgrade", "--version", "latest" })

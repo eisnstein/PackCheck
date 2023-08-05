@@ -12,4 +12,8 @@ public sealed class CheckSettings : CommandSettings
     [CommandOption("--slnFile <path>")]
     [Description(@"Path to *.sln file. (default .\*.sln)")]
     public string? PathToSlnFile { get; init; }
+
+    [CommandOption("--cpmFile <path>")]
+    [Description(@"Path to Directory.Packages.props file. (default .\Directory.Packages.props)")]
+    public string? PathToCpmFile { get; init; }
 }

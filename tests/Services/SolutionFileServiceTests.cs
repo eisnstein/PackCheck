@@ -6,19 +6,12 @@ namespace PackCheck.Tests.Services;
 
 public class SolutionFileServiceTests
 {
-    private readonly SolutionFileService _service;
-
-    public SolutionFileServiceTests()
-    {
-        _service = new();
-    }
-
     [Fact]
     public void LoadsSolutionFile()
     {
         TestHelper.LoadSolution();
 
-        Assert.True(_service.HasSolution());
+        Assert.True(SolutionFileService.HasSolution());
 
         TestHelper.DeleteSolution();
     }
@@ -28,7 +21,7 @@ public class SolutionFileServiceTests
     {
         TestHelper.LoadSolution();
 
-        var projectDefinitions = _service.GetProjectDefinitions("testSolution.sln").ToList();
+        var projectDefinitions = SolutionFileService.GetProjectDefinitions("testSolution.sln").ToList();
 
         Assert.Equal(2, projectDefinitions.Count);
         foreach (var projectDefinition in projectDefinitions)
@@ -49,8 +42,8 @@ public class SolutionFileServiceTests
             @"SolProj.Tests\SolProj.Tests.csproj"
         };
 
-        var projectDefinitions = _service.GetProjectDefinitions("testSolution.sln");
-        var projectPaths = _service.ParseProjectDefinitions(projectDefinitions);
+        var projectDefinitions = SolutionFileService.GetProjectDefinitions("testSolution.sln");
+        var projectPaths = SolutionFileService.ParseProjectDefinitions(projectDefinitions);
 
         Assert.Equal(2, projectPaths.Count);
         Assert.Equal(expectedPaths, projectPaths);

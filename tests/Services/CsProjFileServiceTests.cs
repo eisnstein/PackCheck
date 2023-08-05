@@ -13,19 +13,12 @@ namespace PackCheck.Tests.Services;
 
 public class CsProjFileServiceTests
 {
-    private readonly CsProjFileService _service;
-
-    public CsProjFileServiceTests()
-    {
-        _service = new();
-    }
-
     [Fact]
     public void ThrowsWhenPathToCsProjFileIsProvidedButFileDoesNotExist()
     {
         var pathToFile = "does-not-exist.csproj";
 
-        Action actual = () => _service.GetPathToCsProjFile(pathToFile);
+        Action actual = () => CsProjFileService.GetPathToCsProjFile(pathToFile);
 
         Assert.Throws<CsProjFileException>(actual);
     }
@@ -36,7 +29,7 @@ public class CsProjFileServiceTests
         TestHelper.LoadTestCsProjFile();
         var relativePath = "test.csproj";
 
-        var fullPath = _service.GetPathToCsProjFile(relativePath);
+        var fullPath = CsProjFileService.GetPathToCsProjFile(relativePath);
 
         Assert.EndsWith(relativePath, fullPath);
         TestHelper.DeleteTestCsProjFile();
@@ -47,7 +40,7 @@ public class CsProjFileServiceTests
     {
         TestHelper.LoadTestCsProjFile();
 
-        var fullPath = _service.GetPathToCsProjFile();
+        var fullPath = CsProjFileService.GetPathToCsProjFile();
 
         Assert.EndsWith("test.csproj", fullPath);
         TestHelper.DeleteTestCsProjFile();
@@ -68,7 +61,7 @@ public class CsProjFileServiceTests
 
         var preparedPackages = PackagesService.PreparePackagesForUpgrade(packages, settings.Version);
 
-        await _service.UpgradePackageVersionsAsync(pathToCsProjFile, preparedPackages, settings.DryRun);
+        await CsProjFileService.UpgradePackageVersionsAsync(pathToCsProjFile, preparedPackages, settings.DryRun);
 
         var fileContent = await File.ReadAllTextAsync(pathToCsProjFile);
 
@@ -97,7 +90,7 @@ public class CsProjFileServiceTests
 
         var preparedPackages = PackagesService.PreparePackagesForUpgrade(packages, settings.Version);
 
-        await _service.UpgradePackageVersionsAsync(pathToCsProjFile, preparedPackages, settings.DryRun);
+        await CsProjFileService.UpgradePackageVersionsAsync(pathToCsProjFile, preparedPackages, settings.DryRun);
 
         var fileContent = await File.ReadAllTextAsync(pathToCsProjFile);
 
@@ -123,7 +116,7 @@ public class CsProjFileServiceTests
 
         var preparedPackages = PackagesService.PreparePackagesForUpgrade(packages, settings.Version);
 
-        await _service.UpgradePackageVersionsAsync(pathToCsProjFile, preparedPackages, settings.DryRun);
+        await CsProjFileService.UpgradePackageVersionsAsync(pathToCsProjFile, preparedPackages, settings.DryRun);
 
         var fileContent = await File.ReadAllTextAsync(pathToCsProjFile);
 

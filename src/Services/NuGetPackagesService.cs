@@ -1,7 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using System.Xml;
 using NuGet.Versioning;
 using PackCheck.Data;
 using Spectre.Console;
@@ -15,50 +14,6 @@ public class NuGetPackagesService
     public NuGetPackagesService(NuGetApiService nuGetApiService)
     {
         _nuGetApiService = nuGetApiService;
-    }
-
-    public async Task GetPackagesDataFromCsProjFileAsync(string pathToCsProjFile, List<Package> packages)
-    {
-        var settings = new XmlReaderSettings { Async = true };
-        var reader = XmlReader.Create(pathToCsProjFile, settings);
-
-        while (await reader.ReadAsync())
-        {
-            if (reader.NodeType != XmlNodeType.Element || reader.Name != "PackageReference")
-            {
-                continue;
-            }
-
-            if (!reader.HasAttributes)
-            {
-                continue;
-            }
-
-            var packageName = "";
-            var currentVersion = "";
-
-            while (reader.MoveToNextAttribute())
-            {
-                if (reader.Name == "Include")
-                {
-                    packageName = reader.Value;
-                }
-
-                if (reader.Name == "Version")
-                {
-                    currentVersion = reader.Value;
-                }
-            }
-
-            if (string.IsNullOrEmpty(packageName) || string.IsNullOrEmpty(currentVersion))
-            {
-                continue;
-            }
-
-            packages.Add(new Package(packageName, NuGetVersion.Parse(currentVersion)));
-        }
-
-        reader.Close();
     }
 
     public async Task GetPackagesDataFromNugetRepositoryAsync(List<Package> packages)
