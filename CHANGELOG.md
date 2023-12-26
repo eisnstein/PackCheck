@@ -1,6 +1,9 @@
 # Changelog
 
-## 0.4.1 (2023-12-26)
+## 1.0.0 (2023-12-26)
+
+### Breaking Changes
+* Rename `--version` option on the `upgrade` command to `--target`
 
 ### Enhancements
 * Add `net8.0` to target frameworks

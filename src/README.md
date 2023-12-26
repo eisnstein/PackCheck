@@ -11,7 +11,7 @@ Check for newer versions of installed NuGet Packages in your Terminal.
 
 PackCheck is a dotnet tool for checking versions of installed NuGet packages in your .NET projects in your terminal.
 The `check` command (default) shows you all NuGet packages in a nice table with the *current*, *latest stable* and *latest* versions of each package.
-You can upgrade the .csproj file with the `upgrade` command to your desired versions. Whether to the *latest stable* or *latest* version, only a specific
+You can upgrade the .csproj (or Directory.Packages.props if you use Central Package Management) file with the `upgrade` command to your desired target versions. Whether to the *latest stable* or *latest* version, only a specific
 package or all at once.
 
 
@@ -20,7 +20,11 @@ package or all at once.
 You can install PackCheck as a dotnet tool via NuGet:
 
  ```shell
+ # Install
  dotnet tool install --global PackCheck
+ 
+ # Update
+ dotnet tool update --global PackCheck
  ```
 
 ## Usage
@@ -44,8 +48,8 @@ This should give you something like this:
 
 ![PackCheck check example](https://github.com/eisnstein/PackCheck/blob/main/src/Assets/packcheck-check.png)
 
-After that you can upgrade the package versions in the _.csproj_ file (or files in a solution) to their corresponding stable versions by running:
-> This changes your .csproj file!
+After that you can upgrade the package versions in the _.csproj_ file (or _.csproj_ files in a solution, or the _Directory.Packages.props_ file) to their corresponding stable versions by running:
+> This changes your **.csproj** file(s) or the **Directory.Packages.props** file!
 
 ```shell
 packcheck upgrade
@@ -58,14 +62,14 @@ packcheck u
 To upgrade to the latest versions run:
 
 ```shell
-packcheck upgrade --version latest
+packcheck upgrade --target latest
 
 # or
 
-packcheck u --version latest
+packcheck u --target latest
 ```
 
-For a dry-run, which outputs the _.csproj_ file into the terminal without actually changing the .csproj file, run:
+For a dry-run, which outputs the _.csproj_ file (or the _Directory.Packages.props_) into the terminal without actually changing the file, run:
 
 ```shell
 packcheck upgrade --dry-run
@@ -83,6 +87,10 @@ packcheck upgrade -i
 # or
 
 packcheck u -i
+
+# or to upgrade to the latest versions
+
+packcheck u --target latest -i
 ```
 
 For help run:
