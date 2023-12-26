@@ -30,6 +30,11 @@ public static class PackCheckService
         var currentVersionStr = assembly
             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
             .InformationalVersion;
+        if (currentVersionStr is null)
+        {
+            return;
+        }
+
         var currentVersion = NuGetVersion.Parse(currentVersionStr);
 
         // If there is a newer version available, show information

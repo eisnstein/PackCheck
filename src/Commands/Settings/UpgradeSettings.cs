@@ -22,10 +22,10 @@ public sealed class UpgradeSettings : CommandSettings
     [Description(@"Path to Directory.Packages.props file. (default .\Directory.Packages.props)")]
     public string? PathToCpmFile { get; init; }
 
-    [CommandOption("--version <target_version>")]
+    [CommandOption("--target <target_version>")]
     [Description("Upgrade version number to latest stable version (stable) or latest version (latest)")]
     [ValidateTargetVersion("Target version has to be 'stable' or 'latest'.")]
-    public string Version { get; init; } = Data.Version.Stable;
+    public string Target { get; init; } = Data.Target.Stable;
 
     [CommandOption("--dry-run")]
     [DefaultValue(false)]

@@ -1,19 +1,16 @@
 using System;
 using System.Linq;
+using PackCheck.Data;
 using Spectre.Console;
 using Spectre.Console.Cli;
-using Version = PackCheck.Data.Version;
 
 namespace PackCheck.Commands.Validation;
 
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
-public sealed class ValidateTargetVersionAttribute : ParameterValidationAttribute
+public sealed class ValidateTargetVersionAttribute(string errorMessage)
+    : ParameterValidationAttribute(errorMessage)
 {
-    private static readonly string[] PossibleValues = { Version.Stable, Version.Latest };
-
-    public ValidateTargetVersionAttribute(string errorMessage) : base(errorMessage)
-    {
-    }
+    private static readonly string[] PossibleValues =  [Target.Stable, Target.Latest];
 
     public override ValidationResult Validate(CommandParameterContext context)
     {

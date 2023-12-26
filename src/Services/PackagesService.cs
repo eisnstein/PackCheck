@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using PackCheck.Data;
-using Version = PackCheck.Data.Version;
 
 namespace PackCheck.Services;
 
@@ -15,8 +14,8 @@ public static class PackagesService
             // Depending on the desired target version set the new version
             p.NewVersion = upgradeTo switch
             {
-                Version.Stable => p.LatestStableVersion,
-                Version.Latest => p.LatestVersion ?? p.LatestStableVersion,
+                Target.Stable => p.LatestStableVersion,
+                Target.Latest => p.LatestVersion ?? p.LatestStableVersion,
                 _ => throw new ArgumentException(nameof(upgradeTo))
             };
 

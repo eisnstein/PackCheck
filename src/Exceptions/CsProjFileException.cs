@@ -2,10 +2,4 @@ using System;
 
 namespace PackCheck.Exceptions;
 
-public class CsProjFileException : Exception
-{
-    public CsProjFileException(string message)
-        : base(message)
-    {
-    }
-}
+public class CsProjFileException(string message) : Exception(message);

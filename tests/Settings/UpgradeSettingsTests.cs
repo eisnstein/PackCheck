@@ -22,8 +22,8 @@ public class UpgradeSettingsTests
         Assert.NotNull(result.Settings);
         Assert.IsType<UpgradeSettings>(result.Settings);
         UpgradeSettings? settings = result.Settings as UpgradeSettings;
-        Assert.NotNull(settings!.Version);
-        Assert.Equal("stable", settings!.Version);
+        Assert.NotNull(settings!.Target);
+        Assert.Equal("stable", settings!.Target);
     }
 
     [Fact]
@@ -36,13 +36,13 @@ public class UpgradeSettingsTests
             config.AddCommand<UpgradeCommand>("upgrade");
         });
 
-        CommandAppResult result = app.Run(new[] { "upgrade", "--version", "stable" });
+        CommandAppResult result = app.Run(new[] { "upgrade", "--target", "stable" });
 
         Assert.NotNull(result.Settings);
         Assert.IsType<UpgradeSettings>(result.Settings);
         UpgradeSettings? settings = result.Settings as UpgradeSettings;
-        Assert.NotNull(settings!.Version);
-        Assert.Equal("stable", settings!.Version);
+        Assert.NotNull(settings!.Target);
+        Assert.Equal("stable", settings!.Target);
     }
 
     [Fact]
@@ -55,13 +55,13 @@ public class UpgradeSettingsTests
             config.AddCommand<UpgradeCommand>("upgrade");
         });
 
-        CommandAppResult result = app.Run(new[] { "upgrade", "--version", "latest" });
+        CommandAppResult result = app.Run(new[] { "upgrade", "--target", "latest" });
 
         Assert.NotNull(result.Settings);
         Assert.IsType<UpgradeSettings>(result.Settings);
         UpgradeSettings? settings = result.Settings as UpgradeSettings;
-        Assert.NotNull(settings!.Version);
-        Assert.Equal("latest", settings!.Version);
+        Assert.NotNull(settings!.Target);
+        Assert.Equal("latest", settings!.Target);
     }
 
     [Fact]
@@ -74,7 +74,7 @@ public class UpgradeSettingsTests
             config.AddCommand<UpgradeCommand>("upgrade");
         });
 
-        Assert.Throws<CommandRuntimeException>(() => app.Run(new[] { "upgrade", "--version", "wrong" }));
+        Assert.Throws<CommandRuntimeException>(() => app.Run(new[] { "upgrade", "--target", "wrong" }));
     }
 
     [Fact]
@@ -89,7 +89,7 @@ public class UpgradeSettingsTests
 
         CommandAppResult result = app.Run(new[]
         {
-            "upgrade", "awesome-package", "--csprojFile", "\\path-to-file", "--version", "latest"
+            "upgrade", "awesome-package", "--csprojFile", "\\path-to-file", "--target", "latest"
         });
 
         Assert.Equal(-1, result.ExitCode);
@@ -100,8 +100,8 @@ public class UpgradeSettingsTests
         Assert.Equal("awesome-package", settings!.PackageToUpgrade);
         Assert.NotNull(settings!.PathToCsProjFile);
         Assert.Equal("\\path-to-file", settings!.PathToCsProjFile);
-        Assert.NotNull(settings!.Version);
-        Assert.Equal("latest", settings!.Version);
+        Assert.NotNull(settings!.Target);
+        Assert.Equal("latest", settings!.Target);
         Assert.False(settings!.DryRun);
         Assert.False(settings!.Interactive);
     }
@@ -118,7 +118,7 @@ public class UpgradeSettingsTests
 
         CommandAppResult result = app.Run(new[]
         {
-            "upgrade", "awesome-package", "--csprojFile", "\\path-to-file", "--version", "latest", "--dry-run"
+            "upgrade", "awesome-package", "--csprojFile", "\\path-to-file", "--target", "latest", "--dry-run"
         });
 
         Assert.Equal(-1, result.ExitCode);
@@ -129,8 +129,8 @@ public class UpgradeSettingsTests
         Assert.Equal("awesome-package", settings!.PackageToUpgrade);
         Assert.NotNull(settings!.PathToCsProjFile);
         Assert.Equal("\\path-to-file", settings!.PathToCsProjFile);
-        Assert.NotNull(settings!.Version);
-        Assert.Equal("latest", settings!.Version);
+        Assert.NotNull(settings!.Target);
+        Assert.Equal("latest", settings!.Target);
         Assert.True(settings!.DryRun);
         Assert.False(settings!.Interactive);
     }

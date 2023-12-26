@@ -7,7 +7,6 @@ using PackCheck.Exceptions;
 using PackCheck.Services;
 using Spectre.Console;
 using Spectre.Console.Cli;
-using Version = PackCheck.Data.Version;
 
 namespace PackCheck.Commands;
 
@@ -123,7 +122,7 @@ public class UpgradeCommand : AsyncCommand<UpgradeSettings>
             return Result.Error;
         }
 
-        AnsiConsole.MarkupLine($"Upgrading to [grey]{settings.Version}[/] versions in [grey]{pathToCsProjFile}[/]");
+        AnsiConsole.MarkupLine($"Upgrading to [grey]{settings.Target}[/] versions in [grey]{pathToCsProjFile}[/]");
 
         List<Package> packages = new();
 
@@ -145,7 +144,7 @@ public class UpgradeCommand : AsyncCommand<UpgradeSettings>
         // Fetch data for each package from nuget and store data on each package
         await _nuGetPackagesService.GetPackagesDataFromNugetRepositoryAsync(packages);
 
-        packages = PackagesService.PreparePackagesForUpgrade(packages, settings.Version);
+        packages = PackagesService.PreparePackagesForUpgrade(packages, settings.Target);
         if (packages.Count == 0)
         {
             AnsiConsole.MarkupLine("[green]All packages are up to date.[/]");
@@ -209,7 +208,7 @@ public class UpgradeCommand : AsyncCommand<UpgradeSettings>
             return Result.Error;
         }
 
-        AnsiConsole.MarkupLine($"Upgrading to [grey]{settings.Version}[/] versions in [grey]{pathToCpmFile}[/]");
+        AnsiConsole.MarkupLine($"Upgrading to [grey]{settings.Target}[/] versions in [grey]{pathToCpmFile}[/]");
 
         List<Package> packages = new();
 
@@ -231,7 +230,7 @@ public class UpgradeCommand : AsyncCommand<UpgradeSettings>
         // Fetch data for each package from nuget and store data on each package
         await _nuGetPackagesService.GetPackagesDataFromNugetRepositoryAsync(packages);
 
-        packages = PackagesService.PreparePackagesForUpgrade(packages, settings.Version);
+        packages = PackagesService.PreparePackagesForUpgrade(packages, settings.Target);
         if (packages.Count == 0)
         {
             AnsiConsole.MarkupLine("[green]All packages are up to date.[/]");
@@ -284,7 +283,7 @@ public class UpgradeCommand : AsyncCommand<UpgradeSettings>
     {
         var newVersion = package.UpgradeTo switch
         {
-            Version.Latest => PackageVersionHighlighterService.HighlightLatestVersion(package),
+            Target.Latest => PackageVersionHighlighterService.HighlightLatestVersion(package),
             _ => PackageVersionHighlighterService.HighlightLatestStableVersion(package)
         };
 

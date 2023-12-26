@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.4.1 (2023-12-26)
+
+### Enhancements
+* Add `net8.0` to target frameworks
+
 ## 0.4.0 (2023-08-05)
 
 ### Enhancements

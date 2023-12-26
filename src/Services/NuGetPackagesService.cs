@@ -7,15 +7,8 @@ using Spectre.Console;
 
 namespace PackCheck.Services;
 
-public class NuGetPackagesService
+public class NuGetPackagesService(NuGetApiService nuGetApiService)
 {
-    private readonly NuGetApiService _nuGetApiService;
-
-    public NuGetPackagesService(NuGetApiService nuGetApiService)
-    {
-        _nuGetApiService = nuGetApiService;
-    }
-
     public async Task GetPackagesDataFromNugetRepositoryAsync(List<Package> packages)
     {
         await AnsiConsole.Progress()
@@ -39,7 +32,7 @@ public class NuGetPackagesService
 
         foreach (var package in packages)
         {
-            IEnumerable<NuGetVersion> result = await _nuGetApiService.GetPackageVersions(package.PackageName);
+            IEnumerable<NuGetVersion> result = await nuGetApiService.GetPackageVersions(package.PackageName);
             List<NuGetVersion> versions = result.ToList();
             if (versions is { Count: > 0 })
             {

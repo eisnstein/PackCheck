@@ -14,7 +14,7 @@ namespace PackCheck.Services;
 
 public static class CentralPackageMgmtService
 {
-    public static string CpmFileName = "Directory.Packages.props";
+    public static readonly string CpmFileName = "Directory.Packages.props";
 
     public static bool HasCentralPackageMgmt()
     {

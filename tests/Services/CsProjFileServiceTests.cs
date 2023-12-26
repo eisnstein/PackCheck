@@ -7,7 +7,6 @@ using PackCheck.Data;
 using PackCheck.Exceptions;
 using PackCheck.Services;
 using PackCheck.Tests.Factories;
-using Version = PackCheck.Data.Version;
 
 namespace PackCheck.Tests.Services;
 
@@ -55,11 +54,11 @@ public class CsProjFileServiceTests
         var settings = new UpgradeSettings
         {
             DryRun = false,
-            Version = "stable",
+            Target = "stable",
             Interactive = false
         };
 
-        var preparedPackages = PackagesService.PreparePackagesForUpgrade(packages, settings.Version);
+        var preparedPackages = PackagesService.PreparePackagesForUpgrade(packages, settings.Target);
 
         await CsProjFileService.UpgradePackageVersionsAsync(pathToCsProjFile, preparedPackages, settings.DryRun);
 
@@ -81,14 +80,14 @@ public class CsProjFileServiceTests
         {
             PackageToUpgrade = "NuGet.Protocol",
             DryRun = false,
-            Version = Version.Stable,
+            Target = Target.Stable,
             Interactive = false
         };
         var packages = GeneratePackagesList()
             .Where(p => p.PackageName == settings.PackageToUpgrade)
             .ToList();
 
-        var preparedPackages = PackagesService.PreparePackagesForUpgrade(packages, settings.Version);
+        var preparedPackages = PackagesService.PreparePackagesForUpgrade(packages, settings.Target);
 
         await CsProjFileService.UpgradePackageVersionsAsync(pathToCsProjFile, preparedPackages, settings.DryRun);
 
@@ -110,11 +109,11 @@ public class CsProjFileServiceTests
         var settings = new UpgradeSettings
         {
             DryRun = false,
-            Version = Version.Latest,
+            Target = Target.Latest,
             Interactive = false
         };
 
-        var preparedPackages = PackagesService.PreparePackagesForUpgrade(packages, settings.Version);
+        var preparedPackages = PackagesService.PreparePackagesForUpgrade(packages, settings.Target);
 
         await CsProjFileService.UpgradePackageVersionsAsync(pathToCsProjFile, preparedPackages, settings.DryRun);
 

@@ -63,11 +63,11 @@ public class CentralPackageMgmtServiceTest
         var settings = new UpgradeSettings
         {
             DryRun = false,
-            Version = "stable",
+            Target = "stable",
             Interactive = false
         };
 
-        var preparedPackages = PackagesService.PreparePackagesForUpgrade(packages, settings.Version);
+        var preparedPackages = PackagesService.PreparePackagesForUpgrade(packages, settings.Target);
 
         await CentralPackageMgmtService.UpgradePackageVersionsAsync(pathToCsProjFile, preparedPackages, settings.DryRun);
 

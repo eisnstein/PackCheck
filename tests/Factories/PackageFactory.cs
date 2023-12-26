@@ -5,7 +5,11 @@ namespace PackCheck.Tests.Factories;
 
 public static class PackageFactory
 {
-    public static Package Create(string packageName, string currentVersion, string? latestStableVersion = null, string? latestVersion = null)
+    public static Package Create(
+        string packageName,
+        string currentVersion,
+        string? latestStableVersion = null,
+        string? latestVersion = null)
     {
         return new Package(packageName, NuGetVersion.Parse(currentVersion))
         {

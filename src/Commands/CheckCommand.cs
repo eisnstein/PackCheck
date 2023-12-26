@@ -226,11 +226,11 @@ public class CheckCommand : AsyncCommand<CheckSettings>
         AnsiConsole.MarkupLine(
             "[dim]INFO:[/] Run [blue]packcheck upgrade[/] to upgrade the .csproj file with the latest stable versions.");
         AnsiConsole.MarkupLine(
-            "[dim]INFO:[/] Run [blue]packcheck upgrade --version latest[/] to upgrade the .csproj file with the latest versions.");
+            "[dim]INFO:[/] Run [blue]packcheck upgrade --target latest[/] to upgrade the .csproj file with the latest versions.");
         AnsiConsole.MarkupLine(
             "[dim]INFO:[/] Run [blue]packcheck upgrade <Package Name>[/] to upgrade only the specified package to the latest stable version.");
         AnsiConsole.MarkupLine(
-            "[dim]INFO:[/] Run [blue]packcheck upgrade <Package Name> --version latest[/] to upgrade only the specified package to the latest version.");
+            "[dim]INFO:[/] Run [blue]packcheck upgrade <Package Name> --target latest[/] to upgrade only the specified package to the latest version.");
     }
 
     private void PrintSolutionInfo()
@@ -238,6 +238,6 @@ public class CheckCommand : AsyncCommand<CheckSettings>
         AnsiConsole.MarkupLine(
             "[dim]INFO:[/] Run [blue]packcheck upgrade[/] to upgrade all .csproj files with the latest stable versions.");
         AnsiConsole.MarkupLine(
-            "[dim]INFO:[/] Run [blue]packcheck upgrade --version latest[/] to upgrade all .csproj files with the latest versions.");
+            "[dim]INFO:[/] Run [blue]packcheck upgrade --target latest[/] to upgrade all .csproj files with the latest versions.");
     }
 }

@@ -18,7 +18,7 @@ public class PackagesServiceTest
             PackageFactory.Create("Pack4", "0.44.0", "0.44.0"),
         };
 
-        var preparedPackages = PackagesService.PreparePackagesForUpgrade(packages, Version.Stable);
+        var preparedPackages = PackagesService.PreparePackagesForUpgrade(packages, Target.Stable);
 
         Assert.Empty(preparedPackages);
     }
@@ -34,7 +34,7 @@ public class PackagesServiceTest
             PackageFactory.Create("Pack4", "0.44.0", "0.44.1"),
         };
 
-        var preparedPackages = PackagesService.PreparePackagesForUpgrade(packages, Version.Stable);
+        var preparedPackages = PackagesService.PreparePackagesForUpgrade(packages, Target.Stable);
 
         Assert.Equal(4, preparedPackages.Count);
         Assert.Equal("6.2.2", preparedPackages[0]!.NewVersion!.ToString());
@@ -44,7 +44,7 @@ public class PackagesServiceTest
 
         foreach (var package in preparedPackages)
         {
-            Assert.Equal(Version.Stable, package.UpgradeTo);
+            Assert.Equal(Target.Stable, package.UpgradeTo);
         }
     }
 
@@ -59,12 +59,12 @@ public class PackagesServiceTest
             PackageFactory.Create("Pack4", "0.44.0", "0.44.0"),
         };
 
-        var preparedPackages = PackagesService.PreparePackagesForUpgrade(packages, Version.Latest);
+        var preparedPackages = PackagesService.PreparePackagesForUpgrade(packages, Target.Latest);
 
         Assert.Single(preparedPackages);
         Assert.Equal("6.2.2", preparedPackages[0]!.NewVersion!.ToString());
         Assert.Equal("Pack1", preparedPackages[0]!.PackageName);
-        Assert.Equal(Version.Latest, preparedPackages[0]!.UpgradeTo);
+        Assert.Equal(Target.Latest, preparedPackages[0]!.UpgradeTo);
     }
 
     [Fact]
@@ -78,7 +78,7 @@ public class PackagesServiceTest
             PackageFactory.Create("Pack4", "0.44.0", "0.44.1", "0.5.0-rc.1"),
         };
 
-        var preparedPackages = PackagesService.PreparePackagesForUpgrade(packages, Version.Latest);
+        var preparedPackages = PackagesService.PreparePackagesForUpgrade(packages, Target.Latest);
 
         Assert.Equal(4, preparedPackages.Count);
         Assert.Equal("6.2.2", preparedPackages[0]!.NewVersion!.ToString());
@@ -88,7 +88,7 @@ public class PackagesServiceTest
 
         foreach (var package in preparedPackages)
         {
-            Assert.Equal(Version.Latest, package.UpgradeTo);
+            Assert.Equal(Target.Latest, package.UpgradeTo);
         }
     }
 }

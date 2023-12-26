@@ -24,13 +24,13 @@ app.Configure(
             .WithAlias("u")
             .WithDescription("Upgrade the *.csproj (or Directory.Packages.props) file")
             .WithExample(new[] { "upgrade" })
-            .WithExample(new[] { "upgrade", "--version", "stable" })
-            .WithExample(new[] { "upgrade", "--version", "latest" })
-            .WithExample(new[] { "upgrade", "Microsoft.Extensions.Logging", "--version", "stable" })
-            .WithExample(new[] { "upgrade", "Microsoft.Extensions.Logging", "--version", "latest" })
+            .WithExample(new[] { "upgrade", "--target", "stable" })
+            .WithExample(new[] { "upgrade", "--target", "latest" })
+            .WithExample(new[] { "upgrade", "Microsoft.Extensions.Logging", "--target", "stable" })
+            .WithExample(new[] { "upgrade", "Microsoft.Extensions.Logging", "--target", "latest" })
             .WithExample(new[] { "upgrade", "--dry-run" })
             .WithExample(new[] { "upgrade", "-i" })
-            .WithExample(new[] { "upgrade", "--version", "latest", "-i" });
+            .WithExample(new[] { "upgrade", "--target", "latest", "-i" });
     });
 
 return await app.RunAsync(args)
