@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.0.1 (2023-12-27)
+
+### Enhancements
+* Add link to CHANGELOG.md in PackCheck outdated info
+
 ## 1.0.0 (2023-12-26)
 
 ### Breaking Changes
