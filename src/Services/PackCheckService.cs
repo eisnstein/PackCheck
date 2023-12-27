@@ -41,6 +41,7 @@ public static class PackCheckService
         if (latestVersion > currentVersion)
         {
             AnsiConsole.MarkupLine($"[dim]INFO:[/] A new version of PackCheck is available: {currentVersion} -> {latestVersion}");
+            AnsiConsole.MarkupLine($"[dim]INFO:[/] Changelog: [link]https://github.com/eisnstein/PackCheck/blob/main/CHANGELOG.md[/]");
             AnsiConsole.MarkupLine("[dim]INFO:[/] Run [blue]dotnet tool update --global PackCheck[/] to update");
             Console.WriteLine();
         }
