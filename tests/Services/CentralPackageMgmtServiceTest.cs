@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 using PackCheck.Commands.Settings;
 using PackCheck.Data;
 using PackCheck.Exceptions;
@@ -32,7 +33,7 @@ public class CentralPackageMgmtServiceTest
     }
 
     [Fact]
-    public async void ReadsPackagesDataFromCpmFile()
+    public async Task ReadsPackagesDataFromCpmFile()
     {
         TestHelper.LoadCpm();
 
@@ -54,7 +55,7 @@ public class CentralPackageMgmtServiceTest
     }
 
     [Fact]
-    public async void AllPackagesGetUpdatedToLatestStableVersion()
+    public async Task AllPackagesGetUpdatedToLatestStableVersion()
     {
         TestHelper.LoadCpm();
 

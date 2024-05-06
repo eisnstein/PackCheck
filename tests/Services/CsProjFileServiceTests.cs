@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using PackCheck.Commands.Settings;
 using PackCheck.Data;
 using PackCheck.Exceptions;
@@ -46,7 +47,7 @@ public class CsProjFileServiceTests
     }
 
     [Fact]
-    public async void AllPackagesGetUpdatedToLatestStableVersion()
+    public async Task AllPackagesGetUpdatedToLatestStableVersion()
     {
         TestHelper.LoadTestCsProjFile();
         var pathToCsProjFile = "test.csproj";
@@ -72,7 +73,7 @@ public class CsProjFileServiceTests
     }
 
     [Fact]
-    public async void OnePackageGetsUpdatedToLatestStableVersion()
+    public async Task OnePackageGetsUpdatedToLatestStableVersion()
     {
         TestHelper.LoadTestCsProjFile();
         var pathToCsProjFile = "test.csproj";
@@ -101,7 +102,7 @@ public class CsProjFileServiceTests
     }
 
     [Fact]
-    public async void AllPackagesGetUpdatedToLatestVersionIfAvailable()
+    public async Task AllPackagesGetUpdatedToLatestVersionIfAvailable()
     {
         TestHelper.LoadTestCsProjFile();
         var pathToCsProjFile = "test.csproj";
