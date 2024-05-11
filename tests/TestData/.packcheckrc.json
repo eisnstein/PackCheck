@@ -1,0 +1,4 @@
+{
+  "Exclude": ["PackageName1"],
+  "Filter": ["PackageName2"]
+}

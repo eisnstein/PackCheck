@@ -4,36 +4,24 @@ using Spectre.Console.Cli;
 
 namespace PackCheck.Commands.Settings;
 
-public sealed class UpgradeSettings : CommandSettings
+public sealed class UpgradeSettings : CommonSettings
 {
-    [CommandArgument(0, "[package_name]")]
+    [CommandArgument(0, "[Package_Name]")]
     [Description("Name of package to upgrade")]
-    public string? PackageToUpgrade { get; init; }
+    public string? PackageToUpgrade { get; set; }
 
-    [CommandOption("--csprojFile <path>")]
-    [Description(@"Path to *.csproj file. (default .\*.csproj)")]
-    public string? PathToCsProjFile { get; set; }
-
-    [CommandOption("--slnFile <path>")]
-    [Description(@"Path to *.sln file. (default .\*.sln)")]
-    public string? PathToSlnFile { get; init; }
-
-    [CommandOption("--cpmFile <path>")]
-    [Description(@"Path to Directory.Packages.props file. (default .\Directory.Packages.props)")]
-    public string? PathToCpmFile { get; init; }
-
-    [CommandOption("--target <target_version>")]
+    [CommandOption("--target <Target_Version>")]
     [Description("Upgrade version number to latest stable version (stable) or latest version (latest)")]
     [ValidateTargetVersion("Target version has to be 'stable' or 'latest'.")]
-    public string Target { get; init; } = Data.Target.Stable;
+    public string Target { get; set; } = Data.Target.Stable;
 
     [CommandOption("--dry-run")]
     [DefaultValue(false)]
     [Description("Only show the result without actually changing the .csproj file")]
-    public bool DryRun { get; init; }
+    public bool DryRun { get; set; }
 
     [CommandOption("-i|--interactive")]
     [DefaultValue(false)]
     [Description("Interactively decide for each package if it should be upgraded")]
-    public bool Interactive { get; init; }
+    public bool Interactive { get; set; }
 }

@@ -37,9 +37,7 @@ public class CentralPackageMgmtServiceTest
     {
         TestHelper.LoadCpm();
 
-        List<Package> packages = new();
-
-        await CentralPackageMgmtService.GetPackagesDataFromCpmFileAsync(CentralPackageMgmtService.CpmFileName, packages);
+        List<Package> packages = await CentralPackageMgmtService.GetPackagesDataFromCpmFileAsync(CentralPackageMgmtService.CpmFileName);
 
         Assert.Equal(9, packages.Count);
 

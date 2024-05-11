@@ -1,5 +1,13 @@
 # Changelog
 
+## 2.0.0
+
+### Enhancements
+* Update dependencies
+
+### Breaking Changes
+* Remove `net5.0` from target frameworks
+
 ## 1.0.1 (2023-12-27)
 
 ### Enhancements

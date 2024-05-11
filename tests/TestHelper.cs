@@ -42,4 +42,17 @@ public static class TestHelper
             File.Delete("Directory.Packages.props");
         }
     }
+
+    public static void LoadConfig()
+    {
+        File.Copy("TestData/.packcheckrc.json", ".packcheckrc.json", true);
+    }
+
+    public static void DeleteConfig()
+    {
+        if (File.Exists(".packcheckrc.json"))
+        {
+            File.Delete(".packcheckrc.json");
+        }
+    }
 }

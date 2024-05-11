@@ -53,8 +53,9 @@ public static class CentralPackageMgmtService
         return cpmFilePath;
     }
 
-    public static async Task GetPackagesDataFromCpmFileAsync(string pathToCpmFile, List<Package> packages)
+    public static async Task<List<Package>> GetPackagesDataFromCpmFileAsync(string pathToCpmFile)
     {
+        List<Package> packages = new();
         var settings = new XmlReaderSettings { Async = true };
         var reader = XmlReader.Create(pathToCpmFile, settings);
 
@@ -95,9 +96,11 @@ public static class CentralPackageMgmtService
         }
 
         reader.Close();
+
+        return packages;
     }
 
-    public static async Task UpgradePackageVersionsAsync(string pathToCpmFile, List<Package> packages, bool dryRun)
+    public static async Task UpgradePackageVersionsAsync(string pathToCpmFile, IReadOnlyList<Package> packages, bool dryRun)
     {
         XmlReaderSettings readerSettings = new XmlReaderSettings { Async = true };
         XmlReader reader = XmlReader.Create(pathToCpmFile, readerSettings);

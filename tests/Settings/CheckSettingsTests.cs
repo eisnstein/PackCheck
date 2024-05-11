@@ -132,13 +132,13 @@ public class CheckSettingsTests
             config.AddCommand<CheckCommand>("check");
         });
 
-        CommandAppResult result = app.Run(new[] { "check", "--cpmFile", $".\\{CentralPackageMgmtService.CpmFileName}" });
+        CommandAppResult result = app.Run(["check", "--cpmFile", $".\\{CentralPackageMgmtService.CpmFileName}"]);
 
         Assert.Equal(-1, result.ExitCode);
         Assert.NotNull(result.Settings);
         Assert.IsType<CheckSettings>(result.Settings);
-        CheckSettings? settings = result.Settings as CheckSettings;
-        Assert.NotNull(settings!.PathToCpmFile);
+        CheckSettings settings = (result.Settings as CheckSettings)!;
+        Assert.NotNull(settings.PathToCpmFile);
         Assert.Equal($".\\{CentralPackageMgmtService.CpmFileName}", settings!.PathToCpmFile);
     }
 }

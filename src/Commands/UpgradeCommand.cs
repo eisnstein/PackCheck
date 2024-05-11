@@ -124,10 +124,7 @@ public class UpgradeCommand : AsyncCommand<UpgradeSettings>
 
         AnsiConsole.MarkupLine($"Upgrading to [grey]{settings.Target}[/] versions in [grey]{pathToCsProjFile}[/]");
 
-        List<Package> packages = new();
-
-        // Get information for all installed packages
-        await CsProjFileService.GetPackagesDataFromCsProjFileAsync(pathToCsProjFile, packages);
+        List<Package> packages = await CsProjFileService.GetPackagesDataFromCsProjFileAsync(pathToCsProjFile);
         if (packages.Count == 0)
         {
             AnsiConsole.MarkupLine($"Could not find any packages in [grey]{pathToCsProjFile}[/]");
@@ -210,10 +207,7 @@ public class UpgradeCommand : AsyncCommand<UpgradeSettings>
 
         AnsiConsole.MarkupLine($"Upgrading to [grey]{settings.Target}[/] versions in [grey]{pathToCpmFile}[/]");
 
-        List<Package> packages = new();
-
-        // Get information for all installed packages
-        await CentralPackageMgmtService.GetPackagesDataFromCpmFileAsync(pathToCpmFile, packages);
+        List<Package> packages = await CentralPackageMgmtService.GetPackagesDataFromCpmFileAsync(pathToCpmFile);
         if (packages.Count == 0)
         {
             AnsiConsole.MarkupLine($"Could not find any packages in [grey]{pathToCpmFile}[/]");

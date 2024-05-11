@@ -7,7 +7,21 @@ namespace PackCheck.Services;
 
 public static class PackagesService
 {
-    public static List<Package> PreparePackagesForUpgrade(IEnumerable<Package> packages, string upgradeTo)
+    public static List<Package> ApplyConfig(List<Package> packages, Config? config = null)
+    {
+        if (config is null)
+        {
+            return packages;
+        }
+
+        if (config is { Filter: { Count: > 0 } })
+        {
+            packages.Where(p => config.Filter.Contains(p.PackageName));
+        }
+
+        return packages;
+    }
+    public static List<Package> PreparePackagesForUpgrade(List<Package> packages, string upgradeTo)
     {
         return packages.Select(p =>
         {

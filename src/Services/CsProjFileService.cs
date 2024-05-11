@@ -45,8 +45,9 @@ public static class CsProjFileService
         };
     }
 
-    public static async Task GetPackagesDataFromCsProjFileAsync(string pathToCsProjFile, List<Package> packages)
+    public static async Task<List<Package>> GetPackagesDataFromCsProjFileAsync(string pathToCsProjFile)
     {
+        List<Package> packages = new();
         var settings = new XmlReaderSettings { Async = true };
         var reader = XmlReader.Create(pathToCsProjFile, settings);
 
@@ -87,9 +88,11 @@ public static class CsProjFileService
         }
 
         reader.Close();
+
+        return packages;
     }
 
-    public static async Task UpgradePackageVersionsAsync(string pathToCsProjFile, List<Package> packages, bool dryRun)
+    public static async Task UpgradePackageVersionsAsync(string pathToCsProjFile, IReadOnlyList<Package> packages, bool dryRun)
     {
         XmlReaderSettings readerSettings = new XmlReaderSettings { Async = true };
         XmlReader reader = XmlReader.Create(pathToCsProjFile, readerSettings);

@@ -3,6 +3,8 @@ using Spectre.Console.Cli;
 using System.Threading.Tasks;
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using System.Text.Json;
 using PackCheck.Data;
 using PackCheck.Exceptions;
 using PackCheck.Services;
@@ -25,12 +27,25 @@ public class CheckCommand : AsyncCommand<CheckSettings>
     {
         await PackCheckService.CheckForNewPackCheckVersion(_nuGetApiService);
 
+        Config? config = null;
+
+        try
+        {
+            config = PackCheckConfigService.GetConfig();
+        }
+        catch (JsonException e)
+        {
+            AnsiConsole.MarkupLine(
+                $"[dim]WARN:[/] Your .packcheckrc.json configuration file seems to be invalid: ${e.Message}");
+            return -1;
+        }
+
         Result? result = null;
 
         // Check if a path to a specific project is given
         if (!string.IsNullOrEmpty(settings.PathToCsProjFile))
         {
-            result = await CheckProject(settings.PathToCsProjFile);
+            result = await CheckProject(settings.PathToCsProjFile, config);
             if (result != Result.Success)
             {
                 return -1;
@@ -51,7 +66,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
 
             foreach (var projectCsProjFile in projectCsProjFiles)
             {
-                result = await CheckProject(projectCsProjFile);
+                result = await CheckProject(projectCsProjFile, config);
                 if (result == Result.Error)
                 {
                     return -1;
@@ -105,7 +120,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
 
             foreach (var projectCsProjFile in projectCsProjFiles)
             {
-                result = await CheckProject(projectCsProjFile);
+                result = await CheckProject(projectCsProjFile, config);
                 if (result == Result.Error)
                 {
                     return -1;
@@ -119,7 +134,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
         }
 
         // Check if a project file exists
-        result = await CheckProject();
+        result = await CheckProject(config: config);
         if (result != Result.Success)
         {
             return -1;
@@ -131,7 +146,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
         return 0;
     }
 
-    private async Task<Result> CheckProject(string? pathToCsProjFile = null)
+    private async Task<Result> CheckProject(string? pathToCsProjFile = null, Config? config = null)
     {
         try
         {
@@ -145,16 +160,14 @@ public class CheckCommand : AsyncCommand<CheckSettings>
 
         AnsiConsole.MarkupLine($"Checking versions for [grey]{pathToCsProjFile}[/]");
 
-        List<Package> packages = new();
-
-        await CsProjFileService.GetPackagesDataFromCsProjFileAsync(pathToCsProjFile, packages);
-
+        List<Package> packages = await CsProjFileService.GetPackagesDataFromCsProjFileAsync(pathToCsProjFile);
         if (packages.Count == 0)
         {
             AnsiConsole.MarkupLine($"Could not find any packages in [grey]{pathToCsProjFile}[/]");
             return Result.Warning;
         }
 
+        packages = PackagesService.ApplyConfig(packages, config);
         await _nuGetPackagesService.GetPackagesDataFromNugetRepositoryAsync(packages);
 
         PrintTable(packages);
@@ -163,7 +176,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
         return Result.Success;
     }
 
-    private async Task<Result> CheckCpm(string? pathToCpmFile = null)
+    private async Task<Result> CheckCpm(string? pathToCpmFile = null, Config? config = null)
     {
         try
         {
@@ -177,10 +190,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
 
         AnsiConsole.MarkupLine($"Checking versions for [grey]{pathToCpmFile}[/]");
 
-        List<Package> packages = new();
-
-        await CentralPackageMgmtService.GetPackagesDataFromCpmFileAsync(pathToCpmFile, packages);
-
+        List<Package> packages = await CentralPackageMgmtService.GetPackagesDataFromCpmFileAsync(pathToCpmFile);
         if (packages.Count == 0)
         {
             AnsiConsole.MarkupLine($"Could not find any packages in [grey]{pathToCpmFile}[/]");

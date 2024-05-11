@@ -8,6 +8,20 @@ namespace PackCheck.Tests.Services;
 public class PackagesServiceTest
 {
     [Fact]
+    public void Returns_UnchangedPackagesList_When_ConfigIsNull()
+    {
+        List<Package> packages = new()
+        {
+            PackageFactory.Create("Pack1", "6.2.1", "6.2.1", "6.2.2"),
+            PackageFactory.Create("Pack2", "6.2.1", "6.2.1"),
+        };
+
+        var newPackages = PackagesService.ApplyConfig(packages, null);
+
+        Assert.Equal(packages, newPackages);
+    }
+
+    [Fact]
     public void ReturnsEmptyListWhenNoPackageNeedsUpgrade()
     {
         List<Package> packages = new()
