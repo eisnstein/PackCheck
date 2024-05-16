@@ -22,7 +22,64 @@ public class PackagesServiceTest
     }
 
     [Fact]
-    public void ReturnsEmptyListWhenNoPackageNeedsUpgrade()
+    public void Returns_ChangedPackagesList_When_FilterIsSet()
+    {
+        List<Package> packages = new()
+        {
+            PackageFactory.Create("Pack1", "6.2.1", "6.2.1", "6.2.2"),
+            PackageFactory.Create("Pack2", "6.2.1", "6.2.1"),
+        };
+        Config config = new()
+        {
+            Filter = ["Pack1"]
+        };
+
+        var newPackages = PackagesService.ApplyConfig(packages, config);
+
+        Assert.Single(newPackages);
+        Assert.Equal("Pack1", newPackages[0].PackageName);
+    }
+
+    [Fact]
+    public void Returns_ChangedPackagesList_When_ExcludeIsSet()
+    {
+        List<Package> packages = new()
+        {
+            PackageFactory.Create("Pack1", "6.2.1", "6.2.1", "6.2.2"),
+            PackageFactory.Create("Pack2", "6.2.1", "6.2.1"),
+        };
+        Config config = new()
+        {
+            Exclude = ["Pack1"]
+        };
+
+        var newPackages = PackagesService.ApplyConfig(packages, config);
+
+        Assert.Single(newPackages);
+        Assert.Equal("Pack2", newPackages[0].PackageName);
+    }
+
+    [Fact]
+    public void Returns_EmptyPackagesList_When_FilterAndExcludeIsSet()
+    {
+        List<Package> packages = new()
+        {
+            PackageFactory.Create("Pack1", "6.2.1", "6.2.1", "6.2.2"),
+            PackageFactory.Create("Pack2", "6.2.1", "6.2.1"),
+        };
+        Config config = new()
+        {
+            Filter = ["Pack1"],
+            Exclude = ["Pack1"]
+        };
+
+        var newPackages = PackagesService.ApplyConfig(packages, config);
+
+        Assert.Empty(newPackages);
+    }
+
+    [Fact]
+    public void Returns_EmptyList_When_NoPackageNeedsUpgrade()
     {
         List<Package> packages = new()
         {
@@ -38,7 +95,7 @@ public class PackagesServiceTest
     }
 
     [Fact]
-    public void ReturnsAllPackagesForStableUpgrade()
+    public void Returns_AllPackagesForStableUpgrade()
     {
         List<Package> packages = new()
         {
@@ -63,7 +120,7 @@ public class PackagesServiceTest
     }
 
     [Fact]
-    public void ReturnsOnePackageForLatestUpgrade()
+    public void Returns_OnePackageForLatestUpgrade()
     {
         List<Package> packages = new()
         {
@@ -82,7 +139,7 @@ public class PackagesServiceTest
     }
 
     [Fact]
-    public void ReturnsAllPackagesForLatestUpgrade()
+    public void Returns_AllPackagesForLatestUpgrade()
     {
         List<Package> packages = new()
         {

@@ -21,7 +21,7 @@ public class CommonSettings : CommandSettings
     [Description("Include only packages matching the given name (can be used multiple times)")]
     public string[]? Filter { get; set; }
 
-    [CommandOption("-x|--reject <Package_Name>")]
+    [CommandOption("-x|--exclude <Package_Name>")]
     [Description("Exclude packages matching the given name (can be used multiple times)")]
-    public string[]? Reject { get; set; }
+    public string[]? Exclude { get; set; }
 }

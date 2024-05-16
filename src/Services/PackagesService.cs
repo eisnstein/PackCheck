@@ -16,11 +16,17 @@ public static class PackagesService
 
         if (config is { Filter: { Count: > 0 } })
         {
-            packages.Where(p => config.Filter.Contains(p.PackageName));
+            packages = packages.Where(p => config.Filter.Contains(p.PackageName)).ToList();
+        }
+
+        if (config is { Exclude: { Count: > 0 } })
+        {
+            packages = packages.Where(p => !config.Exclude.Contains(p.PackageName)).ToList();
         }
 
         return packages;
     }
+
     public static List<Package> PreparePackagesForUpgrade(List<Package> packages, string upgradeTo)
     {
         return packages.Select(p =>
