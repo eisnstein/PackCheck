@@ -1,8 +1,10 @@
 # Changelog
 
-## 2.0.0
+## 2.0.0 (2024-05-20)
 
 ### Enhancements
+* Introduce the PackCheck config file - `.packcheckrc` or `.packcheckrc.json` - to control the behaviour of PackCheck
+* New `filter` and `exclude` options to filter packages
 * Update dependencies
 
 ### Breaking Changes

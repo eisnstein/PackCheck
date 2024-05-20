@@ -93,6 +93,32 @@ packcheck u -i
 packcheck u --target latest -i
 ```
 
+To select packages which should be checked or upgraded, run:
+
+```shell
+packcheck --filter "NuGet.Version" -f "Microsoft.Logging"
+```
+
+To exclude packages which should not be checked or upgraded, run:
+
+```shell
+packcheck --exclude "NuGet.Version" -x "Microsoft.Logging"
+```
+
+## Configuration
+
+You can configure PackCheck via a `.packcheckrc.{json}` file. Example:
+
+```json
+{
+  "CsProjFile": "path/to/Project.csproj",
+  "SlnFile": "path/to/Project.sln",
+  "CpmFile": "path/to/Directory.Packages.props",
+  "Filter": ["NuGet.Version"],
+  "Exclude": ["Microsoft.Logging"]
+}
+```
+
 For help run:
 
 ```shell
