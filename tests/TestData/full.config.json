@@ -1,0 +1,7 @@
+{
+  "CsProjFile": "Project.csproj",
+  "SlnFile": "Project.sln",
+  "CpmFile": "Directory.Packages.props",
+  "Exclude": ["PackageName1"],
+  "Filter": ["PackageName2"]
+}

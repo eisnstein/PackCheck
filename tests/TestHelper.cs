@@ -43,9 +43,9 @@ public static class TestHelper
         }
     }
 
-    public static void LoadConfig()
+    public static void LoadConfig(string type = "full")
     {
-        File.Copy("TestData/.packcheckrc.json", ".packcheckrc.json", true);
+        File.Copy($"TestData/{type}.config.json", ".packcheckrc.json", true);
     }
 
     public static void DeleteConfig()

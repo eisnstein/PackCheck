@@ -14,7 +14,7 @@ namespace PackCheck.Tests.Services;
 public class CsProjFileServiceTests
 {
     [Fact]
-    public void ThrowsWhenPathToCsProjFileIsProvidedButFileDoesNotExist()
+    public void Throws_When_PathToCsProjFileIsProvidedButFileDoesNotExist()
     {
         var pathToFile = "does-not-exist.csproj";
 

@@ -1,0 +1,4 @@
+{
+  "CsProjFile": "Project.csproj",
+  "Exclude": ["PackageName1"]
+}

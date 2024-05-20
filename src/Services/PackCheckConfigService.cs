@@ -1,6 +1,6 @@
-using System.Collections.Generic;
 using System.IO;
 using System.Text.Json;
+using PackCheck.Data;
 
 namespace PackCheck.Services;
 
@@ -26,33 +26,31 @@ public static class PackCheckConfigService
         return false;
     }
 
-    public static Config? GetConfig()
+    public static (string? configFile, Config? config) GetConfig()
     {
         var cwd = Directory.GetCurrentDirectory();
         var configFile = Path.Combine(cwd, PackCheckConfigFileName);
         if (File.Exists(configFile))
         {
-            return ParseConfigFile(configFile);
+            return (configFile, ParseConfigFile(configFile));
         }
 
         configFile = Path.Combine(cwd, PackCheckConfigFileName + ".json");
         if (File.Exists(configFile))
         {
-            return ParseConfigFile(configFile);
+            return (configFile, ParseConfigFile(configFile));
         }
 
-        return null;
+        return (null, null);
     }
 
     private static Config? ParseConfigFile(string pathToConfigFile)
     {
+        var options = new JsonSerializerOptions()
+        {
+            PropertyNameCaseInsensitive = true
+        };
         string configJsonStr = File.ReadAllText(pathToConfigFile);
-        return JsonSerializer.Deserialize<Config>(configJsonStr);
+        return JsonSerializer.Deserialize<Config>(configJsonStr, options);
     }
-}
-
-public record Config
-{
-    public List<string>? Exclude { get; init; }
-    public List<string>? Filter { get; init; }
 }

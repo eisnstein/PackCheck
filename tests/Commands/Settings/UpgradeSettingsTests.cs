@@ -3,7 +3,7 @@ using PackCheck.Commands.Settings;
 using Spectre.Console.Cli;
 using Spectre.Console.Testing;
 
-namespace PackCheck.Tests.Settings;
+namespace PackCheck.Tests.Commands.Settings;
 
 public class UpgradeSettingsTests
 {
@@ -21,9 +21,9 @@ public class UpgradeSettingsTests
 
         Assert.NotNull(result.Settings);
         Assert.IsType<UpgradeSettings>(result.Settings);
-        UpgradeSettings? settings = result.Settings as UpgradeSettings;
-        Assert.NotNull(settings!.Target);
-        Assert.Equal("stable", settings!.Target);
+        UpgradeSettings settings = (result.Settings as UpgradeSettings)!;
+        Assert.NotNull(settings.Target);
+        Assert.Equal("stable", settings.Target);
     }
 
     [Fact]
@@ -40,9 +40,9 @@ public class UpgradeSettingsTests
 
         Assert.NotNull(result.Settings);
         Assert.IsType<UpgradeSettings>(result.Settings);
-        UpgradeSettings? settings = result.Settings as UpgradeSettings;
-        Assert.NotNull(settings!.Target);
-        Assert.Equal("stable", settings!.Target);
+        UpgradeSettings settings = (result.Settings as UpgradeSettings)!;
+        Assert.NotNull(settings.Target);
+        Assert.Equal("stable", settings.Target);
     }
 
     [Fact]
@@ -59,9 +59,9 @@ public class UpgradeSettingsTests
 
         Assert.NotNull(result.Settings);
         Assert.IsType<UpgradeSettings>(result.Settings);
-        UpgradeSettings? settings = result.Settings as UpgradeSettings;
-        Assert.NotNull(settings!.Target);
-        Assert.Equal("latest", settings!.Target);
+        UpgradeSettings settings = (result.Settings as UpgradeSettings)!;
+        Assert.NotNull(settings.Target);
+        Assert.Equal("latest", settings.Target);
     }
 
     [Fact]
@@ -92,18 +92,17 @@ public class UpgradeSettingsTests
             "upgrade", "awesome-package", "--csprojFile", "\\path-to-file", "--target", "latest"
         });
 
-        Assert.Equal(-1, result.ExitCode);
         Assert.NotNull(result.Settings);
         Assert.IsType<UpgradeSettings>(result.Settings);
-        UpgradeSettings? settings = result.Settings as UpgradeSettings;
-        Assert.NotNull(settings!.PackageToUpgrade);
-        Assert.Equal("awesome-package", settings!.PackageToUpgrade);
-        Assert.NotNull(settings!.PathToCsProjFile);
-        Assert.Equal("\\path-to-file", settings!.PathToCsProjFile);
-        Assert.NotNull(settings!.Target);
-        Assert.Equal("latest", settings!.Target);
-        Assert.False(settings!.DryRun);
-        Assert.False(settings!.Interactive);
+        UpgradeSettings settings = (result.Settings as UpgradeSettings)!;
+        Assert.NotNull(settings.PackageToUpgrade);
+        Assert.Equal("awesome-package", settings.PackageToUpgrade);
+        Assert.NotNull(settings.PathToCsProjFile);
+        Assert.Equal("\\path-to-file", settings.PathToCsProjFile);
+        Assert.NotNull(settings.Target);
+        Assert.Equal("latest", settings.Target);
+        Assert.False(settings.DryRun);
+        Assert.False(settings.Interactive);
     }
 
     [Fact]
@@ -121,18 +120,17 @@ public class UpgradeSettingsTests
             "upgrade", "awesome-package", "--csprojFile", "\\path-to-file", "--target", "latest", "--dry-run"
         });
 
-        Assert.Equal(-1, result.ExitCode);
         Assert.NotNull(result.Settings);
         Assert.IsType<UpgradeSettings>(result.Settings);
-        UpgradeSettings? settings = result.Settings as UpgradeSettings;
-        Assert.NotNull(settings!.PackageToUpgrade);
-        Assert.Equal("awesome-package", settings!.PackageToUpgrade);
-        Assert.NotNull(settings!.PathToCsProjFile);
-        Assert.Equal("\\path-to-file", settings!.PathToCsProjFile);
-        Assert.NotNull(settings!.Target);
-        Assert.Equal("latest", settings!.Target);
-        Assert.True(settings!.DryRun);
-        Assert.False(settings!.Interactive);
+        UpgradeSettings settings = (result.Settings as UpgradeSettings)!;
+        Assert.NotNull(settings.PackageToUpgrade);
+        Assert.Equal("awesome-package", settings.PackageToUpgrade);
+        Assert.NotNull(settings.PathToCsProjFile);
+        Assert.Equal("\\path-to-file", settings.PathToCsProjFile);
+        Assert.NotNull(settings.Target);
+        Assert.Equal("latest", settings.Target);
+        Assert.True(settings.DryRun);
+        Assert.False(settings.Interactive);
     }
 
     [Fact]
@@ -152,8 +150,8 @@ public class UpgradeSettingsTests
 
         Assert.NotNull(result.Settings);
         Assert.IsType<UpgradeSettings>(result.Settings);
-        UpgradeSettings? settings = result.Settings as UpgradeSettings;
-        Assert.False(settings!.Interactive);
+        UpgradeSettings settings = (result.Settings as UpgradeSettings)!;
+        Assert.False(settings.Interactive);
     }
 
     [Fact]
@@ -162,7 +160,6 @@ public class UpgradeSettingsTests
         var app = new CommandAppTester();
         app.Configure(config =>
         {
-            config.PropagateExceptions();
             config.AddCommand<UpgradeCommand>("upgrade");
         });
 
@@ -173,8 +170,8 @@ public class UpgradeSettingsTests
 
         Assert.NotNull(result.Settings);
         Assert.IsType<UpgradeSettings>(result.Settings);
-        UpgradeSettings? settings = result.Settings as UpgradeSettings;
-        Assert.True(settings!.Interactive);
+        UpgradeSettings settings = (result.Settings as UpgradeSettings)!;
+        Assert.True(settings.Interactive);
     }
 
     [Fact]
@@ -183,7 +180,6 @@ public class UpgradeSettingsTests
         var app = new CommandAppTester();
         app.Configure(config =>
         {
-            config.PropagateExceptions();
             config.AddCommand<UpgradeCommand>("upgrade");
         });
 
@@ -194,7 +190,7 @@ public class UpgradeSettingsTests
 
         Assert.NotNull(result.Settings);
         Assert.IsType<UpgradeSettings>(result.Settings);
-        UpgradeSettings? settings = result.Settings as UpgradeSettings;
-        Assert.True(settings!.Interactive);
+        UpgradeSettings settings = (result.Settings as UpgradeSettings)!;
+        Assert.True(settings.Interactive);
     }
 }

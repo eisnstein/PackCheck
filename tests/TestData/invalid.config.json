@@ -1,4 +1,4 @@
 {
+  "CsProjFile": "Project.csproj",
   "Exclude": ["PackageName1"],
-  "Filter": ["PackageName2"]
 }

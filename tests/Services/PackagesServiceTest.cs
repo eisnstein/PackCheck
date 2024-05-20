@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using PackCheck.Commands.Settings;
 using PackCheck.Data;
 using PackCheck.Services;
 using PackCheck.Tests.Factories;
@@ -16,7 +17,7 @@ public class PackagesServiceTest
             PackageFactory.Create("Pack2", "6.2.1", "6.2.1"),
         };
 
-        var newPackages = PackagesService.ApplyConfig(packages, null);
+        var newPackages = PackagesService.ApplySettings(packages, null);
 
         Assert.Equal(packages, newPackages);
     }
@@ -29,12 +30,12 @@ public class PackagesServiceTest
             PackageFactory.Create("Pack1", "6.2.1", "6.2.1", "6.2.2"),
             PackageFactory.Create("Pack2", "6.2.1", "6.2.1"),
         };
-        Config config = new()
+        CheckSettings settings = new()
         {
             Filter = ["Pack1"]
         };
 
-        var newPackages = PackagesService.ApplyConfig(packages, config);
+        var newPackages = PackagesService.ApplySettings(packages, settings);
 
         Assert.Single(newPackages);
         Assert.Equal("Pack1", newPackages[0].PackageName);
@@ -48,12 +49,12 @@ public class PackagesServiceTest
             PackageFactory.Create("Pack1", "6.2.1", "6.2.1", "6.2.2"),
             PackageFactory.Create("Pack2", "6.2.1", "6.2.1"),
         };
-        Config config = new()
+        CheckSettings settings = new()
         {
             Exclude = ["Pack1"]
         };
 
-        var newPackages = PackagesService.ApplyConfig(packages, config);
+        var newPackages = PackagesService.ApplySettings(packages, settings);
 
         Assert.Single(newPackages);
         Assert.Equal("Pack2", newPackages[0].PackageName);
@@ -67,13 +68,13 @@ public class PackagesServiceTest
             PackageFactory.Create("Pack1", "6.2.1", "6.2.1", "6.2.2"),
             PackageFactory.Create("Pack2", "6.2.1", "6.2.1"),
         };
-        Config config = new()
+        CheckSettings settings = new()
         {
             Filter = ["Pack1"],
             Exclude = ["Pack1"]
         };
 
-        var newPackages = PackagesService.ApplyConfig(packages, config);
+        var newPackages = PackagesService.ApplySettings(packages, settings);
 
         Assert.Empty(newPackages);
     }

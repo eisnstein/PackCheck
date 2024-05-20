@@ -3,7 +3,6 @@ using Spectre.Console.Cli;
 using System.Threading.Tasks;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
 using PackCheck.Data;
 using PackCheck.Exceptions;
@@ -27,25 +26,32 @@ public class CheckCommand : AsyncCommand<CheckSettings>
     {
         await PackCheckService.CheckForNewPackCheckVersion(_nuGetApiService);
 
+        Result? result = null;
+        string? pathToConfigFile = null;
         Config? config = null;
 
         try
         {
-            config = PackCheckConfigService.GetConfig();
+            (pathToConfigFile, config) = PackCheckConfigService.GetConfig();
         }
         catch (JsonException e)
         {
             AnsiConsole.MarkupLine(
-                $"[dim]WARN:[/] Your .packcheckrc.json configuration file seems to be invalid: ${e.Message}");
+                $"[dim]WARN:[/] Your .packcheckrc[.json] configuration file seems to be invalid: {e.Message}");
             return -1;
         }
 
-        Result? result = null;
+        if (config is not null)
+        {
+            AnsiConsole.MarkupLine($"Reading config from [grey]{pathToConfigFile}[/]");
+        }
+
+        settings = SettingsService.CombineSettingsWithConfig(settings, config);
 
         // Check if a path to a specific project is given
         if (!string.IsNullOrEmpty(settings.PathToCsProjFile))
         {
-            result = await CheckProject(settings.PathToCsProjFile, config);
+            result = await CheckProject(settings.PathToCsProjFile, settings);
             if (result != Result.Success)
             {
                 return -1;
@@ -66,7 +72,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
 
             foreach (var projectCsProjFile in projectCsProjFiles)
             {
-                result = await CheckProject(projectCsProjFile, config);
+                result = await CheckProject(projectCsProjFile, settings);
                 if (result == Result.Error)
                 {
                     return -1;
@@ -84,7 +90,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
         {
             var pathToCpmFile = CentralPackageMgmtService.GetPathToCpmFile(settings.PathToCpmFile);
 
-            result = await CheckCpm(pathToCpmFile);
+            result = await CheckCpm(pathToCpmFile, settings);
             if (result != Result.Success)
             {
                 return -1;
@@ -99,7 +105,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
         // Check if Central Package Management is used
         if (CentralPackageMgmtService.HasCentralPackageMgmt())
         {
-            result = await CheckCpm();
+            result = await CheckCpm(settings: settings);
             if (result != Result.Success)
             {
                 return -1;
@@ -120,7 +126,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
 
             foreach (var projectCsProjFile in projectCsProjFiles)
             {
-                result = await CheckProject(projectCsProjFile, config);
+                result = await CheckProject(projectCsProjFile, settings);
                 if (result == Result.Error)
                 {
                     return -1;
@@ -134,7 +140,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
         }
 
         // Check if a project file exists
-        result = await CheckProject(config: config);
+        result = await CheckProject(settings: settings);
         if (result != Result.Success)
         {
             return -1;
@@ -146,7 +152,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
         return 0;
     }
 
-    private async Task<Result> CheckProject(string? pathToCsProjFile = null, Config? config = null)
+    private async Task<Result> CheckProject(string? pathToCsProjFile = null, CheckSettings? settings = null)
     {
         try
         {
@@ -167,7 +173,13 @@ public class CheckCommand : AsyncCommand<CheckSettings>
             return Result.Warning;
         }
 
-        packages = PackagesService.ApplyConfig(packages, config);
+        packages = PackagesService.ApplySettings(packages, settings);
+        if (packages.Count == 0)
+        {
+            AnsiConsole.MarkupLine($"No packages to check. Check your 'filter' or 'exclude' in settings/config.");
+            return Result.Warning;
+        }
+
         await _nuGetPackagesService.GetPackagesDataFromNugetRepositoryAsync(packages);
 
         PrintTable(packages);
@@ -176,7 +188,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
         return Result.Success;
     }
 
-    private async Task<Result> CheckCpm(string? pathToCpmFile = null, Config? config = null)
+    private async Task<Result> CheckCpm(string? pathToCpmFile = null, CheckSettings? settings = null)
     {
         try
         {
@@ -194,6 +206,13 @@ public class CheckCommand : AsyncCommand<CheckSettings>
         if (packages.Count == 0)
         {
             AnsiConsole.MarkupLine($"Could not find any packages in [grey]{pathToCpmFile}[/]");
+            return Result.Warning;
+        }
+
+        packages = PackagesService.ApplySettings(packages, settings);
+        if (packages.Count == 0)
+        {
+            AnsiConsole.MarkupLine($"No packages to check. Check your 'filter' or 'exclude' in settings/config.");
             return Result.Warning;
         }
 

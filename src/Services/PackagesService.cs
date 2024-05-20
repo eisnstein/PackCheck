@@ -1,27 +1,28 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using PackCheck.Commands.Settings;
 using PackCheck.Data;
 
 namespace PackCheck.Services;
 
 public static class PackagesService
 {
-    public static List<Package> ApplyConfig(List<Package> packages, Config? config = null)
+    public static List<Package> ApplySettings(List<Package> packages, CheckSettings? settings = null)
     {
-        if (config is null)
+        if (settings is null)
         {
             return packages;
         }
 
-        if (config is { Filter: { Count: > 0 } })
+        if (settings is { Filter: { Length: > 0 } })
         {
-            packages = packages.Where(p => config.Filter.Contains(p.PackageName)).ToList();
+            packages = packages.Where(p => settings.Filter.Contains(p.PackageName)).ToList();
         }
 
-        if (config is { Exclude: { Count: > 0 } })
+        if (settings is { Exclude: { Length: > 0 } })
         {
-            packages = packages.Where(p => !config.Exclude.Contains(p.PackageName)).ToList();
+            packages = packages.Where(p => !settings.Exclude.Contains(p.PackageName)).ToList();
         }
 
         return packages;

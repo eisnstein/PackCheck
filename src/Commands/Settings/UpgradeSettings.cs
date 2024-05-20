@@ -10,10 +10,10 @@ public sealed class UpgradeSettings : CommonSettings
     [Description("Name of package to upgrade")]
     public string? PackageToUpgrade { get; set; }
 
-    [CommandOption("--target <Target_Version>")]
+    [CommandOption("-t|--target <Target_Version>")]
     [Description("Upgrade version number to latest stable version (stable) or latest version (latest)")]
     [ValidateTargetVersion("Target version has to be 'stable' or 'latest'.")]
-    public string Target { get; set; } = Data.Target.Stable;
+    public string? Target { get; set; } = "stable";
 
     [CommandOption("--dry-run")]
     [DefaultValue(false)]

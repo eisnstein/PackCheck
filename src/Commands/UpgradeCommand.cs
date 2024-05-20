@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 using PackCheck.Commands.Settings;
 using PackCheck.Data;
 using PackCheck.Exceptions;
@@ -110,6 +111,26 @@ public class UpgradeCommand : AsyncCommand<UpgradeSettings>
     private async Task<Result> UpgradeProject(UpgradeSettings settings)
     {
         var pathToCsProjFile = "";
+        string? pathToConfigFile = null;
+        Config? config = null;
+
+        try
+        {
+            (pathToConfigFile, config) = PackCheckConfigService.GetConfig();
+        }
+        catch (JsonException e)
+        {
+            AnsiConsole.MarkupLine(
+                $"[dim]WARN:[/] Your .packcheckrc.json configuration file seems to be invalid: ${e.Message}");
+            return Result.Error;
+        }
+
+        if (config is not null)
+        {
+            AnsiConsole.MarkupLine($"Reading config from [grey]{pathToConfigFile}[/]");
+        }
+
+        settings = SettingsService.CombineSettingsWithConfig(settings, config);
 
         // Get the path to the *.csproj file
         try
@@ -141,7 +162,7 @@ public class UpgradeCommand : AsyncCommand<UpgradeSettings>
         // Fetch data for each package from nuget and store data on each package
         await _nuGetPackagesService.GetPackagesDataFromNugetRepositoryAsync(packages);
 
-        packages = PackagesService.PreparePackagesForUpgrade(packages, settings.Target);
+        packages = PackagesService.PreparePackagesForUpgrade(packages, settings.Target!);
         if (packages.Count == 0)
         {
             AnsiConsole.MarkupLine("[green]All packages are up to date.[/]");
@@ -193,6 +214,26 @@ public class UpgradeCommand : AsyncCommand<UpgradeSettings>
     private async Task<Result> UpgradeCpm(UpgradeSettings settings)
     {
         var pathToCpmFile = "";
+        string? pathToConfigFile = null;
+        Config? config = null;
+
+        try
+        {
+            (pathToConfigFile, config) = PackCheckConfigService.GetConfig();
+        }
+        catch (JsonException e)
+        {
+            AnsiConsole.MarkupLine(
+                $"[dim]WARN:[/] Your .packcheckrc.json configuration file seems to be invalid: ${e.Message}");
+            return Result.Error;
+        }
+
+        if (config is not null)
+        {
+            AnsiConsole.MarkupLine($"Reading config from [grey]{pathToConfigFile}[/]");
+        }
+
+        settings = SettingsService.CombineSettingsWithConfig(settings, config);
 
         // Get the path to the *.csproj file
         try
@@ -224,7 +265,7 @@ public class UpgradeCommand : AsyncCommand<UpgradeSettings>
         // Fetch data for each package from nuget and store data on each package
         await _nuGetPackagesService.GetPackagesDataFromNugetRepositoryAsync(packages);
 
-        packages = PackagesService.PreparePackagesForUpgrade(packages, settings.Target);
+        packages = PackagesService.PreparePackagesForUpgrade(packages, settings.Target!);
         if (packages.Count == 0)
         {
             AnsiConsole.MarkupLine("[green]All packages are up to date.[/]");
