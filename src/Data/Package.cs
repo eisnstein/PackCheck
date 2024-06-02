@@ -6,6 +6,7 @@ public class Package(string name, NuGetVersion version)
 {
     public string PackageName { get; } = name;
     public string UpgradeTo { get; set; } = Target.Stable;
+    public EUpgradeType UpgradeType { get; set; }
     public NuGetVersion CurrentVersion { get; } = version;
     public NuGetVersion? NewVersion { get; set; }
     public NuGetVersion? LatestStableVersion { get; set; }

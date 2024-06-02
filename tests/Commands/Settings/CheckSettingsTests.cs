@@ -211,4 +211,36 @@ public class CheckSettingsTests
             result.Output
         );
     }
+
+    [Fact]
+    public void FormatOptionIsGiven()
+    {
+        var app = new CommandAppTester();
+        app.Configure(config =>
+        {
+            config.AddCommand<CheckCommand>("check");
+        });
+
+        CommandAppResult result = app.Run(["check", "--format", "group"]);
+
+        Assert.NotNull(result.Settings);
+        Assert.IsType<CheckSettings>(result.Settings);
+        CheckSettings settings = (result.Settings as CheckSettings)!;
+        Assert.NotNull(settings.Format);
+
+        Assert.Equal("group", settings.Format);
+    }
+
+    [Fact]
+    public void Error_When_WrongFormatOptionIsGiven()
+    {
+        var app = new CommandAppTester();
+        app.Configure(config =>
+        {
+            config.PropagateExceptions();
+            config.AddCommand<CheckCommand>("check");
+        });
+
+        Assert.Throws<CommandRuntimeException>(() => app.Run(new[] { "check", "--format", "wrong" }));
+    }
 }

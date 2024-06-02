@@ -3,7 +3,10 @@ using Spectre.Console.Cli;
 using System.Threading.Tasks;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
 using System.Text.Json;
+using NuGet.Configuration;
 using PackCheck.Data;
 using PackCheck.Exceptions;
 using PackCheck.Services;
@@ -182,7 +185,9 @@ public class CheckCommand : AsyncCommand<CheckSettings>
 
         await _nuGetPackagesService.GetPackagesDataFromNugetRepositoryAsync(packages);
 
-        PrintTable(packages);
+        packages = PackagesService.CalculateUpgradeType(packages, settings);
+
+        PrintResult(packages, settings);
         Console.WriteLine();
 
         return Result.Success;
@@ -218,13 +223,79 @@ public class CheckCommand : AsyncCommand<CheckSettings>
 
         await _nuGetPackagesService.GetPackagesDataFromNugetRepositoryAsync(packages);
 
-        PrintTable(packages);
+        packages = PackagesService.CalculateUpgradeType(packages, settings);
+
+        PrintResult(packages, settings);
         Console.WriteLine();
 
         return Result.Success;
     }
 
-    private void PrintTable(IReadOnlyList<Package> packages)
+    private void PrintResult(List<Package> packages, CheckSettings? settings)
+    {
+        if (settings is { Format: "group" })
+        {
+            var query = packages.GroupBy(p => p.UpgradeType);
+
+            var patch = query.FirstOrDefault(group => group.Key == EUpgradeType.Patch);
+            var minor = query.FirstOrDefault(group => group.Key == EUpgradeType.Minor);
+            var major = query.FirstOrDefault(group => group.Key == EUpgradeType.Major);
+
+            if (patch is not null)
+            {
+                var patchPackages = patch.ToList();
+                AnsiConsole.MarkupLine( "[green]Patch[/] [dim]Backwards compatible - bug fixes[/]");
+
+                PrintTable(patchPackages);
+                Console.WriteLine();
+            }
+
+            if (minor is not null)
+            {
+                var minorPackages = minor.ToList();
+                AnsiConsole.MarkupLine( "[yellow]Minor[/] [dim]Backwards compatible - new features[/]");
+
+                PrintTable(minorPackages);
+                Console.WriteLine();
+            }
+
+            if (major is not null)
+            {
+                var majorPackages = major.ToList();
+                AnsiConsole.MarkupLine( "[red]Major[/] [dim]Possibly breaking changes - check Changelog[/]");
+
+                PrintTable(majorPackages);
+                Console.WriteLine();
+            }
+
+            return;
+        }
+
+        var table = new Table();
+
+        table.AddColumn("Package Name");
+        table.AddColumn("Current Version");
+        table.AddColumn("Latest Stable Version");
+        table.AddColumn("Latest Version");
+
+        foreach (Package p in packages)
+        {
+            table.AddRow(
+                p.PackageName,
+                p.CurrentVersion.ToString(),
+                PackageVersionHighlighterService.HighlightLatestStableVersion(p),
+                PackageVersionHighlighterService.HighlightLatestVersion(p)
+            );
+        }
+
+        table.Columns[1].RightAligned();
+        table.Columns[2].RightAligned();
+        table.Columns[3].RightAligned();
+
+        AnsiConsole.Write(table);
+    }
+
+    private void PrintTable(List<Package> packages)
     {
         var table = new Table();
 

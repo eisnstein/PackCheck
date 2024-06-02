@@ -28,6 +28,53 @@ public static class PackagesService
         return packages;
     }
 
+    public static List<Package> CalculateUpgradeType(List<Package> packages, CheckSettings? settings)
+    {
+        if (settings is null)
+        {
+            return packages;
+        }
+
+        foreach (var p in packages)
+        {
+            var currentVersion = p.CurrentVersion;
+            var upgradeToVersion = settings.Target switch
+            {
+                Target.Stable => p.LatestStableVersion,
+                Target.Latest => p.LatestVersion ?? p.LatestStableVersion,
+                _ => throw new ArgumentException(nameof(settings.Target))
+            };
+
+            if (upgradeToVersion is null)
+            {
+                p.UpgradeType = EUpgradeType.NoUpgrade;
+                continue;
+            }
+
+            if (currentVersion.Major != upgradeToVersion.Major)
+            {
+                p.UpgradeType = EUpgradeType.Major;
+                continue;
+            }
+
+            if (currentVersion.Minor != upgradeToVersion.Minor)
+            {
+                p.UpgradeType = EUpgradeType.Minor;
+                continue;
+            }
+
+            if (currentVersion.Patch != upgradeToVersion.Patch)
+            {
+                p.UpgradeType = EUpgradeType.Patch;
+                continue;
+            }
+
+            p.UpgradeType = EUpgradeType.NoUpgrade;
+        }
+
+        return packages;
+    }
+
     public static List<Package> PreparePackagesForUpgrade(List<Package> packages, string upgradeTo)
     {
         return packages.Select(p =>

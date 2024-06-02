@@ -3,5 +3,6 @@
   "SlnFile": "Project.sln",
   "CpmFile": "Directory.Packages.props",
   "Exclude": ["PackageName1"],
-  "Filter": ["PackageName2"]
+  "Filter": ["PackageName2"],
+  "Format": "group"
 }

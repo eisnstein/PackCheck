@@ -18,6 +18,7 @@ public static class SettingsService
         settings.PathToCpmFile ??= config.CpmFile;
         settings.Filter ??= config.Filter?.ToArray();
         settings.Exclude ??= config.Exclude?.ToArray();
+        settings.Format ??= config.Format;
 
         return settings;
     }
@@ -35,6 +36,7 @@ public static class SettingsService
         settings.PathToCpmFile ??= config.CpmFile;
         settings.Filter ??= config.Filter?.ToArray();
         settings.Exclude ??= config.Exclude?.ToArray();
+        settings.Format ??= config.Format;
 
         return settings;
     }

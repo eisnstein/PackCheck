@@ -9,4 +9,5 @@ public record Config
     public string? CpmFile { get; init; }
     public List<string>? Exclude { get; init; }
     public List<string>? Filter { get; init; }
+    public string? Format { get; init; }
 }
