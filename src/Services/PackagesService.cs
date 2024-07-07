@@ -8,7 +8,7 @@ namespace PackCheck.Services;
 
 public static class PackagesService
 {
-    public static List<Package> ApplySettings(List<Package> packages, CheckSettings? settings = null)
+    public static List<Package> ApplySettings(List<Package> packages, CommonSettings? settings = null)
     {
         if (settings is null)
         {

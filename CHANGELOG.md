@@ -1,5 +1,11 @@
 # Changelog
 
+
+## 2.1.0 (2024-07-07)
+
+### Bug fixes
+* Add missing `filter` and `exclude` settings to `upgrade` command
+
 ## 2.0.0 (2024-05-20)
 
 ### Enhancements

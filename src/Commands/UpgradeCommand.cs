@@ -152,6 +152,13 @@ public class UpgradeCommand : AsyncCommand<UpgradeSettings>
             return Result.Warning;
         }
 
+        packages = PackagesService.ApplySettings(packages, settings);
+        if (packages.Count == 0)
+        {
+            AnsiConsole.MarkupLine($"No packages to check. Check your 'filter' or 'exclude' in settings/config.");
+            return Result.Warning;
+        }
+
         // If only a specific package should be upgraded,
         // ignore all the others
         if (!string.IsNullOrEmpty(settings.PackageToUpgrade))
@@ -252,6 +259,13 @@ public class UpgradeCommand : AsyncCommand<UpgradeSettings>
         if (packages.Count == 0)
         {
             AnsiConsole.MarkupLine($"Could not find any packages in [grey]{pathToCpmFile}[/]");
+            return Result.Warning;
+        }
+
+        packages = PackagesService.ApplySettings(packages, settings);
+        if (packages.Count == 0)
+        {
+            AnsiConsole.MarkupLine($"No packages to check. Check your 'filter' or 'exclude' in settings/config.");
             return Result.Warning;
         }
 
