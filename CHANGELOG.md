@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.2.0 (2024-11-19)
+
+### Enhancements
+* Add `net9.0` to target frameworks
+* New `format` option to group packages by *patch*, *minor* or *major* upgrade.
 
 ## 2.1.0 (2024-07-07)
 

@@ -105,6 +105,12 @@ To exclude packages which should not be checked or upgraded, run:
 packcheck --exclude "NuGet.Version" -x "Microsoft.Logging"
 ```
 
+To format the output of the `check` command, use the `--format` option. Currently only `group` is supported, which groups the packages by *patch*, *minor* and *major* versions.
+
+```shell
+packcheck --format group
+```
+
 ## Configuration
 
 You can configure PackCheck via a `.packcheckrc.{json}` file. Example:
@@ -115,7 +121,8 @@ You can configure PackCheck via a `.packcheckrc.{json}` file. Example:
   "SlnFile": "path/to/Project.sln",
   "CpmFile": "path/to/Directory.Packages.props",
   "Filter": ["NuGet.Version"],
-  "Exclude": ["Microsoft.Logging"]
+  "Exclude": ["Microsoft.Logging"],
+  "Format": "group"
 }
 ```
 
