@@ -14,6 +14,10 @@ public class CommonSettings : CommandSettings
     [Description(@"Path to *.sln file. (default .\*.sln)")]
     public string? PathToSlnFile { get; set; }
 
+    [CommandOption("--slnxFile <Path>")]
+    [Description(@"Path to *.slnx file. (default .\*.slnx)")]
+    public string? PathToSlnxFile { get; set; }
+
     [CommandOption("--cpmFile <Path>")]
     [Description(@"Path to Directory.Packages.props file. (default .\Directory.Packages.props)")]
     public string? PathToCpmFile { get; set; }

@@ -52,6 +52,26 @@ public class UpgradeCommand : AsyncCommand<UpgradeSettings>
             return 0;
         }
 
+        // Check if a path to a solution X file is given
+        if (!string.IsNullOrEmpty(settings.PathToSlnxFile))
+        {
+            var pathToSolutionXFile = SolutionXFileService.GetPathToSolutionXFile(settings.PathToSlnxFile);
+            var projectCsProjFiles = SolutionXFileService.ParseProjectDefinitions(pathToSolutionXFile);
+
+            foreach (var projectCsProjFile in projectCsProjFiles)
+            {
+                settings.PathToCsProjFile = projectCsProjFile;
+
+                result = await UpgradeProject(settings);
+                if (result == Result.Error)
+                {
+                    return -1;
+                }
+            }
+
+            return 0;
+        }
+
         // Check if a path to a Central Packages Mgmt file is given
         if (!string.IsNullOrEmpty(settings.PathToCpmFile))
         {
@@ -76,12 +96,32 @@ public class UpgradeCommand : AsyncCommand<UpgradeSettings>
             return 0;
         }
 
-        // Check if we are in a solution
+        // Check if a solution file exists
         if (SolutionFileService.HasSolution())
         {
             var pathToSolutionFile = SolutionFileService.GetPathToSolutionFile(settings.PathToSlnFile);
             var projectDefinitions = SolutionFileService.GetProjectDefinitions(pathToSolutionFile);
             var projectCsProjFiles = SolutionFileService.ParseProjectDefinitions(projectDefinitions);
+
+            foreach (var projectCsProjFile in projectCsProjFiles)
+            {
+                settings.PathToCsProjFile = projectCsProjFile;
+
+                result = await UpgradeProject(settings);
+                if (result == Result.Error)
+                {
+                    return -1;
+                }
+            }
+
+            return 0;
+        }
+
+        // Check if a solution X file exists
+        if (SolutionXFileService.HasSolutionX())
+        {
+            var pathToSolutionFile = SolutionXFileService.GetPathToSolutionXFile(settings.PathToSlnFile);
+            var projectCsProjFiles = SolutionXFileService.ParseProjectDefinitions(pathToSolutionFile);
 
             foreach (var projectCsProjFile in projectCsProjFiles)
             {

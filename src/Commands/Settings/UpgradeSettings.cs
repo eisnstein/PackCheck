@@ -1,5 +1,4 @@
 using System.ComponentModel;
-using PackCheck.Commands.Validation;
 using Spectre.Console.Cli;
 
 namespace PackCheck.Commands.Settings;

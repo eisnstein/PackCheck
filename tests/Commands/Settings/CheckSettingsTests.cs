@@ -100,6 +100,43 @@ public class CheckSettingsTests
     }
 
     [Fact]
+    public void PathToSolutionXFileIsSetButNoValueGiven()
+    {
+        var app = new CommandAppTester();
+        app.Configure(config =>
+        {
+            config.AddCommand<CheckCommand>("check");
+        });
+
+        CommandAppResult result = app.Run(new[] { "check", "--slnxFile" });
+
+        Assert.Equal(-1, result.ExitCode);
+        Assert.StartsWith(
+            "Error: Option 'slnxFile' is defined but no value has been provided.",
+            result.Output
+        );
+    }
+
+    [Fact]
+    public void PathToSolutionXFileIsSet()
+    {
+        var app = new CommandAppTester();
+        app.Configure(config =>
+        {
+            // config.PropagateExceptions();
+            config.AddCommand<CheckCommand>("check");
+        });
+
+        CommandAppResult result = app.Run(new[] { "check", "--slnxFile", @".\example.slnx" });
+
+        Assert.NotNull(result.Settings);
+        Assert.IsType<CheckSettings>(result.Settings);
+        CheckSettings settings = (result.Settings as CheckSettings)!;
+        Assert.NotNull(settings.PathToSlnxFile);
+        Assert.Equal(@".\example.slnx", settings.PathToSlnxFile);
+    }
+
+    [Fact]
     public void PathToCpmFileIsSetButNoValueGiven()
     {
         var app = new CommandAppTester();

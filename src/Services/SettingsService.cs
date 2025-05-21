@@ -15,6 +15,7 @@ public static class SettingsService
         // Settings given via the CLI have precedence over values from the config file.
         settings.PathToCsProjFile ??= config.CsProjFile;
         settings.PathToSlnFile ??= config.SlnFile;
+        settings.PathToSlnxFile ??= config.SlnxFile;
         settings.PathToCpmFile ??= config.CpmFile;
         settings.Filter ??= config.Filter?.ToArray();
         settings.Exclude ??= config.Exclude?.ToArray();
@@ -33,6 +34,7 @@ public static class SettingsService
         // Settings given via the CLI have precedence over values from the config file.
         settings.PathToCsProjFile ??= config.CsProjFile;
         settings.PathToSlnFile ??= config.SlnFile;
+        settings.PathToSlnxFile ??= config.SlnxFile;
         settings.PathToCpmFile ??= config.CpmFile;
         settings.Filter ??= config.Filter?.ToArray();
         settings.Exclude ??= config.Exclude?.ToArray();

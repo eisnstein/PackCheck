@@ -119,6 +119,7 @@ You can configure PackCheck via a `.packcheckrc.{json}` file. Example:
 {
   "CsProjFile": "path/to/Project.csproj",
   "SlnFile": "path/to/Project.sln",
+  "SlnxFile": "path/to/Project.slnx",
   "CpmFile": "path/to/Directory.Packages.props",
   "Filter": ["NuGet.Version"],
   "Exclude": ["Microsoft.Logging"],

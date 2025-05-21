@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.3.0 (2025-05-21)
+
+### Enhancements
+* Add support for new solution file format `.slnx`
+
 ## 2.2.0 (2024-11-19)
 
 ### Enhancements

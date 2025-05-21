@@ -30,6 +30,19 @@ public static class TestHelper
         }
     }
 
+    public static void LoadSolutionX()
+    {
+        File.Copy("TestData/solutionx/testSolution.slnx", "testSolution.slnx", true);
+    }
+
+    public static void DeleteSolutionX()
+    {
+        if (File.Exists("testSolution.slnx"))
+        {
+            File.Delete("testSolution.slnx");
+        }
+    }
+
     public static void LoadCpm()
     {
         File.Copy("TestData/cpm/Directory.Packages.props", "Directory.Packages.props", true);
