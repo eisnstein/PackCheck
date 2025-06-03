@@ -37,8 +37,8 @@ public static class SolutionXFileService
             return fullPath;
         }
 
-        // No path was provided, we try to find a .sln file
-        var files = Directory.GetFiles(cwd, "*.sln");
+        // No path was provided, we try to find a .slnx file
+        var files = Directory.GetFiles(cwd, "*.slnx");
 
         return files.Length switch
         {

@@ -164,8 +164,8 @@ public class CheckCommand : AsyncCommand<CheckSettings>
         // Check if a solution X file exists
         if (SolutionXFileService.HasSolutionX())
         {
-            var pathToSolutionFile = SolutionXFileService.GetPathToSolutionXFile(settings.PathToSlnFile);
-            var projectCsProjFiles = SolutionXFileService.ParseProjectDefinitions(pathToSolutionFile);
+            var pathToSolutionXFile = SolutionXFileService.GetPathToSolutionXFile(settings.PathToSlnxFile);
+            var projectCsProjFiles = SolutionXFileService.ParseProjectDefinitions(pathToSolutionXFile);
 
             foreach (var projectCsProjFile in projectCsProjFiles)
             {

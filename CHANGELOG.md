@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.3.1 (2025-06-03)
+
+### Bug fixes
+* Correctly use and discover of `.slnx` file
+
 ## 2.3.0 (2025-05-21)
 
 ### Enhancements
