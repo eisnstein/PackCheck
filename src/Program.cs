@@ -10,10 +10,10 @@ app.Configure(
     {
         config.SetApplicationName("packcheck");
 
-        #if DEBUG
+#if DEBUG
         config.PropagateExceptions();
         config.ValidateExamples();
-        #endif
+#endif
 
         config.AddCommand<CheckCommand>("check")
             .WithAlias("c")
@@ -22,7 +22,7 @@ app.Configure(
 
         config.AddCommand<UpgradeCommand>("upgrade")
             .WithAlias("u")
-            .WithDescription("Upgrade the *.csproj (or Directory.Packages.props) file")
+            .WithDescription("Upgrade the *.csproj (or Directory.Packages.props or file-based app file) file")
             .WithExample(new[] { "upgrade" })
             .WithExample(new[] { "upgrade", "--target", "stable" })
             .WithExample(new[] { "upgrade", "--target", "latest" })

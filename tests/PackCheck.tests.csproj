@@ -31,4 +31,8 @@
     <Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="TestData\**\*.cs" />
+  </ItemGroup>
+
 </Project>

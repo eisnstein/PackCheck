@@ -1,13 +1,13 @@
-using System;
-using System.Collections.Generic;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
 using PackCheck.Commands.Settings;
 using PackCheck.Data;
 using PackCheck.Exceptions;
 using PackCheck.Services;
 using Spectre.Console;
 using Spectre.Console.Cli;
+using System;
+using System.Collections.Generic;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace PackCheck.Commands;
 
@@ -76,6 +76,18 @@ public class UpgradeCommand : AsyncCommand<UpgradeSettings>
         if (!string.IsNullOrEmpty(settings.PathToCpmFile))
         {
             result = await UpgradeCpm(settings);
+            if (result != Result.Success)
+            {
+                return -1;
+            }
+
+            return 0;
+        }
+
+        // Check if a path to a file-based app file is given
+        if (!string.IsNullOrEmpty(settings.PathToFbaFile))
+        {
+            result = await UpgradeFbaFile(settings);
             if (result != Result.Success)
             {
                 return -1;
@@ -351,6 +363,116 @@ public class UpgradeCommand : AsyncCommand<UpgradeSettings>
         }
 
         await CentralPackageMgmtService.UpgradePackageVersionsAsync(pathToCpmFile, packages, settings.DryRun);
+
+        if (!settings.DryRun)
+        {
+            if (settings.Interactive)
+            {
+                Console.WriteLine();
+            }
+
+            AnsiConsole.MarkupLine(
+                "[dim]INFO:[/] Run [blue]dotnet restore[/] to upgrade packages.");
+        }
+
+        Console.WriteLine();
+
+        return Result.Success;
+    }
+
+    private async Task<Result> UpgradeFbaFile(UpgradeSettings settings)
+    {
+        var pathToFbaFile = "";
+        string? pathToConfigFile = null;
+        Config? config = null;
+
+        try
+        {
+            (pathToConfigFile, config) = PackCheckConfigService.GetConfig();
+        }
+        catch (JsonException e)
+        {
+            AnsiConsole.MarkupLine(
+                $"[dim]WARN:[/] Your .packcheckrc.json configuration file seems to be invalid: ${e.Message}");
+            return Result.Error;
+        }
+
+        if (config is not null)
+        {
+            AnsiConsole.MarkupLine($"Reading config from [grey]{pathToConfigFile}[/]");
+        }
+
+        settings = SettingsService.CombineSettingsWithConfig(settings, config);
+
+        // Get the path to the file-based app file
+        try
+        {
+            pathToFbaFile = FileBasedAppService.GetPathToFileBasedAppFile(settings.PathToFbaFile!);
+        }
+        catch (CpmFileException ex)
+        {
+            AnsiConsole.Markup($"[dim]WARN:[/] [red]{ex.Message}[/]");
+            return Result.Error;
+        }
+
+        AnsiConsole.MarkupLine($"Upgrading to [grey]{settings.Target}[/] versions in [grey]{pathToFbaFile}[/]");
+
+        List<Package> packages = FileBasedAppService.GetPackagesDataFromFbaFile(pathToFbaFile);
+        if (packages.Count == 0)
+        {
+            AnsiConsole.MarkupLine($"Could not find any packages in [grey]{pathToFbaFile}[/]");
+            return Result.Warning;
+        }
+
+        packages = PackagesService.ApplySettings(packages, settings);
+        if (packages.Count == 0)
+        {
+            AnsiConsole.MarkupLine($"No packages to check. Check your 'filter' or 'exclude' in settings/config.");
+            return Result.Warning;
+        }
+
+        // If only a specific package should be upgraded,
+        // ignore all the others
+        if (!string.IsNullOrEmpty(settings.PackageToUpgrade))
+        {
+            packages.RemoveAll(p => p.PackageName != settings.PackageToUpgrade);
+        }
+
+        // Fetch data for each package from nuget and store data on each package
+        await _nuGetPackagesService.GetPackagesDataFromNugetRepositoryAsync(packages);
+
+        packages = PackagesService.PreparePackagesForUpgrade(packages, settings.Target!);
+        if (packages.Count == 0)
+        {
+            AnsiConsole.MarkupLine("[green]All packages are up to date.[/]");
+            Console.WriteLine();
+            return Result.Success;
+        }
+
+        if (settings.Interactive)
+        {
+            packages = AnsiConsole.Prompt(
+                new MultiSelectionPrompt<Package>()
+                    .Title("Select which packages to upgrade:")
+                    .NotRequired()
+                    .PageSize(30)
+                    .InstructionsText(
+                        "[grey]<up>/<down> to select a package[/]" + Environment.NewLine +
+                        "[grey]<space> to toggle a package[/]" + Environment.NewLine +
+                        "[grey]<enter> to upgrade[/]")
+                    .UseConverter(FormatSelectRow)
+                    .AddChoices(packages)
+            );
+
+            if (packages.Count == 0)
+            {
+                AnsiConsole.MarkupLine("[grey]No packages selected to upgrade.[/]");
+                Console.WriteLine();
+                return Result.Warning;
+            }
+        }
+
+        FileBasedAppService.UpgradePackageVersions(pathToFbaFile, packages, settings.DryRun);
 
         if (!settings.DryRun)
         {

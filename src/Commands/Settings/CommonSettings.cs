@@ -22,6 +22,10 @@ public class CommonSettings : CommandSettings
     [Description(@"Path to Directory.Packages.props file. (default .\Directory.Packages.props)")]
     public string? PathToCpmFile { get; set; }
 
+    [CommandOption("--fbaFile <Path>")]
+    [Description(@"Path to file-based app file which includes package directives.")]
+    public string? PathToFbaFile { get; set; }
+
     [CommandOption("-t|--target <Target_Version>")]
     [Description("Upgrade version number to latest stable version (stable) or latest version (latest)")]
     [ValidateTargetVersion("Target version has to be 'stable' or 'latest'.")]

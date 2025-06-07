@@ -10,6 +10,7 @@
     <TargetFrameworks>net6.0;net7.0;net8.0;net9.0</TargetFrameworks>
     <ToolCommandName>packcheck</ToolCommandName>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <Version>2.4.0</Version>
   </PropertyGroup>
 
   <PropertyGroup Label="Package Information">
@@ -19,7 +20,7 @@
     <PackageIcon>icon.png</PackageIcon>
     <PackageId>PackCheck</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageVersion>$(Version)</PackageVersion>
+    <PackageVersion>2.4.0</PackageVersion>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/eisnstein/PackCheck</RepositoryUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -37,7 +38,7 @@
   <ItemGroup>
     <Folder Include="nupkg" />
     <None Include="Assets\icon.png" Pack="true" PackagePath="\" />
-    <None Include="README.md" Pack="true" PackagePath="\" />
+    <None Include="..\README.md" Pack="true" PackagePath="\" />
   </ItemGroup>
 
 </Project>

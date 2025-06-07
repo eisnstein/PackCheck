@@ -1,13 +1,13 @@
 using PackCheck.Commands.Settings;
+using PackCheck.Data;
+using PackCheck.Exceptions;
+using PackCheck.Services;
 using Spectre.Console.Cli;
 using System.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
-using PackCheck.Data;
-using PackCheck.Exceptions;
-using PackCheck.Services;
 using Spectre.Console;
 
 namespace PackCheck.Commands;
@@ -123,6 +123,24 @@ public class CheckCommand : AsyncCommand<CheckSettings>
 
             return 0;
         }
+
+        // Check if a path to a file-based app file is given
+        if (!string.IsNullOrEmpty(settings.PathToFbaFile))
+        {
+            var pathToFileBasedAppFile = FileBasedAppService.GetPathToFileBasedAppFile(settings.PathToFbaFile);
+
+            result = await CheckFba(pathToFileBasedAppFile, settings);
+            if (result != Result.Success)
+            {
+                return -1;
+            }
+
+            PrintInfo();
+            Console.WriteLine();
+
+            return 0;
+        }
+
 
         // Check if Central Package Management is used
         if (CentralPackageMgmtService.HasCentralPackageMgmt())
@@ -271,6 +289,44 @@ public class CheckCommand : AsyncCommand<CheckSettings>
         return Result.Success;
     }
 
+    private async Task<Result> CheckFba(string pathToFbaFile, CheckSettings? settings = null)
+    {
+        try
+        {
+            pathToFbaFile = FileBasedAppService.GetPathToFileBasedAppFile(pathToFbaFile);
+        }
+        catch (FileBasedAppFileException ex)
+        {
+            AnsiConsole.MarkupLine($"[dim]WARN:[/] [red]{ex.Message}[/]");
+            return Result.Error;
+        }
+
+        AnsiConsole.MarkupLine($"Checking versions for [grey]{pathToFbaFile}[/]");
+
+        List<Package> packages = FileBasedAppService.GetPackagesDataFromFbaFile(pathToFbaFile);
+        if (packages.Count == 0)
+        {
+            AnsiConsole.MarkupLine($"Could not find any packages in [grey]{pathToFbaFile}[/]");
+            return Result.Warning;
+        }
+
+        packages = PackagesService.ApplySettings(packages, settings);
+        if (packages.Count == 0)
+        {
+            AnsiConsole.MarkupLine($"No packages to check. Check your 'filter' or 'exclude' in settings/config.");
+            return Result.Warning;
+        }
+
+        await _nuGetPackagesService.GetPackagesDataFromNugetRepositoryAsync(packages);
+
+        packages = PackagesService.CalculateUpgradeType(packages, settings);
+
+        PrintResult(packages, settings);
+        Console.WriteLine();
+
+        return Result.Success;
+    }
+
     private void PrintResult(List<Package> packages, CheckSettings? settings)
     {
         if (settings is { Format: "group" })
@@ -284,7 +340,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
             if (patch is not null)
             {
                 var patchPackages = patch.ToList();
-                AnsiConsole.MarkupLine( "[green]Patch[/] [dim]Backwards compatible - bug fixes[/]");
+                AnsiConsole.MarkupLine("[green]Patch[/] [dim]Backwards compatible - bug fixes[/]");
 
                 PrintTable(patchPackages);
                 Console.WriteLine();
@@ -293,7 +349,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
             if (minor is not null)
             {
                 var minorPackages = minor.ToList();
-                AnsiConsole.MarkupLine( "[yellow]Minor[/] [dim]Backwards compatible - new features[/]");
+                AnsiConsole.MarkupLine("[yellow]Minor[/] [dim]Backwards compatible - new features[/]");
 
                 PrintTable(minorPackages);
                 Console.WriteLine();
@@ -302,7 +358,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
             if (major is not null)
             {
                 var majorPackages = major.ToList();
-                AnsiConsole.MarkupLine( "[red]Major[/] [dim]Possibly breaking changes - check Changelog[/]");
+                AnsiConsole.MarkupLine("[red]Major[/] [dim]Possibly breaking changes - check Changelog[/]");
 
                 PrintTable(majorPackages);
                 Console.WriteLine();
@@ -364,20 +420,14 @@ public class CheckCommand : AsyncCommand<CheckSettings>
     private void PrintInfo()
     {
         AnsiConsole.MarkupLine(
-            "[dim]INFO:[/] Run [blue]packcheck upgrade[/] to upgrade the .csproj file with the latest stable versions.");
-        AnsiConsole.MarkupLine(
-            "[dim]INFO:[/] Run [blue]packcheck upgrade --target latest[/] to upgrade the .csproj file with the latest versions.");
-        AnsiConsole.MarkupLine(
-            "[dim]INFO:[/] Run [blue]packcheck upgrade <Package Name>[/] to upgrade only the specified package to the latest stable version.");
-        AnsiConsole.MarkupLine(
-            "[dim]INFO:[/] Run [blue]packcheck upgrade <Package Name> --target latest[/] to upgrade only the specified package to the latest version.");
+            "[dim]INFO:[/] Run [blue]packcheck upgrade[/] to upgrade to the latest stable versions.");
+        AnsiConsole.MarkupLine("[dim]INFO:[/] Run [blue]packcheck --help[/] for more options.");
     }
 
     private void PrintSolutionInfo()
     {
         AnsiConsole.MarkupLine(
             "[dim]INFO:[/] Run [blue]packcheck upgrade[/] to upgrade all .csproj files with the latest stable versions.");
-        AnsiConsole.MarkupLine(
-            "[dim]INFO:[/] Run [blue]packcheck upgrade --target latest[/] to upgrade all .csproj files with the latest versions.");
+        AnsiConsole.MarkupLine("[dim]INFO:[/] Run [blue]packcheck --help[/] for more options.");
     }
 }

@@ -56,6 +56,19 @@ public static class TestHelper
         }
     }
 
+    public static void LoadFba()
+    {
+        File.Copy("TestData/fba/app.cs", "app.cs", true);
+    }
+
+    public static void DeleteFba()
+    {
+        if (File.Exists("app.cs"))
+        {
+            File.Delete("app.cs");
+        }
+    }
+
     public static void LoadConfig(string type = "full")
     {
         File.Copy($"TestData/{type}.config.json", ".packcheckrc.json", true);
