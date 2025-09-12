@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.0.1 (2025-09-12)
+
+### Enhancements
+
+- Add GitHub workflow for releasing to NuGet
+
+### Breaking Changes
+
+- Remove `net6.0` and `net7.0` from target frameworks
+
 ## 2.4.1 (2025-09-12)
 
 ### Enhancements
