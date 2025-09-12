@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.4.1 (2025-09-12)
+
+### Enhancements
+
+- Update dependencies
+
+### Bug fixes
+
+- If the `format` option is set to **group**, no output was shown if _current_ and _stable_ version were equal.
+
 ## 2.4.0 (2025-06-07)
 
 ### Enhancements

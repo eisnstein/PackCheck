@@ -331,6 +331,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
     {
         if (settings is { Format: "group" })
         {
+            var returnEarly = false;
             var query = packages.GroupBy(p => p.UpgradeType);
 
             var patch = query.FirstOrDefault(group => group.Key == EUpgradeType.Patch);
@@ -344,6 +345,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
 
                 PrintTable(patchPackages);
                 Console.WriteLine();
+                returnEarly = true;
             }
 
             if (minor is not null)
@@ -353,6 +355,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
 
                 PrintTable(minorPackages);
                 Console.WriteLine();
+                returnEarly = true;
             }
 
             if (major is not null)
@@ -362,9 +365,16 @@ public class CheckCommand : AsyncCommand<CheckSettings>
 
                 PrintTable(majorPackages);
                 Console.WriteLine();
+                returnEarly = true;
             }
 
-            return;
+            // If we printed something, we return early to avoid printing the table again below. If nothing was printed,
+            // it means there are no updates available from the current to the stable version. So we print the full table below
+            // to see potential pre-release versions.
+            if (returnEarly)
+            {
+                return;
+            }
         }
 
         var table = new Table();
