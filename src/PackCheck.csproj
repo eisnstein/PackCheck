@@ -10,7 +10,7 @@
     <TargetFrameworks>net8.0;net9.0</TargetFrameworks>
     <ToolCommandName>packcheck</ToolCommandName>
     <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Version>3.0.0</Version>
+    <Version>3.0.1</Version>
   </PropertyGroup>
 
   <PropertyGroup Label="Package Information">
@@ -20,7 +20,7 @@
     <PackageIcon>icon.png</PackageIcon>
     <PackageId>PackCheck</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageVersion>3.0.0</PackageVersion>
+    <PackageVersion>3.0.1</PackageVersion>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/eisnstein/PackCheck</RepositoryUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
