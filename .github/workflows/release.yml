@@ -1,0 +1,42 @@
+name: Publish to NuGet
+
+on:
+  push:
+    tags:
+      - "v*" # Trigger when pushing tags like v1.0.0, v1.2.3, etc.
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: |
+            8.0.x
+            9.0.x
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build src/PackCheck.csproj --configuration Release --no-restore
+
+      - name: Pack NuGet package
+        run: dotnet pack src/PackCheck.csproj --configuration Release --no-build -o ./artifacts /p:PackageVersion=${GITHUB_REF_NAME#v}
+
+      - name: Push to NuGet
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: dotnet nuget push "./artifacts/*.nupkg" --api-key "$NUGET_API_KEY" --source https://api.nuget.org/v3/index.json
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Release ${{ github.ref_name }}
+          files: ./artifacts/*.nupkg
