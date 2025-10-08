@@ -28,7 +28,7 @@ public class NuGetPackagesService(NuGetApiService nuGetApiService)
 
     private async Task FetchPackagesDataAsync(ProgressTask task, List<Package> packages)
     {
-        var incrementBy = 100 / packages.Count;
+        var incrementBy = 100.0 / packages.Count;
 
         foreach (var package in packages)
         {
