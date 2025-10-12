@@ -1,5 +1,16 @@
 # Changelog
 
+## 3.0.2 (2025-10-12)
+
+### Enhancements
+
+- Remove an unnecessary while loop in the fetch packages info task
+- Update dependencies
+
+### Bug fixes
+
+- Prevent freeze when more than 100 packages are given. Thanks to @zgabi. (https://github.com/eisnstein/PackCheck/pull/3)
+
 ## 3.0.1 (2025-09-12)
 
 ### Enhancements

@@ -17,10 +17,7 @@ public class NuGetPackagesService(NuGetApiService nuGetApiService)
             {
                 var task = ctx.AddTask(">");
 
-                while (!ctx.IsFinished)
-                {
-                    await FetchPackagesDataAsync(task, packages);
-                }
+                await FetchPackagesDataAsync(task, packages);
 
                 task.StopTask();
             });
