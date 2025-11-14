@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.0.3 (2025-11-14)
+
+### Enhancements
+
+- Add `net10.0` to target frameworks
+- Update dependencies
+
 ## 3.0.2 (2025-10-12)
 
 ### Enhancements

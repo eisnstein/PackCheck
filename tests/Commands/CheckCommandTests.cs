@@ -1,6 +1,5 @@
 using PackCheck.Commands;
-using Spectre.Console.Cli;
-using Spectre.Console.Testing;
+using Spectre.Console.Cli.Testing;
 using VerifyXunit;
 
 namespace PackCheck.Tests.Commands;
@@ -15,7 +14,6 @@ public class CheckCommandTest
         var app = new CommandAppTester();
         app.Configure(config =>
         {
-            config.PropagateExceptions();
             config.AddCommand<CheckCommand>("check");
         });
 
@@ -34,11 +32,10 @@ public class CheckCommandTest
         var app = new CommandAppTester();
         app.Configure(config =>
         {
-            config.PropagateExceptions();
-            config.AddCommand<UpgradeCommand>("check");
+            config.AddCommand<CheckCommand>("check");
         });
 
-        CommandAppResult result = app.Run(new[] { "check", "--filter", "Spectre.Console" });
+        CommandAppResult result = app.Run(["check", "--filter", "Spectre.Console"]);
 
         Verifier.Verify(result);
 

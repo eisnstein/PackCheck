@@ -2,13 +2,14 @@ using PackCheck.Commands.Settings;
 using PackCheck.Data;
 using PackCheck.Exceptions;
 using PackCheck.Services;
+using Spectre.Console;
 using Spectre.Console.Cli;
-using System.Threading.Tasks;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.Json;
-using Spectre.Console;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace PackCheck.Commands;
 
@@ -23,7 +24,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
         _nuGetPackagesService = new NuGetPackagesService(_nuGetApiService);
     }
 
-    public override async Task<int> ExecuteAsync(CommandContext context, CheckSettings settings)
+    public override async Task<int> ExecuteAsync(CommandContext context, CheckSettings settings, CancellationToken _cancellationToken)
     {
         await PackCheckService.CheckForNewPackCheckVersion(_nuGetApiService);
 

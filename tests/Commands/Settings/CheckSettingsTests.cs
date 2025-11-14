@@ -2,7 +2,7 @@ using PackCheck.Commands;
 using PackCheck.Commands.Settings;
 using PackCheck.Services;
 using Spectre.Console.Cli;
-using Spectre.Console.Testing;
+using Spectre.Console.Cli.Testing;
 
 namespace PackCheck.Tests.Commands.Settings;
 
@@ -14,11 +14,10 @@ public class CheckSettingsTests
         var app = new CommandAppTester();
         app.Configure(config =>
         {
-            config.PropagateExceptions();
             config.AddCommand<CheckCommand>("check");
         });
 
-        CommandAppResult result = app.Run(new[] { "check" });
+        CommandAppResult result = app.Run(["check"]);
 
         Assert.NotNull(result.Settings);
         Assert.IsType<CheckSettings>(result.Settings);
@@ -35,7 +34,7 @@ public class CheckSettingsTests
             config.AddCommand<CheckCommand>("check");
         });
 
-        CommandAppResult result = app.Run(new[] { "check", "--csprojFile" });
+        CommandAppResult result = app.Run(["check", "--csprojFile"]);
 
         Assert.Equal(-1, result.ExitCode);
         Assert.StartsWith(
@@ -50,10 +49,11 @@ public class CheckSettingsTests
         var app = new CommandAppTester();
         app.Configure(config =>
         {
+            config.PropagateExceptions();
             config.AddCommand<CheckCommand>("check");
         });
 
-        CommandAppResult result = app.Run(new[] { "check", "--csprojFile", @".\example.csproj" });
+        CommandAppResult result = app.Run(["check", "--csprojFile", @".\example.csproj"]);
 
         Assert.NotNull(result.Settings);
         Assert.IsType<CheckSettings>(result.Settings);
@@ -71,7 +71,7 @@ public class CheckSettingsTests
             config.AddCommand<CheckCommand>("check");
         });
 
-        CommandAppResult result = app.Run(new[] { "check", "--slnFile" });
+        CommandAppResult result = app.Run(["check", "--slnFile"]);
 
         Assert.Equal(-1, result.ExitCode);
         Assert.StartsWith(
@@ -86,11 +86,10 @@ public class CheckSettingsTests
         var app = new CommandAppTester();
         app.Configure(config =>
         {
-            // config.PropagateExceptions();
             config.AddCommand<CheckCommand>("check");
         });
 
-        CommandAppResult result = app.Run(new[] { "check", "--slnFile", @".\example.sln" });
+        CommandAppResult result = app.Run(["check", "--slnFile", @".\example.sln"]);
 
         Assert.NotNull(result.Settings);
         Assert.IsType<CheckSettings>(result.Settings);
@@ -108,7 +107,7 @@ public class CheckSettingsTests
             config.AddCommand<CheckCommand>("check");
         });
 
-        CommandAppResult result = app.Run(new[] { "check", "--slnxFile" });
+        CommandAppResult result = app.Run(["check", "--slnxFile"]);
 
         Assert.Equal(-1, result.ExitCode);
         Assert.StartsWith(
@@ -123,11 +122,10 @@ public class CheckSettingsTests
         var app = new CommandAppTester();
         app.Configure(config =>
         {
-            // config.PropagateExceptions();
             config.AddCommand<CheckCommand>("check");
         });
 
-        CommandAppResult result = app.Run(new[] { "check", "--slnxFile", @".\example.slnx" });
+        CommandAppResult result = app.Run(["check", "--slnxFile", @".\example.slnx"]);
 
         Assert.NotNull(result.Settings);
         Assert.IsType<CheckSettings>(result.Settings);
@@ -145,7 +143,7 @@ public class CheckSettingsTests
             config.AddCommand<CheckCommand>("check");
         });
 
-        CommandAppResult result = app.Run(new[] { "check", "--cpmFile" });
+        CommandAppResult result = app.Run(["check", "--cpmFile"]);
 
         // No Directory.Packages.props file is given
         Assert.Equal(-1, result.ExitCode);
@@ -278,6 +276,6 @@ public class CheckSettingsTests
             config.AddCommand<CheckCommand>("check");
         });
 
-        Assert.Throws<CommandRuntimeException>(() => app.Run(new[] { "check", "--format", "wrong" }));
+        Assert.Throws<CommandRuntimeException>(() => app.Run(["check", "--format", "wrong"]));
     }
 }

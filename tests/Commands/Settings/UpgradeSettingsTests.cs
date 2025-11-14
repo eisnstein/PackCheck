@@ -1,7 +1,7 @@
 using PackCheck.Commands;
 using PackCheck.Commands.Settings;
 using Spectre.Console.Cli;
-using Spectre.Console.Testing;
+using Spectre.Console.Cli.Testing;
 
 namespace PackCheck.Tests.Commands.Settings;
 
@@ -13,11 +13,10 @@ public class UpgradeSettingsTests
         var app = new CommandAppTester();
         app.Configure(config =>
         {
-            config.PropagateExceptions();
             config.AddCommand<UpgradeCommand>("upgrade");
         });
 
-        CommandAppResult result = app.Run(new[] { "upgrade" });
+        CommandAppResult result = app.Run(["upgrade"]);
 
         Assert.NotNull(result.Settings);
         Assert.IsType<UpgradeSettings>(result.Settings);
@@ -32,11 +31,10 @@ public class UpgradeSettingsTests
         var app = new CommandAppTester();
         app.Configure(config =>
         {
-            config.PropagateExceptions();
             config.AddCommand<UpgradeCommand>("upgrade");
         });
 
-        CommandAppResult result = app.Run(new[] { "upgrade", "--target", "stable" });
+        CommandAppResult result = app.Run(["upgrade", "--target", "stable"]);
 
         Assert.NotNull(result.Settings);
         Assert.IsType<UpgradeSettings>(result.Settings);
@@ -51,11 +49,10 @@ public class UpgradeSettingsTests
         var app = new CommandAppTester();
         app.Configure(config =>
         {
-            config.PropagateExceptions();
             config.AddCommand<UpgradeCommand>("upgrade");
         });
 
-        CommandAppResult result = app.Run(new[] { "upgrade", "--target", "latest" });
+        CommandAppResult result = app.Run(["upgrade", "--target", "latest"]);
 
         Assert.NotNull(result.Settings);
         Assert.IsType<UpgradeSettings>(result.Settings);
@@ -74,7 +71,7 @@ public class UpgradeSettingsTests
             config.AddCommand<UpgradeCommand>("upgrade");
         });
 
-        Assert.Throws<CommandRuntimeException>(() => app.Run(new[] { "upgrade", "--target", "wrong" }));
+        Assert.Throws<CommandRuntimeException>(() => app.Run(["upgrade", "--target", "wrong"]));
     }
 
     [Fact]
@@ -83,14 +80,13 @@ public class UpgradeSettingsTests
         var app = new CommandAppTester();
         app.Configure(config =>
         {
-            config.PropagateExceptions();
             config.AddCommand<UpgradeCommand>("upgrade");
         });
 
-        CommandAppResult result = app.Run(new[]
-        {
+        CommandAppResult result = app.Run(
+        [
             "upgrade", "awesome-package", "--csprojFile", "\\path-to-file", "--target", "latest"
-        });
+        ]);
 
         Assert.NotNull(result.Settings);
         Assert.IsType<UpgradeSettings>(result.Settings);
@@ -111,14 +107,13 @@ public class UpgradeSettingsTests
         var app = new CommandAppTester();
         app.Configure(config =>
         {
-            config.PropagateExceptions();
             config.AddCommand<UpgradeCommand>("upgrade");
         });
 
-        CommandAppResult result = app.Run(new[]
-        {
+        CommandAppResult result = app.Run(
+        [
             "upgrade", "awesome-package", "--csprojFile", "\\path-to-file", "--target", "latest", "--dry-run"
-        });
+        ]);
 
         Assert.NotNull(result.Settings);
         Assert.IsType<UpgradeSettings>(result.Settings);
@@ -139,14 +134,10 @@ public class UpgradeSettingsTests
         var app = new CommandAppTester();
         app.Configure(config =>
         {
-            config.PropagateExceptions();
             config.AddCommand<UpgradeCommand>("upgrade");
         });
 
-        CommandAppResult result = app.Run(new[]
-        {
-            "upgrade"
-        });
+        CommandAppResult result = app.Run(["upgrade"]);
 
         Assert.NotNull(result.Settings);
         Assert.IsType<UpgradeSettings>(result.Settings);
@@ -163,10 +154,7 @@ public class UpgradeSettingsTests
             config.AddCommand<UpgradeCommand>("upgrade");
         });
 
-        CommandAppResult result = app.Run(new[]
-        {
-            "upgrade", "-i"
-        });
+        CommandAppResult result = app.Run(["upgrade", "-i"]);
 
         Assert.NotNull(result.Settings);
         Assert.IsType<UpgradeSettings>(result.Settings);
@@ -183,10 +171,7 @@ public class UpgradeSettingsTests
             config.AddCommand<UpgradeCommand>("upgrade");
         });
 
-        CommandAppResult result = app.Run(new[]
-        {
-            "upgrade", "--interactive"
-        });
+        CommandAppResult result = app.Run(["upgrade", "--interactive"]);
 
         Assert.NotNull(result.Settings);
         Assert.IsType<UpgradeSettings>(result.Settings);

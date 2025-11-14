@@ -7,6 +7,7 @@ using Spectre.Console.Cli;
 using System;
 using System.Collections.Generic;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace PackCheck.Commands;
@@ -15,7 +16,7 @@ public class UpgradeCommand : AsyncCommand<UpgradeSettings>
 {
     private readonly NuGetPackagesService _nuGetPackagesService = new(new NuGetApiService());
 
-    public override async Task<int> ExecuteAsync(CommandContext context, UpgradeSettings settings)
+    public override async Task<int> ExecuteAsync(CommandContext context, UpgradeSettings settings, CancellationToken _cancellationToken)
     {
         Result? result = null;
 
