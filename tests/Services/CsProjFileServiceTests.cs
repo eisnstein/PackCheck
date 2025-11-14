@@ -63,7 +63,7 @@ public class CsProjFileServiceTests
 
         await CsProjFileService.UpgradePackageVersionsAsync(pathToCsProjFile, preparedPackages, settings.DryRun);
 
-        var fileContent = await File.ReadAllTextAsync(pathToCsProjFile);
+        var fileContent = await File.ReadAllTextAsync(pathToCsProjFile, TestContext.Current.CancellationToken);
 
         Assert.Contains($"<PackageReference Include=\"NuGet.Protocol\" Version=\"6.3.0\" />", fileContent);
         Assert.Contains($"<PackageReference Include=\"NuGet.Versioning\" Version=\"6.3.0\" />", fileContent);
@@ -92,7 +92,7 @@ public class CsProjFileServiceTests
 
         await CsProjFileService.UpgradePackageVersionsAsync(pathToCsProjFile, preparedPackages, settings.DryRun);
 
-        var fileContent = await File.ReadAllTextAsync(pathToCsProjFile);
+        var fileContent = await File.ReadAllTextAsync(pathToCsProjFile, TestContext.Current.CancellationToken);
 
         Assert.Contains($"<PackageReference Include=\"NuGet.Protocol\" Version=\"6.3.0\" />", fileContent);
         Assert.Contains($"<PackageReference Include=\"NuGet.Versioning\" Version=\"6.2.1\" />", fileContent);
@@ -118,7 +118,7 @@ public class CsProjFileServiceTests
 
         await CsProjFileService.UpgradePackageVersionsAsync(pathToCsProjFile, preparedPackages, settings.DryRun);
 
-        var fileContent = await File.ReadAllTextAsync(pathToCsProjFile);
+        var fileContent = await File.ReadAllTextAsync(pathToCsProjFile, TestContext.Current.CancellationToken);
 
         Assert.Contains($"<PackageReference Include=\"NuGet.Protocol\" Version=\"7.0.0-preview.123\" />", fileContent);
         Assert.Contains($"<PackageReference Include=\"NuGet.Versioning\" Version=\"6.3.0\" />", fileContent);

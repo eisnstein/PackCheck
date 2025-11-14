@@ -70,7 +70,7 @@ public class CentralPackageMgmtServiceTest
 
         await CentralPackageMgmtService.UpgradePackageVersionsAsync(pathToCsProjFile, preparedPackages, settings.DryRun);
 
-        var fileContent = await File.ReadAllTextAsync(pathToCsProjFile);
+        var fileContent = await File.ReadAllTextAsync(pathToCsProjFile, TestContext.Current.CancellationToken);
 
         Assert.Contains($"<PackageVersion Include=\"NuGet.Protocol\" Version=\"6.3.0\" />", fileContent);
         Assert.Contains($"<PackageVersion Include=\"NuGet.Versioning\" Version=\"6.3.0\" />", fileContent);
