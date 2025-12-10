@@ -5,8 +5,8 @@ namespace PackCheck.Tests.Services;
 
 public class PackageVersionHighlighterServiceTests
 {
-    [Fact]
-    public void HighlightsNothingWhenVersionAreTheSame()
+    [Test]
+    public async Task HighlightsNothingWhenVersionAreTheSame()
     {
         var package = new Package("test.package", new("4.0.4"));
         package.LatestStableVersion = new("4.0.4");
@@ -15,12 +15,12 @@ public class PackageVersionHighlighterServiceTests
         var highlightedStableVersion = PackageVersionHighlighterService.HighlightLatestStableVersion(package);
         var highlightedLatestVersion = PackageVersionHighlighterService.HighlightLatestVersion(package);
 
-        Assert.Equal("4.0.4", highlightedStableVersion);
-        Assert.Equal("4.0.4", highlightedLatestVersion);
+        await Assert.That(highlightedStableVersion).IsEqualTo("4.0.4");
+        await Assert.That(highlightedLatestVersion).IsEqualTo("4.0.4");
     }
 
-    [Fact]
-    public void HighlightsGreenWhenOlderVersionIsPrelease()
+    [Test]
+    public async Task HighlightsGreenWhenOlderVersionIsPrelease()
     {
         var package = new Package("test.package", new("5.0.0-rc.2.20475.5"));
         package.LatestStableVersion = new("5.0.0");
@@ -29,12 +29,12 @@ public class PackageVersionHighlighterServiceTests
         var highlightedStableVersion = PackageVersionHighlighterService.HighlightLatestStableVersion(package);
         var highlightedLatestVersion = PackageVersionHighlighterService.HighlightLatestVersion(package);
 
-        Assert.Equal("[green]5.0.0[/]", highlightedStableVersion);
-        Assert.Equal("[red]6.0.0-preview.2.21154.6[/]", highlightedLatestVersion);
+        await Assert.That(highlightedStableVersion).IsEqualTo("[green]5.0.0[/]");
+        await Assert.That(highlightedLatestVersion).IsEqualTo("[red]6.0.0-preview.2.21154.6[/]");
     }
 
-    [Fact]
-    public void HighlightsThePatchPart()
+    [Test]
+    public async Task HighlightsThePatchPart()
     {
         var package = new Package("test.package", new("1.0.1"));
         package.LatestStableVersion = new("1.0.2");
@@ -43,12 +43,12 @@ public class PackageVersionHighlighterServiceTests
         var highlightedStableVersion = PackageVersionHighlighterService.HighlightLatestStableVersion(package);
         var highlightedLatestVersion = PackageVersionHighlighterService.HighlightLatestVersion(package);
 
-        Assert.Equal("1.0.[green]2[/]", highlightedStableVersion);
-        Assert.Equal("1.0.[green]2[/]", highlightedLatestVersion);
+        await Assert.That(highlightedStableVersion).IsEqualTo("1.0.[green]2[/]");
+        await Assert.That(highlightedLatestVersion).IsEqualTo("1.0.[green]2[/]");
     }
 
-    [Fact]
-    public void HighlightsThePrereleasePart()
+    [Test]
+    public async Task HighlightsThePrereleasePart()
     {
         var package = new Package("test.package", new("1.0.1-rc1-final"));
         package.LatestStableVersion = new("1.0.1-rc2-final");
@@ -57,12 +57,12 @@ public class PackageVersionHighlighterServiceTests
         var highlightedStableVersion = PackageVersionHighlighterService.HighlightLatestStableVersion(package);
         var highlightedLatestVersion = PackageVersionHighlighterService.HighlightLatestVersion(package);
 
-        Assert.Equal("1.0.1[green]-rc2-final[/]", highlightedStableVersion);
-        Assert.Equal("1.0.1[green]-rc2-final[/]", highlightedLatestVersion);
+        await Assert.That(highlightedStableVersion).IsEqualTo("1.0.1[green]-rc2-final[/]");
+        await Assert.That(highlightedLatestVersion).IsEqualTo("1.0.1[green]-rc2-final[/]");
     }
 
-    [Fact]
-    public void HighlightsTheMinorPart()
+    [Test]
+    public async Task HighlightsTheMinorPart()
     {
         var package = new Package("test.package", new("1.0.1"));
         package.LatestStableVersion = new("1.1.0");
@@ -71,12 +71,12 @@ public class PackageVersionHighlighterServiceTests
         var highlightedStableVersion = PackageVersionHighlighterService.HighlightLatestStableVersion(package);
         var highlightedVersion = PackageVersionHighlighterService.HighlightLatestVersion(package);
 
-        Assert.Equal("1.[yellow]1.0[/]", highlightedStableVersion);
-        Assert.Equal("1.[yellow]1.0[/]", highlightedVersion);
+        await Assert.That(highlightedStableVersion).IsEqualTo("1.[yellow]1.0[/]");
+        await Assert.That(highlightedVersion).IsEqualTo("1.[yellow]1.0[/]");
     }
 
-    [Fact]
-    public void HighlightsTheMajorPart()
+    [Test]
+    public async Task HighlightsTheMajorPart()
     {
         var package = new Package("test.package", new("1.0.1"));
         package.LatestStableVersion = new("2.0.0");
@@ -85,12 +85,12 @@ public class PackageVersionHighlighterServiceTests
         var highlightedStableVersion = PackageVersionHighlighterService.HighlightLatestStableVersion(package);
         var highlightedLatestVersion = PackageVersionHighlighterService.HighlightLatestVersion(package);
 
-        Assert.Equal("[red]2.0.0[/]", highlightedStableVersion);
-        Assert.Equal("[red]2.0.0[/]", highlightedLatestVersion);
+        await Assert.That(highlightedStableVersion).IsEqualTo("[red]2.0.0[/]");
+        await Assert.That(highlightedLatestVersion).IsEqualTo("[red]2.0.0[/]");
     }
 
-    [Fact]
-    public void HighlightsTheMajorPartWhenCurrentVersionIsHigherThanStableVersion()
+    [Test]
+    public async Task HighlightsTheMajorPartWhenCurrentVersionIsHigherThanStableVersion()
     {
         var package = new Package("test.package", new("6.0.0-preview.2.21154.6"));
         package.LatestStableVersion = new("5.0.5");
@@ -99,7 +99,7 @@ public class PackageVersionHighlighterServiceTests
         var highlightedStableVersion = PackageVersionHighlighterService.HighlightLatestStableVersion(package);
         var highlightedLatestVersion = PackageVersionHighlighterService.HighlightLatestVersion(package);
 
-        Assert.Equal("[red]5.0.5[/]", highlightedStableVersion);
-        Assert.Equal("6.0.0-preview.2.21154.6", highlightedLatestVersion);
+        await Assert.That(highlightedStableVersion).IsEqualTo("[red]5.0.5[/]");
+        await Assert.That(highlightedLatestVersion).IsEqualTo("6.0.0-preview.2.21154.6");
     }
 }

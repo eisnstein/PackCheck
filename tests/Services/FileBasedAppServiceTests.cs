@@ -5,20 +5,20 @@ namespace PackCheck.Tests.Services;
 
 public class FileBasedAppServiceTests
 {
-    [Fact]
-    public void LoadsFbaFile()
+    [Test]
+    public async Task LoadsFbaFile()
     {
         TestHelper.LoadFba();
 
         var path = FileBasedAppService.GetPathToFileBasedAppFile("app.cs");
 
-        Assert.EndsWith("app.cs", path);
+        await Assert.That(path).EndsWith("app.cs");
 
         TestHelper.DeleteFba();
     }
 
-    [Fact]
-    public void ReturnsNullWhenInputDoesNotStartWithPackageDirective()
+    [Test]
+    public async Task ReturnsNullWhenInputDoesNotStartWithPackageDirective()
     {
         // Arrange
         var input = "some random text";
@@ -27,11 +27,11 @@ public class FileBasedAppServiceTests
         var result = FileBasedAppService.ParsePackageDirective(input);
 
         // Assert
-        Assert.Null(result);
+        await Assert.That(result).IsNull();
     }
 
-    [Fact]
-    public void ReturnsNullWhenInputIsEmpty()
+    [Test]
+    public async Task ReturnsNullWhenInputIsEmpty()
     {
         // Arrange
         var input = "";
@@ -40,11 +40,11 @@ public class FileBasedAppServiceTests
         var result = FileBasedAppService.ParsePackageDirective(input);
 
         // Assert
-        Assert.Null(result);
+        await Assert.That(result).IsNull();
     }
 
-    [Fact]
-    public void ReturnsNullWhenInputIsOnlyPackageDirective()
+    [Test]
+    public async Task ReturnsNullWhenInputIsOnlyPackageDirective()
     {
         // Arrange
         var input = "#:package";
@@ -53,11 +53,11 @@ public class FileBasedAppServiceTests
         var result = FileBasedAppService.ParsePackageDirective(input);
 
         // Assert
-        Assert.Null(result);
+        await Assert.That(result).IsNull();
     }
 
-    [Fact]
-    public void ReturnsNullWhenPackageInfoIsMissingAtSymbol()
+    [Test]
+    public async Task ReturnsNullWhenPackageInfoIsMissingAtSymbol()
     {
         // Arrange
         var input = "#:package MyPackage1.0.0";
@@ -66,11 +66,11 @@ public class FileBasedAppServiceTests
         var result = FileBasedAppService.ParsePackageDirective(input);
 
         // Assert
-        Assert.Null(result);
+        await Assert.That(result).IsNull();
     }
 
-    [Fact]
-    public void ReturnsNullWhenPackageInfoHasMultipleAtSymbols()
+    [Test]
+    public async Task ReturnsNullWhenPackageInfoHasMultipleAtSymbols()
     {
         // Arrange
         var input = "#:package MyPackage@1.0.0@extra";
@@ -79,11 +79,11 @@ public class FileBasedAppServiceTests
         var result = FileBasedAppService.ParsePackageDirective(input);
 
         // Assert
-        Assert.Null(result);
+        await Assert.That(result).IsNull();
     }
 
-    [Fact]
-    public void ReturnsNullWhenVersionStringIsInvalid()
+    [Test]
+    public async Task ReturnsNullWhenVersionStringIsInvalid()
     {
         // Arrange
         var input = "#:package MyPackage@invalid-version";
@@ -92,11 +92,11 @@ public class FileBasedAppServiceTests
         var result = FileBasedAppService.ParsePackageDirective(input);
 
         // Assert
-        Assert.Null(result);
+        await Assert.That(result).IsNull();
     }
 
-    [Fact]
-    public void ReturnsPackageWhenValidPackageDirectiveWithStableVersion()
+    [Test]
+    public async Task ReturnsPackageWhenValidPackageDirectiveWithStableVersion()
     {
         // Arrange
         var input = "#:package MyPackage@1.0.0";
@@ -105,13 +105,13 @@ public class FileBasedAppServiceTests
         var result = FileBasedAppService.ParsePackageDirective(input);
 
         // Assert
-        Assert.NotNull(result);
-        Assert.Equal("MyPackage", result.PackageName);
-        Assert.Equal("1.0.0", result.CurrentVersion.ToString());
+        await Assert.That(result).IsNotNull();
+        await Assert.That(result.PackageName).IsEqualTo("MyPackage");
+        await Assert.That(result.CurrentVersion.ToString()).IsEqualTo("1.0.0");
     }
 
-    [Fact]
-    public void ReturnsPackageWhenValidPackageDirectiveWithPrereleaseVersion()
+    [Test]
+    public async Task ReturnsPackageWhenValidPackageDirectiveWithPrereleaseVersion()
     {
         // Arrange
         var input = "#:package MyPackage@1.0.0-beta1";
@@ -120,13 +120,13 @@ public class FileBasedAppServiceTests
         var result = FileBasedAppService.ParsePackageDirective(input);
 
         // Assert
-        Assert.NotNull(result);
-        Assert.Equal("MyPackage", result.PackageName);
-        Assert.Equal("1.0.0-beta1", result.CurrentVersion.ToString());
+        await Assert.That(result).IsNotNull();
+        await Assert.That(result.PackageName).IsEqualTo("MyPackage");
+        await Assert.That(result.CurrentVersion.ToString()).IsEqualTo("1.0.0-beta1");
     }
 
-    [Fact]
-    public void ReturnsPackageWhenValidPackageDirectiveWithComplexVersion()
+    [Test]
+    public async Task ReturnsPackageWhenValidPackageDirectiveWithComplexVersion()
     {
         // Arrange
         var input = "#:package NuGet.Protocol@6.2.1-preview.1.123.45";
@@ -135,13 +135,13 @@ public class FileBasedAppServiceTests
         var result = FileBasedAppService.ParsePackageDirective(input);
 
         // Assert
-        Assert.NotNull(result);
-        Assert.Equal("NuGet.Protocol", result.PackageName);
-        Assert.Equal("6.2.1-preview.1.123.45", result.CurrentVersion.ToString());
+        await Assert.That(result).IsNotNull();
+        await Assert.That(result.PackageName).IsEqualTo("NuGet.Protocol");
+        await Assert.That(result.CurrentVersion.ToString()).IsEqualTo("6.2.1-preview.1.123.45");
     }
 
-    [Fact]
-    public void HandlesWhitespaceAroundPackageInfo()
+    [Test]
+    public async Task HandlesWhitespaceAroundPackageInfo()
     {
         // Arrange
         var input = "#:package   MyPackage@1.0.0   ";
@@ -150,13 +150,13 @@ public class FileBasedAppServiceTests
         var result = FileBasedAppService.ParsePackageDirective(input);
 
         // Assert
-        Assert.NotNull(result);
-        Assert.Equal("MyPackage", result.PackageName);
-        Assert.Equal("1.0.0", result.CurrentVersion.ToString());
+        await Assert.That(result).IsNotNull();
+        await Assert.That(result.PackageName).IsEqualTo("MyPackage");
+        await Assert.That(result.CurrentVersion.ToString()).IsEqualTo("1.0.0");
     }
 
-    [Fact]
-    public void ReturnsPackageWithPackageNameContainingDots()
+    [Test]
+    public async Task ReturnsPackageWithPackageNameContainingDots()
     {
         // Arrange
         var input = "#:package Microsoft.Extensions.Logging@7.0.0";
@@ -165,13 +165,13 @@ public class FileBasedAppServiceTests
         var result = FileBasedAppService.ParsePackageDirective(input);
 
         // Assert
-        Assert.NotNull(result);
-        Assert.Equal("Microsoft.Extensions.Logging", result.PackageName);
-        Assert.Equal("7.0.0", result.CurrentVersion.ToString());
+        await Assert.That(result).IsNotNull();
+        await Assert.That(result.PackageName).IsEqualTo("Microsoft.Extensions.Logging");
+        await Assert.That(result.CurrentVersion.ToString()).IsEqualTo("7.0.0");
     }
 
-    [Fact]
-    public void ReturnsNullWhenPackageNameIsEmpty()
+    [Test]
+    public async Task ReturnsNullWhenPackageNameIsEmpty()
     {
         // Arrange
         var input = "#:package @1.0.0";
@@ -180,11 +180,11 @@ public class FileBasedAppServiceTests
         var result = FileBasedAppService.ParsePackageDirective(input);
 
         // Assert
-        Assert.Null(result);
+        await Assert.That(result).IsNull();
     }
 
-    [Fact]
-    public void ReturnsNullWhenVersionIsEmpty()
+    [Test]
+    public async Task ReturnsNullWhenVersionIsEmpty()
     {
         // Arrange
         var input = "#:package MyPackage@";
@@ -193,11 +193,11 @@ public class FileBasedAppServiceTests
         var result = FileBasedAppService.ParsePackageDirective(input);
 
         // Assert
-        Assert.Null(result);
+        await Assert.That(result).IsNull();
     }
 
-    [Fact]
-    public void ReturnsPackageWhenVersionHasFourParts()
+    [Test]
+    public async Task ReturnsPackageWhenVersionHasFourParts()
     {
         // Arrange
         var input = "#:package MyPackage@1.2.3.4";
@@ -206,13 +206,13 @@ public class FileBasedAppServiceTests
         var result = FileBasedAppService.ParsePackageDirective(input);
 
         // Assert
-        Assert.NotNull(result);
-        Assert.Equal("MyPackage", result.PackageName);
-        Assert.Equal("1.2.3.4", result.CurrentVersion.ToString());
+        await Assert.That(result).IsNotNull();
+        await Assert.That(result.PackageName).IsEqualTo("MyPackage");
+        await Assert.That(result.CurrentVersion.ToString()).IsEqualTo("1.2.3.4");
     }
 
-    [Fact]
-    public void GetsPackagesDataFromFbaFile()
+    [Test]
+    public async Task GetsPackagesDataFromFbaFile()
     {
         TestHelper.LoadFba();
 
@@ -221,16 +221,16 @@ public class FileBasedAppServiceTests
 
         var packages = FileBasedAppService.GetPackagesDataFromFbaFile(fbaFilePath);
 
-        Assert.NotEmpty(packages);
-        Assert.Single(packages);
-        Assert.Equal("Humanizer", packages[0].PackageName);
-        Assert.Equal("2.14.1", packages[0].CurrentVersion.ToString());
+        await Assert.That(packages).IsNotEmpty();
+        await Assert.That(packages).HasCount(1);
+        await Assert.That(packages[0].PackageName).IsEqualTo("Humanizer");
+        await Assert.That(packages[0].CurrentVersion.ToString()).IsEqualTo("2.14.1");
 
         TestHelper.DeleteFba();
     }
 
-    [Fact]
-    public void WritesNewVersionToFile()
+    [Test]
+    public async Task WritesNewVersionToFile()
     {
         TestHelper.LoadFba();
 
@@ -245,10 +245,11 @@ public class FileBasedAppServiceTests
         FileBasedAppService.UpgradePackageVersions(fbaFilePath, packages, false);
 
         var updatedPackages = FileBasedAppService.GetPackagesDataFromFbaFile(fbaFilePath);
-        Assert.NotEmpty(updatedPackages);
-        Assert.Single(updatedPackages);
-        Assert.Equal("Humanizer", updatedPackages[0].PackageName);
-        Assert.Equal("2.15.0", updatedPackages[0].CurrentVersion.ToString());
+
+        await Assert.That(updatedPackages).IsNotEmpty();
+        await Assert.That(updatedPackages).HasCount(1);
+        await Assert.That(updatedPackages[0].PackageName).IsEqualTo("Humanizer");
+        await Assert.That(updatedPackages[0].CurrentVersion.ToString()).IsEqualTo("2.15.0");
 
         TestHelper.DeleteFba();
     }

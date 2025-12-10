@@ -1,16 +1,25 @@
 using PackCheck.Commands;
 using Spectre.Console.Cli.Testing;
-using VerifyXunit;
 
 namespace PackCheck.Tests.Commands;
 
 public class CheckCommandTest
 {
-    [Fact]
-    public void Returns_Success_ForCheck()
+    [Before(Test)]
+    public void Setup()
     {
         TestHelper.LoadTestCsProjFile();
+    }
 
+    [After(Test)]
+    public void TearDown()
+    {
+        TestHelper.DeleteTestCsProjFile();
+    }
+
+    [Test]
+    public Task Returns_Success_ForCheck()
+    {
         var app = new CommandAppTester();
         app.Configure(config =>
         {
@@ -19,16 +28,12 @@ public class CheckCommandTest
 
         CommandAppResult result = app.Run("check");
 
-        Verifier.Verify(result);
-
-        TestHelper.DeleteTestCsProjFile();
+        return Verifier.Verify(result);
     }
 
-    [Fact]
-    public void Returns_Success_ForCheckWithFilter()
+    [Test]
+    public Task Returns_Success_ForCheckWithFilter()
     {
-        TestHelper.LoadTestCsProjFile();
-
         var app = new CommandAppTester();
         app.Configure(config =>
         {
@@ -37,8 +42,6 @@ public class CheckCommandTest
 
         CommandAppResult result = app.Run(["check", "--filter", "Spectre.Console"]);
 
-        Verifier.Verify(result);
-
-        TestHelper.DeleteTestCsProjFile();
+        return Verifier.Verify(result);
     }
 }

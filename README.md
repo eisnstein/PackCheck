@@ -119,6 +119,12 @@ To format the output of the `check` command, use the `--format` option. Currentl
 packcheck --format group
 ```
 
+To show the _latest_ versions in the output of the `check` command, use the `--pre` option, otherwise only the _current_ and _latest stable_ columns will be shown.
+
+```shell
+packcheck --pre
+```
+
 ## Configuration
 
 You can configure PackCheck via a `.packcheckrc.{json}` file. Example:
@@ -132,7 +138,8 @@ You can configure PackCheck via a `.packcheckrc.{json}` file. Example:
   "FbaFile": "path/to/file-based-app.cs",
   "Filter": ["NuGet.Version"],
   "Exclude": ["Microsoft.Logging"],
-  "Format": "group"
+  "Format": "group",
+  "Pre": true
 }
 ```
 

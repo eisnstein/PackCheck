@@ -8,8 +8,8 @@ namespace PackCheck.Tests.Commands.Settings;
 
 public class CheckSettingsTests
 {
-    [Fact]
-    public void PathToCsProjFileIsNotSet()
+    [Test]
+    public async Task PathToCsProjFileIsNotSet()
     {
         var app = new CommandAppTester();
         app.Configure(config =>
@@ -19,14 +19,14 @@ public class CheckSettingsTests
 
         CommandAppResult result = app.Run(["check"]);
 
-        Assert.NotNull(result.Settings);
-        Assert.IsType<CheckSettings>(result.Settings);
+        await Assert.That(result.Settings).IsNotNull();
+        await Assert.That(result.Settings).IsTypeOf<CheckSettings>();
         CheckSettings settings = (result.Settings as CheckSettings)!;
-        Assert.Null(settings.PathToCsProjFile);
+        await Assert.That(settings.PathToCsProjFile).IsNull();
     }
 
-    [Fact]
-    public void PathToCsProjFileIsSetButNoValueGiven()
+    [Test]
+    public async Task PathToCsProjFileIsSetButNoValueGiven()
     {
         var app = new CommandAppTester();
         app.Configure(config =>
@@ -36,15 +36,14 @@ public class CheckSettingsTests
 
         CommandAppResult result = app.Run(["check", "--csprojFile"]);
 
-        Assert.Equal(-1, result.ExitCode);
-        Assert.StartsWith(
-            "Error: Option 'csprojFile' is defined but no value has been provided.",
-            result.Output
+        await Assert.That(result.ExitCode).IsEqualTo(-1);
+        await Assert.That(result.Output).StartsWith(
+            "Error: Option 'csprojFile' is defined but no value has been provided."
         );
     }
 
-    [Fact]
-    public void PathToCsProjFileIsSet()
+    [Test]
+    public async Task PathToCsProjFileIsSet()
     {
         var app = new CommandAppTester();
         app.Configure(config =>
@@ -55,15 +54,15 @@ public class CheckSettingsTests
 
         CommandAppResult result = app.Run(["check", "--csprojFile", @".\example.csproj"]);
 
-        Assert.NotNull(result.Settings);
-        Assert.IsType<CheckSettings>(result.Settings);
+        await Assert.That(result.Settings).IsNotNull();
+        await Assert.That(result.Settings).IsTypeOf<CheckSettings>();
         CheckSettings settings = (result.Settings as CheckSettings)!;
-        Assert.NotNull(settings.PathToCsProjFile);
-        Assert.Equal(@".\example.csproj", settings.PathToCsProjFile);
+        await Assert.That(settings.PathToCsProjFile).IsNotNull();
+        await Assert.That(settings.PathToCsProjFile).IsEqualTo(@".\example.csproj");
     }
 
-    [Fact]
-    public void PathToSolutionFileIsSetButNoValueGiven()
+    [Test]
+    public async Task PathToSolutionFileIsSetButNoValueGiven()
     {
         var app = new CommandAppTester();
         app.Configure(config =>
@@ -73,15 +72,14 @@ public class CheckSettingsTests
 
         CommandAppResult result = app.Run(["check", "--slnFile"]);
 
-        Assert.Equal(-1, result.ExitCode);
-        Assert.StartsWith(
-            "Error: Option 'slnFile' is defined but no value has been provided.",
-            result.Output
+        await Assert.That(result.ExitCode).IsEqualTo(-1);
+        await Assert.That(result.Output).StartsWith(
+            "Error: Option 'slnFile' is defined but no value has been provided."
         );
     }
 
-    [Fact]
-    public void PathToSlnFileIsSet()
+    [Test]
+    public async Task PathToSlnFileIsSet()
     {
         var app = new CommandAppTester();
         app.Configure(config =>
@@ -91,15 +89,15 @@ public class CheckSettingsTests
 
         CommandAppResult result = app.Run(["check", "--slnFile", @".\example.sln"]);
 
-        Assert.NotNull(result.Settings);
-        Assert.IsType<CheckSettings>(result.Settings);
+        await Assert.That(result.Settings).IsNotNull();
+        await Assert.That(result.Settings).IsTypeOf<CheckSettings>();
         CheckSettings settings = (result.Settings as CheckSettings)!;
-        Assert.NotNull(settings.PathToSlnFile);
-        Assert.Equal(@".\example.sln", settings.PathToSlnFile);
+        await Assert.That(settings.PathToSlnFile).IsNotNull();
+        await Assert.That(settings.PathToSlnFile).IsEqualTo(@".\example.sln");
     }
 
-    [Fact]
-    public void PathToSolutionXFileIsSetButNoValueGiven()
+    [Test]
+    public async Task PathToSolutionXFileIsSetButNoValueGiven()
     {
         var app = new CommandAppTester();
         app.Configure(config =>
@@ -109,15 +107,14 @@ public class CheckSettingsTests
 
         CommandAppResult result = app.Run(["check", "--slnxFile"]);
 
-        Assert.Equal(-1, result.ExitCode);
-        Assert.StartsWith(
-            "Error: Option 'slnxFile' is defined but no value has been provided.",
-            result.Output
+        await Assert.That(result.ExitCode).IsEqualTo(-1);
+        await Assert.That(result.Output).StartsWith(
+            "Error: Option 'slnxFile' is defined but no value has been provided."
         );
     }
 
-    [Fact]
-    public void PathToSolutionXFileIsSet()
+    [Test]
+    public async Task PathToSolutionXFileIsSet()
     {
         var app = new CommandAppTester();
         app.Configure(config =>
@@ -127,15 +124,15 @@ public class CheckSettingsTests
 
         CommandAppResult result = app.Run(["check", "--slnxFile", @".\example.slnx"]);
 
-        Assert.NotNull(result.Settings);
-        Assert.IsType<CheckSettings>(result.Settings);
+        await Assert.That(result.Settings).IsNotNull();
+        await Assert.That(result.Settings).IsTypeOf<CheckSettings>();
         CheckSettings settings = (result.Settings as CheckSettings)!;
-        Assert.NotNull(settings.PathToSlnxFile);
-        Assert.Equal(@".\example.slnx", settings.PathToSlnxFile);
+        await Assert.That(settings.PathToSlnxFile).IsNotNull();
+        await Assert.That(settings.PathToSlnxFile).IsEqualTo(@".\example.slnx");
     }
 
-    [Fact]
-    public void PathToCpmFileIsSetButNoValueGiven()
+    [Test]
+    public async Task PathToCpmFileIsSetButNoValueGiven()
     {
         var app = new CommandAppTester();
         app.Configure(config =>
@@ -146,15 +143,14 @@ public class CheckSettingsTests
         CommandAppResult result = app.Run(["check", "--cpmFile"]);
 
         // No Directory.Packages.props file is given
-        Assert.Equal(-1, result.ExitCode);
-        Assert.StartsWith(
-            "Error: Option 'cpmFile' is defined but no value has been provided.",
-            result.Output
+        await Assert.That(result.ExitCode).IsEqualTo(-1);
+        await Assert.That(result.Output).StartsWith(
+            "Error: Option 'cpmFile' is defined but no value has been provided."
         );
     }
 
-    [Fact]
-    public void PathToCpmFileIsSet()
+    [Test]
+    public async Task PathToCpmFileIsSet()
     {
         var app = new CommandAppTester();
         app.Configure(config =>
@@ -164,15 +160,15 @@ public class CheckSettingsTests
 
         CommandAppResult result = app.Run(["check", "--cpmFile", $".\\{CentralPackageMgmtService.CpmFileName}"]);
 
-        Assert.NotNull(result.Settings);
-        Assert.IsType<CheckSettings>(result.Settings);
+        await Assert.That(result.Settings).IsNotNull();
+        await Assert.That(result.Settings).IsTypeOf<CheckSettings>();
         CheckSettings settings = (result.Settings as CheckSettings)!;
-        Assert.NotNull(settings.PathToCpmFile);
-        Assert.Equal($".\\{CentralPackageMgmtService.CpmFileName}", settings.PathToCpmFile);
+        await Assert.That(settings.PathToCpmFile).IsNotNull();
+        await Assert.That(settings.PathToCpmFile).IsEqualTo($".\\{CentralPackageMgmtService.CpmFileName}");
     }
 
-    [Fact]
-    public void FilterIsSet()
+    [Test]
+    public async Task FilterIsSet()
     {
         var app = new CommandAppTester();
         app.Configure(config =>
@@ -182,17 +178,17 @@ public class CheckSettingsTests
 
         CommandAppResult result = app.Run(["check", "--filter", "Package1", "-f", "Package2"]);
 
-        Assert.NotNull(result.Settings);
-        Assert.IsType<CheckSettings>(result.Settings);
+        await Assert.That(result.Settings).IsNotNull();
+        await Assert.That(result.Settings).IsTypeOf<CheckSettings>();
         CheckSettings settings = (result.Settings as CheckSettings)!;
-        Assert.NotNull(settings.Filter);
+        await Assert.That(settings.Filter).IsNotNull();
 
         string[] expected = ["Package1", "Package2"];
-        Assert.Equal(expected, settings.Filter);
+        await Assert.That(settings.Filter).IsEquivalentTo(expected);
     }
 
-    [Fact]
-    public void Error_When_FilterOptionIsSetButNoValueGiven()
+    [Test]
+    public async Task Error_When_FilterOptionIsSetButNoValueGiven()
     {
         var app = new CommandAppTester();
         app.Configure(config =>
@@ -202,15 +198,14 @@ public class CheckSettingsTests
 
         CommandAppResult result = app.Run(["check", "--filter", "Package1", "-f"]);
 
-        Assert.Equal(-1, result.ExitCode);
-        Assert.StartsWith(
-            "Error: Option 'filter' is defined but no value has been provided.",
-            result.Output
+        await Assert.That(result.ExitCode).IsEqualTo(-1);
+        await Assert.That(result.Output).StartsWith(
+            "Error: Option 'filter' is defined but no value has been provided."
         );
     }
 
-    [Fact]
-    public void ExcludeIsSet()
+    [Test]
+    public async Task ExcludeIsSet()
     {
         var app = new CommandAppTester();
         app.Configure(config =>
@@ -220,17 +215,17 @@ public class CheckSettingsTests
 
         CommandAppResult result = app.Run(["check", "--exclude", "Package1", "-x", "Package2"]);
 
-        Assert.NotNull(result.Settings);
-        Assert.IsType<CheckSettings>(result.Settings);
+        await Assert.That(result.Settings).IsNotNull();
+        await Assert.That(result.Settings).IsTypeOf<CheckSettings>();
         CheckSettings settings = (result.Settings as CheckSettings)!;
-        Assert.NotNull(settings.Exclude);
+        await Assert.That(settings.Exclude).IsNotNull();
 
         string[] expected = ["Package1", "Package2"];
-        Assert.Equal(expected, settings.Exclude);
+        await Assert.That(settings.Exclude).IsEquivalentTo(expected);
     }
 
-    [Fact]
-    public void Error_When_ExcludeOptionIsSetButNoValueGiven()
+    [Test]
+    public async Task Error_When_ExcludeOptionIsSetButNoValueGiven()
     {
         var app = new CommandAppTester();
         app.Configure(config =>
@@ -240,15 +235,14 @@ public class CheckSettingsTests
 
         CommandAppResult result = app.Run(["check", "--filter", "Package1", "-x"]);
 
-        Assert.Equal(-1, result.ExitCode);
-        Assert.StartsWith(
-            "Error: Option 'exclude' is defined but no value has been provided.",
-            result.Output
+        await Assert.That(result.ExitCode).IsEqualTo(-1);
+        await Assert.That(result.Output).StartsWith(
+            "Error: Option 'exclude' is defined but no value has been provided."
         );
     }
 
-    [Fact]
-    public void FormatOptionIsGiven()
+    [Test]
+    public async Task FormatOptionIsGiven()
     {
         var app = new CommandAppTester();
         app.Configure(config =>
@@ -258,16 +252,15 @@ public class CheckSettingsTests
 
         CommandAppResult result = app.Run(["check", "--format", "group"]);
 
-        Assert.NotNull(result.Settings);
-        Assert.IsType<CheckSettings>(result.Settings);
+        await Assert.That(result.Settings).IsNotNull();
+        await Assert.That(result.Settings).IsTypeOf<CheckSettings>();
         CheckSettings settings = (result.Settings as CheckSettings)!;
-        Assert.NotNull(settings.Format);
-
-        Assert.Equal("group", settings.Format);
+        await Assert.That(settings.Format).IsNotNull();
+        await Assert.That(settings.Format).IsEqualTo("group");
     }
 
-    [Fact]
-    public void Error_When_WrongFormatOptionIsGiven()
+    [Test]
+    public async Task Error_When_WrongFormatOptionIsGiven()
     {
         var app = new CommandAppTester();
         app.Configure(config =>
@@ -276,6 +269,6 @@ public class CheckSettingsTests
             config.AddCommand<CheckCommand>("check");
         });
 
-        Assert.Throws<CommandRuntimeException>(() => app.Run(["check", "--format", "wrong"]));
+        await Assert.That(() => app.Run(["check", "--format", "wrong"])).ThrowsExactly<CommandRuntimeException>();
     }
 }

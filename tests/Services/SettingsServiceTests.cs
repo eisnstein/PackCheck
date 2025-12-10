@@ -1,13 +1,14 @@
 using PackCheck.Commands.Settings;
 using PackCheck.Data;
 using PackCheck.Services;
+using Target = PackCheck.Data.Target;
 
 namespace PackCheck.Tests.Services;
 
 public class SettingsServiceTests
 {
-    [Fact]
-    public void Returns_CheckSettingsWithConfigValues_When_NoCliValuesGiven()
+    [Test]
+    public async Task Returns_CheckSettingsWithConfigValues_When_NoCliValuesGiven()
     {
         var settings = new CheckSettings();
         var config = new Config()
@@ -21,15 +22,15 @@ public class SettingsServiceTests
 
         settings = SettingsService.CombineSettingsWithConfig(settings, config);
 
-        Assert.Equal(config.CsProjFile, settings.PathToCsProjFile);
-        Assert.Equal(config.SlnFile, settings.PathToSlnFile);
-        Assert.Equal(config.CpmFile, settings.PathToCpmFile);
-        Assert.Equal(config.Exclude, settings.Exclude);
-        Assert.Equal(config.Filter, settings.Filter);
+        await Assert.That(settings.PathToCsProjFile).IsEqualTo(config.CsProjFile);
+        await Assert.That(settings.PathToSlnFile).IsEqualTo(config.SlnFile);
+        await Assert.That(settings.PathToCpmFile).IsEqualTo(config.CpmFile);
+        await Assert.That(settings.Exclude).IsEquivalentTo(config.Exclude);
+        await Assert.That(settings.Filter).IsEquivalentTo(config.Filter);
     }
 
-    [Fact]
-    public void Returns_CheckSettingsUnchanged_When_SameConfigValuesAreSet()
+    [Test]
+    public async Task Returns_CheckSettingsUnchanged_When_SameConfigValuesAreSet()
     {
         var settings = new CheckSettings()
         {
@@ -47,12 +48,12 @@ public class SettingsServiceTests
         string[] expectedExclude = ["Pack1"];
         string[] expectedFilter = ["Pack2"];
 
-        Assert.Equal(expectedExclude, settings.Exclude);
-        Assert.Equal(expectedFilter, settings.Filter);
+        await Assert.That(settings.Exclude).IsEquivalentTo(expectedExclude);
+        await Assert.That(settings.Filter).IsEquivalentTo(expectedFilter);
     }
 
-    [Fact]
-    public void Returns_CheckSettingsUnchanged_When_SameConfigValuesAreNotSet()
+    [Test]
+    public async Task Returns_CheckSettingsUnchanged_When_SameConfigValuesAreNotSet()
     {
         var settings = new CheckSettings()
         {
@@ -66,18 +67,18 @@ public class SettingsServiceTests
         string[] expectedExclude = ["Pack1"];
         string[] expectedFilter = ["Pack2"];
 
-        Assert.Equal(expectedExclude, settings.Exclude);
-        Assert.Equal(expectedFilter, settings.Filter);
+        await Assert.That(settings.Exclude).IsEquivalentTo(expectedExclude);
+        await Assert.That(settings.Filter).IsEquivalentTo(expectedFilter);
     }
 
-    [Fact]
-    public void Returns_CheckSettingsChanged_When_ConfigValuesAreSet()
+    [Test]
+    public async Task Returns_CheckSettingsChanged_When_ConfigValuesAreSet()
     {
         var settings = new CheckSettings();
         var config = new Config()
         {
             Exclude = ["Pack1"],
-            Filter = ["Pack2"]
+            Filter = ["Pack2"],
         };
 
         settings = SettingsService.CombineSettingsWithConfig(settings, config);
@@ -85,12 +86,60 @@ public class SettingsServiceTests
         string[] expectedExclude = ["Pack1"];
         string[] expectedFilter = ["Pack2"];
 
-        Assert.Equal(expectedExclude, settings.Exclude);
-        Assert.Equal(expectedFilter, settings.Filter);
+        await Assert.That(settings.Exclude).IsEquivalentTo(expectedExclude);
+        await Assert.That(settings.Filter).IsEquivalentTo(expectedFilter);
     }
 
-    [Fact]
-    public void Returns_UpgradeSettingsWithConfigValues_When_NoCliValuesGiven()
+    [Test]
+    public async Task Sets_ShowLatestVersion_When_ConfigValueIsTrue()
+    {
+        var settings = new CheckSettings();
+        var config = new Config()
+        {
+            Pre = true
+        };
+
+        settings = SettingsService.CombineSettingsWithConfig(settings, config);
+
+        await Assert.That(settings.ShowLatestVersion).IsTrue();
+    }
+
+    [Test]
+    public async Task Sets_ShowLatestVersion_When_ConfigValueIsFalse_But_GivenViaCli()
+    {
+        var settings = new CheckSettings()
+        {
+            ShowLatestVersion = true
+        };
+        var config = new Config()
+        {
+            Pre = false
+        };
+
+        settings = SettingsService.CombineSettingsWithConfig(settings, config);
+
+        await Assert.That(settings.ShowLatestVersion).IsTrue();
+    }
+
+    [Test]
+    public async Task DoesNotSet_ShowLatestVersion_When_ConfigValueIsTrue_And_CliValueIsFalse()
+    {
+        var settings = new CheckSettings()
+        {
+            ShowLatestVersion = false
+        };
+        var config = new Config()
+        {
+            Pre = true
+        };
+
+        settings = SettingsService.CombineSettingsWithConfig(settings, config);
+
+        await Assert.That(settings.ShowLatestVersion).IsFalse();
+    }
+
+    [Test]
+    public async Task Returns_UpgradeSettingsWithConfigValues_When_NoCliValuesGiven()
     {
         var settings = new UpgradeSettings();
         var config = new Config()
@@ -104,18 +153,18 @@ public class SettingsServiceTests
 
         settings = SettingsService.CombineSettingsWithConfig(settings, config);
 
-        Assert.Equal(config.CsProjFile, settings.PathToCsProjFile);
-        Assert.Equal(config.SlnFile, settings.PathToSlnFile);
-        Assert.Equal(config.CpmFile, settings.PathToCpmFile);
-        Assert.Equal(config.Exclude, settings.Exclude);
-        Assert.Equal(config.Filter, settings.Filter);
-        Assert.False(settings.Interactive);
-        Assert.False(settings.DryRun);
-        Assert.Equal("stable", settings.Target);
+        await Assert.That(settings.PathToCsProjFile).IsEqualTo(config.CsProjFile);
+        await Assert.That(settings.PathToSlnFile).IsEqualTo(config.SlnFile);
+        await Assert.That(settings.PathToCpmFile).IsEqualTo(config.CpmFile);
+        await Assert.That(settings.Exclude).IsEquivalentTo(config.Exclude);
+        await Assert.That(settings.Filter).IsEquivalentTo(config.Filter);
+        await Assert.That(settings.Interactive).IsFalse();
+        await Assert.That(settings.DryRun).IsFalse();
+        await Assert.That(settings.Target).IsEqualTo("stable");
     }
 
-    [Fact]
-    public void Returns_UpgradeSettingsWithCliValues_When_CliValuesGiven()
+    [Test]
+    public async Task Returns_UpgradeSettingsWithCliValues_When_CliValuesGiven()
     {
         var settings = new UpgradeSettings()
         {
@@ -139,11 +188,11 @@ public class SettingsServiceTests
 
         settings = SettingsService.CombineSettingsWithConfig(settings, config);
 
-        Assert.Equal("Project.csproj", settings.PathToCsProjFile);
-        Assert.Equal("Project.sln", settings.PathToSlnFile);
-        Assert.Equal("Directory.Packages.props", settings.PathToCpmFile);
-        Assert.False(settings.Interactive);
-        Assert.False(settings.DryRun);
-        Assert.Equal(Target.Stable, settings.Target);
+        await Assert.That(settings.PathToCsProjFile).IsEqualTo("Project.csproj");
+        await Assert.That(settings.PathToSlnFile).IsEqualTo("Project.sln");
+        await Assert.That(settings.PathToCpmFile).IsEqualTo("Directory.Packages.props");
+        await Assert.That(settings.Interactive).IsFalse();
+        await Assert.That(settings.DryRun).IsFalse();
+        await Assert.That(settings.Target).IsEqualTo(Target.Stable);
     }
 }

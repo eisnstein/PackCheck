@@ -1,0 +1,18 @@
+﻿{
+  Output: ,
+  Context: {
+    Remaining: {},
+    Arguments: [
+      check,
+      --filter,
+      Spectre.Console
+    ],
+    Name: check
+  },
+  Settings: {
+    Target: stable,
+    Filter: [
+      Spectre.Console
+    ]
+  }
+}

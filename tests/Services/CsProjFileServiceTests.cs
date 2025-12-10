@@ -1,52 +1,48 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using PackCheck.Commands.Settings;
 using PackCheck.Data;
 using PackCheck.Exceptions;
 using PackCheck.Services;
 using PackCheck.Tests.Factories;
+using Target = PackCheck.Data.Target;
 
 namespace PackCheck.Tests.Services;
 
 public class CsProjFileServiceTests
 {
-    [Fact]
-    public void Throws_When_PathToCsProjFileIsProvidedButFileDoesNotExist()
+    [Test]
+    public async Task Throws_When_PathToCsProjFileIsProvidedButFileDoesNotExist()
     {
         var pathToFile = "does-not-exist.csproj";
 
         Action actual = () => CsProjFileService.GetPathToCsProjFile(pathToFile);
 
-        Assert.Throws<CsProjFileException>(actual);
+        await Assert.That(actual).ThrowsExactly<CsProjFileException>();
     }
 
-    [Fact]
-    public void CsProjFileExistsAtGivenPath()
+    [Test]
+    public async Task CsProjFileExistsAtGivenPath()
     {
         TestHelper.LoadTestCsProjFile();
         var relativePath = "test.csproj";
 
         var fullPath = CsProjFileService.GetPathToCsProjFile(relativePath);
 
-        Assert.EndsWith(relativePath, fullPath);
+        await Assert.That(fullPath).EndsWith(relativePath);
         TestHelper.DeleteTestCsProjFile();
     }
 
-    [Fact]
-    public void CsProjFileExistsWithoutGivenPath()
+    [Test]
+    public async Task CsProjFileExistsWithoutGivenPath()
     {
         TestHelper.LoadTestCsProjFile();
 
         var fullPath = CsProjFileService.GetPathToCsProjFile();
 
-        Assert.EndsWith("test.csproj", fullPath);
+        await Assert.That(fullPath).EndsWith("test.csproj");
         TestHelper.DeleteTestCsProjFile();
     }
 
-    [Fact]
+    [Test]
     public async Task AllPackagesGetUpdatedToLatestStableVersion()
     {
         TestHelper.LoadTestCsProjFile();
@@ -63,16 +59,16 @@ public class CsProjFileServiceTests
 
         await CsProjFileService.UpgradePackageVersionsAsync(pathToCsProjFile, preparedPackages, settings.DryRun);
 
-        var fileContent = await File.ReadAllTextAsync(pathToCsProjFile, TestContext.Current.CancellationToken);
+        var fileContent = await File.ReadAllTextAsync(pathToCsProjFile);
 
-        Assert.Contains($"<PackageReference Include=\"NuGet.Protocol\" Version=\"6.3.0\" />", fileContent);
-        Assert.Contains($"<PackageReference Include=\"NuGet.Versioning\" Version=\"6.3.0\" />", fileContent);
-        Assert.Contains($"<PackageReference Include=\"Spectre.Cli.Extensions.DependencyInjection\" Version=\"0.5.0\" />", fileContent);
-        Assert.Contains($"<PackageReference Include=\"Spectre.Console\" Version=\"0.44.1\" />", fileContent);
+        await Assert.That(fileContent).Contains($"<PackageReference Include=\"NuGet.Protocol\" Version=\"6.3.0\" />");
+        await Assert.That(fileContent).Contains($"<PackageReference Include=\"NuGet.Versioning\" Version=\"6.3.0\" />");
+        await Assert.That(fileContent).Contains($"<PackageReference Include=\"Spectre.Cli.Extensions.DependencyInjection\" Version=\"0.5.0\" />");
+        await Assert.That(fileContent).Contains($"<PackageReference Include=\"Spectre.Console\" Version=\"0.44.1\" />");
         TestHelper.DeleteTestCsProjFile();
     }
 
-    [Fact]
+    [Test]
     public async Task OnePackageGetsUpdatedToLatestStableVersion()
     {
         TestHelper.LoadTestCsProjFile();
@@ -92,16 +88,16 @@ public class CsProjFileServiceTests
 
         await CsProjFileService.UpgradePackageVersionsAsync(pathToCsProjFile, preparedPackages, settings.DryRun);
 
-        var fileContent = await File.ReadAllTextAsync(pathToCsProjFile, TestContext.Current.CancellationToken);
+        var fileContent = await File.ReadAllTextAsync(pathToCsProjFile);
 
-        Assert.Contains($"<PackageReference Include=\"NuGet.Protocol\" Version=\"6.3.0\" />", fileContent);
-        Assert.Contains($"<PackageReference Include=\"NuGet.Versioning\" Version=\"6.2.1\" />", fileContent);
-        Assert.Contains($"<PackageReference Include=\"Spectre.Cli.Extensions.DependencyInjection\" Version=\"0.4.0\" />", fileContent);
-        Assert.Contains($"<PackageReference Include=\"Spectre.Console\" Version=\"0.44.0\" />", fileContent);
+        await Assert.That(fileContent).Contains($"<PackageReference Include=\"NuGet.Protocol\" Version=\"6.3.0\" />");
+        await Assert.That(fileContent).Contains($"<PackageReference Include=\"NuGet.Versioning\" Version=\"6.2.1\" />");
+        await Assert.That(fileContent).Contains($"<PackageReference Include=\"Spectre.Cli.Extensions.DependencyInjection\" Version=\"0.4.0\" />");
+        await Assert.That(fileContent).Contains($"<PackageReference Include=\"Spectre.Console\" Version=\"0.44.0\" />");
         TestHelper.LoadTestCsProjFile();
     }
 
-    [Fact]
+    [Test]
     public async Task AllPackagesGetUpdatedToLatestVersionIfAvailable()
     {
         TestHelper.LoadTestCsProjFile();
@@ -118,12 +114,12 @@ public class CsProjFileServiceTests
 
         await CsProjFileService.UpgradePackageVersionsAsync(pathToCsProjFile, preparedPackages, settings.DryRun);
 
-        var fileContent = await File.ReadAllTextAsync(pathToCsProjFile, TestContext.Current.CancellationToken);
+        var fileContent = await File.ReadAllTextAsync(pathToCsProjFile);
 
-        Assert.Contains($"<PackageReference Include=\"NuGet.Protocol\" Version=\"7.0.0-preview.123\" />", fileContent);
-        Assert.Contains($"<PackageReference Include=\"NuGet.Versioning\" Version=\"6.3.0\" />", fileContent);
-        Assert.Contains($"<PackageReference Include=\"Spectre.Cli.Extensions.DependencyInjection\" Version=\"0.5.0\" />", fileContent);
-        Assert.Contains($"<PackageReference Include=\"Spectre.Console\" Version=\"0.44.1\" />", fileContent);
+        await Assert.That(fileContent).Contains($"<PackageReference Include=\"NuGet.Protocol\" Version=\"7.0.0-preview.123\" />");
+        await Assert.That(fileContent).Contains($"<PackageReference Include=\"NuGet.Versioning\" Version=\"6.3.0\" />");
+        await Assert.That(fileContent).Contains($"<PackageReference Include=\"Spectre.Cli.Extensions.DependencyInjection\" Version=\"0.5.0\" />");
+        await Assert.That(fileContent).Contains($"<PackageReference Include=\"Spectre.Console\" Version=\"0.44.1\" />");
         TestHelper.LoadTestCsProjFile();
     }
 

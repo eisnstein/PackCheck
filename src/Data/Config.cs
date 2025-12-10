@@ -12,4 +12,5 @@ public record Config
     public List<string>? Exclude { get; init; }
     public List<string>? Filter { get; init; }
     public string? Format { get; init; }
+    public bool Pre { get; init; } = true;
 }

@@ -1,52 +1,49 @@
-using System.Collections.Generic;
-using System.Linq;
 using PackCheck.Services;
 
 namespace PackCheck.Tests.Services;
 
 public class SolutionFileServiceTests
 {
-    [Fact]
-    public void LoadsSolutionFile()
+    [Test]
+    public async Task LoadsSolutionFile()
     {
         TestHelper.LoadSolution();
 
-        Assert.True(SolutionFileService.HasSolution());
+        await Assert.That(SolutionFileService.HasSolution()).IsTrue();
 
         TestHelper.DeleteSolution();
     }
 
-    [Fact]
-    public void GetProjectDefinitionsFromSolutionFile()
+    [Test]
+    public async Task GetProjectDefinitionsFromSolutionFile()
     {
         TestHelper.LoadSolution();
 
         var projectDefinitions = SolutionFileService.GetProjectDefinitions("testSolution.sln").ToList();
 
-        Assert.Equal(2, projectDefinitions.Count);
+        await Assert.That(projectDefinitions.Count).IsEqualTo(2);
         foreach (var projectDefinition in projectDefinitions)
         {
-            Assert.StartsWith("Project(", projectDefinition);
+            await Assert.That(projectDefinition).StartsWith("Project(");
         }
 
         TestHelper.DeleteSolution();
     }
 
-    [Fact]
-    public void ParseProjectDefinitions()
+    [Test]
+    public async Task ParseProjectDefinitions()
     {
         TestHelper.LoadSolution();
-        List<string> expectedPaths = new()
-        {
+        List<string> expectedPaths = [
             @"SolProj\SolProj.csproj",
             @"SolProj.Tests\SolProj.Tests.csproj"
-        };
+        ];
 
         var projectDefinitions = SolutionFileService.GetProjectDefinitions("testSolution.sln");
         var projectPaths = SolutionFileService.ParseProjectDefinitions(projectDefinitions);
 
-        Assert.Equal(2, projectPaths.Count);
-        Assert.Equal(expectedPaths, projectPaths);
+        await Assert.That(projectPaths.Count).IsEqualTo(2);
+        await Assert.That(projectPaths).IsEquivalentTo(expectedPaths);
 
         TestHelper.DeleteSolution();
     }

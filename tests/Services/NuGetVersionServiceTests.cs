@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using NuGet.Versioning;
 using PackCheck.Services;
 
@@ -6,8 +5,8 @@ namespace PackCheck.Tests.Services;
 
 public class NuGetVersionServiceTests
 {
-    [Fact]
-    public void GetsLatestVersion()
+    [Test]
+    public async Task GetsLatestVersion()
     {
         var versions = new List<NuGetVersion>
         {
@@ -27,11 +26,11 @@ public class NuGetVersionServiceTests
 
         var latestVersion = NuGetVersionService.GetLatestVersion(versions);
 
-        Assert.Equal("4.0.2", latestVersion.ToString());
+        await Assert.That(latestVersion.ToString()).IsEqualTo("4.0.2");
     }
 
-    [Fact]
-    public void GetsLatestVersionWhenLatestVersionIsPrerelease()
+    [Test]
+    public async Task GetsLatestVersionWhenLatestVersionIsPrerelease()
     {
         var versions = new List<NuGetVersion>
         {
@@ -52,11 +51,11 @@ public class NuGetVersionServiceTests
 
         var latestVersion = NuGetVersionService.GetLatestVersion(versions);
 
-        Assert.Equal("4.0.2-preview.1.123.4", latestVersion.ToString());
+        await Assert.That(latestVersion.ToString()).IsEqualTo("4.0.2-preview.1.123.4");
     }
 
-    [Fact]
-    public void GetsLatestStableVersion()
+    [Test]
+    public async Task GetsLatestStableVersion()
     {
         var versions = new List<NuGetVersion>
         {
@@ -79,16 +78,16 @@ public class NuGetVersionServiceTests
         var stableVersion2 = NuGetVersionService.GetLatestStableVersion(versions);
         var latestVersion2 = NuGetVersionService.GetLatestVersion(versions);
 
-        Assert.NotNull(stableVersion1);
-        Assert.Equal("4.0.2", stableVersion1.ToString());
-        Assert.Equal("4.0.2", latestVersion1.ToString());
-        Assert.NotNull(stableVersion2);
-        Assert.Equal("4.0.2", stableVersion2.ToString());
-        Assert.Equal("4.0.2", latestVersion2.ToString());
+        await Assert.That(stableVersion1).IsNotNull();
+        await Assert.That(stableVersion1.ToString()).IsEqualTo("4.0.2");
+        await Assert.That(latestVersion1.ToString()).IsEqualTo("4.0.2");
+        await Assert.That(stableVersion2).IsNotNull();
+        await Assert.That(stableVersion2.ToString()).IsEqualTo("4.0.2");
+        await Assert.That(latestVersion2.ToString()).IsEqualTo("4.0.2");
     }
 
-    [Fact]
-    public void GetsLatestStableVersionWhenPackageOnLatestPrereleaseVersion()
+    [Test]
+    public async Task GetsLatestStableVersionWhenPackageOnLatestPrereleaseVersion()
     {
         var versions = new List<NuGetVersion>
         {
@@ -109,12 +108,12 @@ public class NuGetVersionServiceTests
 
         var latestStableVersion = NuGetVersionService.GetLatestStableVersion(versions);
 
-        Assert.NotNull(latestStableVersion);
-        Assert.Equal("4.0.2", latestStableVersion.ToString());
+        await Assert.That(latestStableVersion).IsNotNull();
+        await Assert.That(latestStableVersion.ToString()).IsEqualTo("4.0.2");
     }
 
-    [Fact]
-    public void GetLatestVersionWhenOnlyPrereleaseVersionsAvailable()
+    [Test]
+    public async Task GetLatestVersionWhenOnlyPrereleaseVersionsAvailable()
     {
         var versions = new List<NuGetVersion>
         {
@@ -126,7 +125,7 @@ public class NuGetVersionServiceTests
         var latestStableVersion = NuGetVersionService.GetLatestStableVersion(versions);
         var latestVersion = NuGetVersionService.GetLatestVersion(versions);
 
-        Assert.Null(latestStableVersion);
-        Assert.Equal("4.0.0-preview3", latestVersion.ToString());
+        await Assert.That(latestStableVersion).IsNull();
+        await Assert.That(latestVersion.ToString()).IsEqualTo("4.0.0-preview3");
     }
 }

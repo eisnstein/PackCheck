@@ -21,6 +21,13 @@ public static class SettingsService
         settings.Exclude ??= config.Exclude?.ToArray();
         settings.Format ??= config.Format;
 
+        // If ShowLatestVersion is not set in CLI,
+        // take the value from config which is false by default.
+        if (settings.ShowLatestVersion is null)
+        {
+            settings.ShowLatestVersion = config.Pre;
+        }
+
         return settings;
     }
 
@@ -38,7 +45,6 @@ public static class SettingsService
         settings.PathToCpmFile ??= config.CpmFile;
         settings.Filter ??= config.Filter?.ToArray();
         settings.Exclude ??= config.Exclude?.ToArray();
-        settings.Format ??= config.Format;
 
         return settings;
     }

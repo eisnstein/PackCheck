@@ -7,8 +7,8 @@ namespace PackCheck.Tests.Commands.Settings;
 
 public class UpgradeSettingsTests
 {
-    [Fact]
-    public void DefaultTargetVersionIsSet()
+    [Test]
+    public async Task DefaultTargetVersionIsSet()
     {
         var app = new CommandAppTester();
         app.Configure(config =>
@@ -18,15 +18,15 @@ public class UpgradeSettingsTests
 
         CommandAppResult result = app.Run(["upgrade"]);
 
-        Assert.NotNull(result.Settings);
-        Assert.IsType<UpgradeSettings>(result.Settings);
+        await Assert.That(result.Settings).IsNotNull();
+        await Assert.That(result.Settings).IsTypeOf<UpgradeSettings>();
         UpgradeSettings settings = (result.Settings as UpgradeSettings)!;
-        Assert.NotNull(settings.Target);
-        Assert.Equal("stable", settings.Target);
+        await Assert.That(settings.Target).IsNotNull();
+        await Assert.That(settings.Target).IsEqualTo("stable");
     }
 
-    [Fact]
-    public void TargetVersionGetsSetToStable()
+    [Test]
+    public async Task TargetVersionGetsSetToStable()
     {
         var app = new CommandAppTester();
         app.Configure(config =>
@@ -36,15 +36,15 @@ public class UpgradeSettingsTests
 
         CommandAppResult result = app.Run(["upgrade", "--target", "stable"]);
 
-        Assert.NotNull(result.Settings);
-        Assert.IsType<UpgradeSettings>(result.Settings);
+        await Assert.That(result.Settings).IsNotNull();
+        await Assert.That(result.Settings).IsTypeOf<UpgradeSettings>();
         UpgradeSettings settings = (result.Settings as UpgradeSettings)!;
-        Assert.NotNull(settings.Target);
-        Assert.Equal("stable", settings.Target);
+        await Assert.That(settings.Target).IsNotNull();
+        await Assert.That(settings.Target).IsEqualTo("stable");
     }
 
-    [Fact]
-    public void TargetVersionGetsSetToLatest()
+    [Test]
+    public async Task TargetVersionGetsSetToLatest()
     {
         var app = new CommandAppTester();
         app.Configure(config =>
@@ -54,15 +54,15 @@ public class UpgradeSettingsTests
 
         CommandAppResult result = app.Run(["upgrade", "--target", "latest"]);
 
-        Assert.NotNull(result.Settings);
-        Assert.IsType<UpgradeSettings>(result.Settings);
+        await Assert.That(result.Settings).IsNotNull();
+        await Assert.That(result.Settings).IsTypeOf<UpgradeSettings>();
         UpgradeSettings settings = (result.Settings as UpgradeSettings)!;
-        Assert.NotNull(settings.Target);
-        Assert.Equal("latest", settings.Target);
+        await Assert.That(settings.Target).IsNotNull();
+        await Assert.That(settings.Target).IsEqualTo("latest");
     }
 
-    [Fact]
-    public void ThrowsOnWrongTargetVersion()
+    [Test]
+    public async Task ThrowsOnWrongTargetVersion()
     {
         var app = new CommandAppTester();
         app.Configure(config =>
@@ -71,11 +71,11 @@ public class UpgradeSettingsTests
             config.AddCommand<UpgradeCommand>("upgrade");
         });
 
-        Assert.Throws<CommandRuntimeException>(() => app.Run(["upgrade", "--target", "wrong"]));
+        await Assert.That(() => app.Run(["upgrade", "--target", "wrong"])).ThrowsExactly<CommandRuntimeException>();
     }
 
-    [Fact]
-    public void AllArgumentsWithoutDryRunGetSet()
+    [Test]
+    public async Task AllArgumentsWithoutDryRunGetSet()
     {
         var app = new CommandAppTester();
         app.Configure(config =>
@@ -88,21 +88,21 @@ public class UpgradeSettingsTests
             "upgrade", "awesome-package", "--csprojFile", "\\path-to-file", "--target", "latest"
         ]);
 
-        Assert.NotNull(result.Settings);
-        Assert.IsType<UpgradeSettings>(result.Settings);
+        await Assert.That(result.Settings).IsNotNull();
+        await Assert.That(result.Settings).IsTypeOf<UpgradeSettings>();
         UpgradeSettings settings = (result.Settings as UpgradeSettings)!;
-        Assert.NotNull(settings.PackageToUpgrade);
-        Assert.Equal("awesome-package", settings.PackageToUpgrade);
-        Assert.NotNull(settings.PathToCsProjFile);
-        Assert.Equal("\\path-to-file", settings.PathToCsProjFile);
-        Assert.NotNull(settings.Target);
-        Assert.Equal("latest", settings.Target);
-        Assert.False(settings.DryRun);
-        Assert.False(settings.Interactive);
+        await Assert.That(settings.PackageToUpgrade).IsNotNull();
+        await Assert.That(settings.PackageToUpgrade).IsEqualTo("awesome-package");
+        await Assert.That(settings.PathToCsProjFile).IsNotNull();
+        await Assert.That(settings.PathToCsProjFile).IsEqualTo("\\path-to-file");
+        await Assert.That(settings.Target).IsNotNull();
+        await Assert.That(settings.Target).IsEqualTo("latest");
+        await Assert.That(settings.DryRun).IsFalse();
+        await Assert.That(settings.Interactive).IsFalse();
     }
 
-    [Fact]
-    public void AllArgumentsWithDryRunGetSet()
+    [Test]
+    public async Task AllArgumentsWithDryRunGetSet()
     {
         var app = new CommandAppTester();
         app.Configure(config =>
@@ -115,21 +115,21 @@ public class UpgradeSettingsTests
             "upgrade", "awesome-package", "--csprojFile", "\\path-to-file", "--target", "latest", "--dry-run"
         ]);
 
-        Assert.NotNull(result.Settings);
-        Assert.IsType<UpgradeSettings>(result.Settings);
+        await Assert.That(result.Settings).IsNotNull();
+        await Assert.That(result.Settings).IsTypeOf<UpgradeSettings>();
         UpgradeSettings settings = (result.Settings as UpgradeSettings)!;
-        Assert.NotNull(settings.PackageToUpgrade);
-        Assert.Equal("awesome-package", settings.PackageToUpgrade);
-        Assert.NotNull(settings.PathToCsProjFile);
-        Assert.Equal("\\path-to-file", settings.PathToCsProjFile);
-        Assert.NotNull(settings.Target);
-        Assert.Equal("latest", settings.Target);
-        Assert.True(settings.DryRun);
-        Assert.False(settings.Interactive);
+        await Assert.That(settings.PackageToUpgrade).IsNotNull();
+        await Assert.That(settings.PackageToUpgrade).IsEqualTo("awesome-package");
+        await Assert.That(settings.PathToCsProjFile).IsNotNull();
+        await Assert.That(settings.PathToCsProjFile).IsEqualTo("\\path-to-file");
+        await Assert.That(settings.Target).IsNotNull();
+        await Assert.That(settings.Target).IsEqualTo("latest");
+        await Assert.That(settings.DryRun).IsTrue();
+        await Assert.That(settings.Interactive).IsFalse();
     }
 
-    [Fact]
-    public void InteractiveIsNotSet()
+    [Test]
+    public async Task InteractiveIsNotSet()
     {
         var app = new CommandAppTester();
         app.Configure(config =>
@@ -139,14 +139,14 @@ public class UpgradeSettingsTests
 
         CommandAppResult result = app.Run(["upgrade"]);
 
-        Assert.NotNull(result.Settings);
-        Assert.IsType<UpgradeSettings>(result.Settings);
+        await Assert.That(result.Settings).IsNotNull();
+        await Assert.That(result.Settings).IsTypeOf<UpgradeSettings>();
         UpgradeSettings settings = (result.Settings as UpgradeSettings)!;
-        Assert.False(settings.Interactive);
+        await Assert.That(settings.Interactive).IsFalse();
     }
 
-    [Fact]
-    public void InteractiveIsSetByShortCode()
+    [Test]
+    public async Task InteractiveIsSetByShortCode()
     {
         var app = new CommandAppTester();
         app.Configure(config =>
@@ -156,14 +156,14 @@ public class UpgradeSettingsTests
 
         CommandAppResult result = app.Run(["upgrade", "-i"]);
 
-        Assert.NotNull(result.Settings);
-        Assert.IsType<UpgradeSettings>(result.Settings);
+        await Assert.That(result.Settings).IsNotNull();
+        await Assert.That(result.Settings).IsTypeOf<UpgradeSettings>();
         UpgradeSettings settings = (result.Settings as UpgradeSettings)!;
-        Assert.True(settings.Interactive);
+        await Assert.That(settings.Interactive).IsTrue();
     }
 
-    [Fact]
-    public void InteractiveIsSetByLongCode()
+    [Test]
+    public async Task InteractiveIsSetByLongCode()
     {
         var app = new CommandAppTester();
         app.Configure(config =>
@@ -173,9 +173,9 @@ public class UpgradeSettingsTests
 
         CommandAppResult result = app.Run(["upgrade", "--interactive"]);
 
-        Assert.NotNull(result.Settings);
-        Assert.IsType<UpgradeSettings>(result.Settings);
+        await Assert.That(result.Settings).IsNotNull();
+        await Assert.That(result.Settings).IsTypeOf<UpgradeSettings>();
         UpgradeSettings settings = (result.Settings as UpgradeSettings)!;
-        Assert.True(settings.Interactive);
+        await Assert.That(settings.Interactive).IsTrue();
     }
 }

@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.1.0 (2025-12-07)
+
+### Enhancements
+
+- Add the `--pre` flag to the `check` command which defines if the `latest` version column should be shown. Default is `true`. You can also add the `"Pre": false` to your `.packcheckrc` file to not show prerelease versions.
+- Switch from `xUnit` to `TUnit` test framework
+- Update dependencies
+
 ## 3.0.3 (2025-11-14)
 
 ### Enhancements

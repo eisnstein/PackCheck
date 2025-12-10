@@ -31,7 +31,6 @@ public class CommonSettings : CommandSettings
     [ValidateTargetVersion("Target version has to be 'stable' or 'latest'.")]
     public string? Target { get; set; } = "stable";
 
-
     [CommandOption("-f|--filter <Package_Name>")]
     [Description("Include only packages matching the given name (can be used multiple times)")]
     public string[]? Filter { get; set; }
@@ -39,9 +38,4 @@ public class CommonSettings : CommandSettings
     [CommandOption("-x|--exclude <Package_Name>")]
     [Description("Exclude packages matching the given name (can be used multiple times)")]
     public string[]? Exclude { get; set; }
-
-    [CommandOption("--format <Format>")]
-    [Description("Format the output by the given value. Possible values: group")]
-    [ValidateFormatValue("Format value has to be 'group'.")]
-    public string? Format { get; set; }
 }

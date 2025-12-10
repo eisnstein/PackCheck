@@ -28,9 +28,9 @@ public class CheckCommand : AsyncCommand<CheckSettings>
     {
         await PackCheckService.CheckForNewPackCheckVersion(_nuGetApiService);
 
-        Result? result = null;
-        string? pathToConfigFile = null;
-        Config? config = null;
+        Result? result;
+        string? pathToConfigFile;
+        Config? config;
 
         try
         {
@@ -344,7 +344,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
                 var patchPackages = patch.ToList();
                 AnsiConsole.MarkupLine("[green]Patch[/] [dim]Backwards compatible - bug fixes[/]");
 
-                PrintTable(patchPackages);
+                PrintTable(patchPackages, settings);
                 Console.WriteLine();
                 returnEarly = true;
             }
@@ -354,7 +354,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
                 var minorPackages = minor.ToList();
                 AnsiConsole.MarkupLine("[yellow]Minor[/] [dim]Backwards compatible - new features[/]");
 
-                PrintTable(minorPackages);
+                PrintTable(minorPackages, settings);
                 Console.WriteLine();
                 returnEarly = true;
             }
@@ -364,7 +364,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
                 var majorPackages = major.ToList();
                 AnsiConsole.MarkupLine("[red]Major[/] [dim]Possibly breaking changes - check Changelog[/]");
 
-                PrintTable(majorPackages);
+                PrintTable(majorPackages, settings);
                 Console.WriteLine();
                 returnEarly = true;
             }
@@ -378,52 +378,50 @@ public class CheckCommand : AsyncCommand<CheckSettings>
             }
         }
 
-        var table = new Table();
-
-        table.AddColumn("Package Name");
-        table.AddColumn("Current Version");
-        table.AddColumn("Latest Stable Version");
-        table.AddColumn("Latest Version");
-
-        foreach (Package p in packages)
-        {
-            table.AddRow(
-                p.PackageName,
-                p.CurrentVersion.ToString(),
-                PackageVersionHighlighterService.HighlightLatestStableVersion(p),
-                PackageVersionHighlighterService.HighlightLatestVersion(p)
-            );
-        }
-
-        table.Columns[1].RightAligned();
-        table.Columns[2].RightAligned();
-        table.Columns[3].RightAligned();
-
-        AnsiConsole.Write(table);
+        PrintTable(packages, settings);
     }
 
-    private void PrintTable(List<Package> packages)
+    private void PrintTable(List<Package> packages, CheckSettings? settings = null)
     {
         var table = new Table();
 
         table.AddColumn("Package Name");
         table.AddColumn("Current Version");
         table.AddColumn("Latest Stable Version");
-        table.AddColumn("Latest Version");
+
+        if (settings?.ShowLatestVersion == true)
+        {
+            table.AddColumn("Latest Version");
+        }
 
         foreach (Package p in packages)
         {
-            table.AddRow(
-                p.PackageName,
-                p.CurrentVersion.ToString(),
-                PackageVersionHighlighterService.HighlightLatestStableVersion(p),
-                PackageVersionHighlighterService.HighlightLatestVersion(p)
-            );
+            if (settings?.ShowLatestVersion == true)
+            {
+                table.AddRow(
+                    p.PackageName,
+                    p.CurrentVersion.ToString(),
+                    PackageVersionHighlighterService.HighlightLatestStableVersion(p),
+                    PackageVersionHighlighterService.HighlightLatestVersion(p)
+                );
+            }
+            else
+            {
+                table.AddRow(
+                    p.PackageName,
+                    p.CurrentVersion.ToString(),
+                    PackageVersionHighlighterService.HighlightLatestStableVersion(p)
+                );
+            }
         }
 
         table.Columns[1].RightAligned();
         table.Columns[2].RightAligned();
-        table.Columns[3].RightAligned();
+
+        if (settings?.ShowLatestVersion == true)
+        {
+            table.Columns[3].RightAligned();
+        }
 
         AnsiConsole.Write(table);
     }

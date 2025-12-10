@@ -1,15 +1,15 @@
-using System.Collections.Generic;
 using PackCheck.Commands.Settings;
 using PackCheck.Data;
 using PackCheck.Services;
 using PackCheck.Tests.Factories;
+using Target = PackCheck.Data.Target;
 
 namespace PackCheck.Tests.Services;
 
 public class PackagesServiceTest
 {
-    [Fact]
-    public void Returns_UnchangedPackagesList_When_ConfigIsNull()
+    [Test]
+    public async Task Returns_UnchangedPackagesList_When_ConfigIsNull()
     {
         List<Package> packages = new()
         {
@@ -19,11 +19,11 @@ public class PackagesServiceTest
 
         var newPackages = PackagesService.ApplySettings(packages, null);
 
-        Assert.Equal(packages, newPackages);
+        await Assert.That(newPackages).IsEqualTo(packages);
     }
 
-    [Fact]
-    public void Returns_ChangedPackagesList_When_FilterIsSet()
+    [Test]
+    public async Task Returns_ChangedPackagesList_When_FilterIsSet()
     {
         List<Package> packages = new()
         {
@@ -37,12 +37,12 @@ public class PackagesServiceTest
 
         var newPackages = PackagesService.ApplySettings(packages, settings);
 
-        Assert.Single(newPackages);
-        Assert.Equal("Pack1", newPackages[0].PackageName);
+        await Assert.That(newPackages).HasCount(1);
+        await Assert.That(newPackages[0].PackageName).IsEqualTo("Pack1");
     }
 
-    [Fact]
-    public void Returns_ChangedPackagesList_When_ExcludeIsSet()
+    [Test]
+    public async Task Returns_ChangedPackagesList_When_ExcludeIsSet()
     {
         List<Package> packages = new()
         {
@@ -56,12 +56,12 @@ public class PackagesServiceTest
 
         var newPackages = PackagesService.ApplySettings(packages, settings);
 
-        Assert.Single(newPackages);
-        Assert.Equal("Pack2", newPackages[0].PackageName);
+        await Assert.That(newPackages).HasCount(1);
+        await Assert.That(newPackages[0].PackageName).IsEqualTo("Pack2");
     }
 
-    [Fact]
-    public void Returns_EmptyPackagesList_When_FilterAndExcludeIsSet()
+    [Test]
+    public async Task Returns_EmptyPackagesList_When_FilterAndExcludeIsSet()
     {
         List<Package> packages = new()
         {
@@ -76,11 +76,11 @@ public class PackagesServiceTest
 
         var newPackages = PackagesService.ApplySettings(packages, settings);
 
-        Assert.Empty(newPackages);
+        await Assert.That(newPackages).IsEmpty();
     }
 
-    [Fact]
-    public void Returns_EmptyList_When_NoPackageNeedsUpgrade()
+    [Test]
+    public async Task Returns_EmptyList_When_NoPackageNeedsUpgrade()
     {
         List<Package> packages = new()
         {
@@ -92,11 +92,11 @@ public class PackagesServiceTest
 
         var preparedPackages = PackagesService.PreparePackagesForUpgrade(packages, Target.Stable);
 
-        Assert.Empty(preparedPackages);
+        await Assert.That(preparedPackages).IsEmpty();
     }
 
-    [Fact]
-    public void Returns_AllPackagesForStableUpgrade()
+    [Test]
+    public async Task Returns_AllPackagesForStableUpgrade()
     {
         List<Package> packages = new()
         {
@@ -108,20 +108,19 @@ public class PackagesServiceTest
 
         var preparedPackages = PackagesService.PreparePackagesForUpgrade(packages, Target.Stable);
 
-        Assert.Equal(4, preparedPackages.Count);
-        Assert.Equal("6.2.2", preparedPackages[0]!.NewVersion!.ToString());
-        Assert.Equal("6.3.0", preparedPackages[1]!.NewVersion!.ToString());
-        Assert.Equal("0.4.1", preparedPackages[2]!.NewVersion!.ToString());
-        Assert.Equal("0.44.1", preparedPackages[3]!.NewVersion!.ToString());
-
+        await Assert.That(preparedPackages).HasCount(4);
+        await Assert.That(preparedPackages[0]!.NewVersion!.ToString()).IsEqualTo("6.2.2");
+        await Assert.That(preparedPackages[1]!.NewVersion!.ToString()).IsEqualTo("6.3.0");
+        await Assert.That(preparedPackages[2]!.NewVersion!.ToString()).IsEqualTo("0.4.1");
+        await Assert.That(preparedPackages[3]!.NewVersion!.ToString()).IsEqualTo("0.44.1");
         foreach (var package in preparedPackages)
         {
-            Assert.Equal(Target.Stable, package.UpgradeTo);
+            await Assert.That(package.UpgradeTo).IsEqualTo(Target.Stable);
         }
     }
 
-    [Fact]
-    public void Returns_OnePackageForLatestUpgrade()
+    [Test]
+    public async Task Returns_OnePackageForLatestUpgrade()
     {
         List<Package> packages = new()
         {
@@ -133,14 +132,14 @@ public class PackagesServiceTest
 
         var preparedPackages = PackagesService.PreparePackagesForUpgrade(packages, Target.Latest);
 
-        Assert.Single(preparedPackages);
-        Assert.Equal("6.2.2", preparedPackages[0]!.NewVersion!.ToString());
-        Assert.Equal("Pack1", preparedPackages[0]!.PackageName);
-        Assert.Equal(Target.Latest, preparedPackages[0]!.UpgradeTo);
+        await Assert.That(preparedPackages).HasCount(1);
+        await Assert.That(preparedPackages[0]!.NewVersion!.ToString()).IsEqualTo("6.2.2");
+        await Assert.That(preparedPackages[0]!.PackageName).IsEqualTo("Pack1");
+        await Assert.That(preparedPackages[0]!.UpgradeTo).IsEqualTo(Target.Latest);
     }
 
-    [Fact]
-    public void Returns_AllPackagesForLatestUpgrade()
+    [Test]
+    public async Task Returns_AllPackagesForLatestUpgrade()
     {
         List<Package> packages = new()
         {
@@ -152,15 +151,14 @@ public class PackagesServiceTest
 
         var preparedPackages = PackagesService.PreparePackagesForUpgrade(packages, Target.Latest);
 
-        Assert.Equal(4, preparedPackages.Count);
-        Assert.Equal("6.2.2", preparedPackages[0]!.NewVersion!.ToString());
-        Assert.Equal("7.0.0-preview1", preparedPackages[1]!.NewVersion!.ToString());
-        Assert.Equal("0.4.1", preparedPackages[2]!.NewVersion!.ToString());
-        Assert.Equal("0.5.0-rc.1", preparedPackages[3]!.NewVersion!.ToString());
-
+        await Assert.That(preparedPackages).HasCount(4);
+        await Assert.That(preparedPackages[0]!.NewVersion!.ToString()).IsEqualTo("6.2.2");
+        await Assert.That(preparedPackages[1]!.NewVersion!.ToString()).IsEqualTo("7.0.0-preview1");
+        await Assert.That(preparedPackages[2]!.NewVersion!.ToString()).IsEqualTo("0.4.1");
+        await Assert.That(preparedPackages[3]!.NewVersion!.ToString()).IsEqualTo("0.5.0-rc.1");
         foreach (var package in preparedPackages)
         {
-            Assert.Equal(Target.Latest, package.UpgradeTo);
+            await Assert.That(package.UpgradeTo).IsEqualTo(Target.Latest);
         }
     }
 }

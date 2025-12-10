@@ -1,22 +1,21 @@
-using System.Collections.Generic;
 using PackCheck.Services;
 
 namespace PackCheck.Tests.Services;
 
 public class SolutionXFileServiceTests
 {
-    [Fact]
-    public void LoadsSolutionXFile()
+    [Test]
+    public async Task LoadsSolutionXFile()
     {
         TestHelper.LoadSolutionX();
 
-        Assert.True(SolutionXFileService.HasSolutionX());
+        await Assert.That(SolutionXFileService.HasSolutionX()).IsTrue();
 
         TestHelper.DeleteSolutionX();
     }
 
-    [Fact]
-    public void ParseProjectDefinitions()
+    [Test]
+    public async Task ParseProjectDefinitions()
     {
         TestHelper.LoadSolutionX();
         List<string> expectedPaths = [
@@ -26,8 +25,8 @@ public class SolutionXFileServiceTests
 
         var projectPaths = SolutionXFileService.ParseProjectDefinitions("testSolution.slnx");
 
-        Assert.Equal(2, projectPaths.Count);
-        Assert.Equal(expectedPaths, projectPaths);
+        await Assert.That(projectPaths.Count).IsEqualTo(2);
+        await Assert.That(projectPaths).IsEquivalentTo(expectedPaths);
 
         TestHelper.DeleteSolutionX();
     }
