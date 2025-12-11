@@ -91,7 +91,7 @@ public class SettingsServiceTests
     }
 
     [Test]
-    public async Task Sets_ShowLatestVersion_When_ConfigValueIsTrue()
+    public async Task Sets_Pre_When_ConfigValueIsTrue()
     {
         var settings = new CheckSettings();
         var config = new Config()
@@ -101,15 +101,15 @@ public class SettingsServiceTests
 
         settings = SettingsService.CombineSettingsWithConfig(settings, config);
 
-        await Assert.That(settings.ShowLatestVersion).IsTrue();
+        await Assert.That(settings.Pre).IsTrue();
     }
 
     [Test]
-    public async Task Sets_ShowLatestVersion_When_ConfigValueIsFalse_But_GivenViaCli()
+    public async Task Sets_Pre_When_ConfigValueIsFalse_But_GivenViaCli()
     {
         var settings = new CheckSettings()
         {
-            ShowLatestVersion = true
+            Pre = true
         };
         var config = new Config()
         {
@@ -118,15 +118,15 @@ public class SettingsServiceTests
 
         settings = SettingsService.CombineSettingsWithConfig(settings, config);
 
-        await Assert.That(settings.ShowLatestVersion).IsTrue();
+        await Assert.That(settings.Pre).IsTrue();
     }
 
     [Test]
-    public async Task DoesNotSet_ShowLatestVersion_When_ConfigValueIsTrue_And_CliValueIsFalse()
+    public async Task DoesNotSet_Pre_When_ConfigValueIsTrue_And_CliValueIsFalse()
     {
         var settings = new CheckSettings()
         {
-            ShowLatestVersion = false
+            Pre = false
         };
         var config = new Config()
         {
@@ -135,7 +135,7 @@ public class SettingsServiceTests
 
         settings = SettingsService.CombineSettingsWithConfig(settings, config);
 
-        await Assert.That(settings.ShowLatestVersion).IsFalse();
+        await Assert.That(settings.Pre).IsFalse();
     }
 
     [Test]

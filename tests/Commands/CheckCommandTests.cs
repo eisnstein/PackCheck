@@ -18,7 +18,7 @@ public class CheckCommandTest
     }
 
     [Test]
-    public Task Returns_Success_ForCheck()
+    public Task Returns_Success_ForCheck_Without_Pre()
     {
         var app = new CommandAppTester();
         app.Configure(config =>
@@ -28,11 +28,25 @@ public class CheckCommandTest
 
         CommandAppResult result = app.Run("check");
 
-        return Verifier.Verify(result);
+        return Verify(result);
     }
 
     [Test]
-    public Task Returns_Success_ForCheckWithFilter()
+    public Task Returns_Success_ForCheck_With_Pre()
+    {
+        var app = new CommandAppTester();
+        app.Configure(config =>
+        {
+            config.AddCommand<CheckCommand>("check");
+        });
+
+        CommandAppResult result = app.Run(["check", "--pre"]);
+
+        return Verify(result);
+    }
+
+    [Test]
+    public Task Returns_Success_ForCheckWithFilter_Without_Pre()
     {
         var app = new CommandAppTester();
         app.Configure(config =>
@@ -42,6 +56,6 @@ public class CheckCommandTest
 
         CommandAppResult result = app.Run(["check", "--filter", "Spectre.Console"]);
 
-        return Verifier.Verify(result);
+        return Verify(result);
     }
 }

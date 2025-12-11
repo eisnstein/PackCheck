@@ -2,24 +2,22 @@ using PackCheck.Commands.Settings;
 using PackCheck.Data;
 using PackCheck.Exceptions;
 using PackCheck.Services;
+using RouteCheck.Services;
 using Spectre.Console;
 using Spectre.Console.Cli;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace PackCheck.Commands;
 
 public class CheckCommand : AsyncCommand<CheckSettings>
 {
+    private readonly IAnsiConsole _console;
     private readonly NuGetApiService _nuGetApiService;
     private readonly NuGetPackagesService _nuGetPackagesService;
 
-    public CheckCommand()
+    public CheckCommand(IAnsiConsole console)
     {
+        _console = console;
         _nuGetApiService = new NuGetApiService();
         _nuGetPackagesService = new NuGetPackagesService(_nuGetApiService);
     }
@@ -38,14 +36,14 @@ public class CheckCommand : AsyncCommand<CheckSettings>
         }
         catch (JsonException e)
         {
-            AnsiConsole.MarkupLine(
+            _console.MarkupLine(
                 $"[dim]WARN:[/] Your .packcheckrc[.json] configuration file seems to be invalid: {e.Message}");
             return -1;
         }
 
         if (config is not null)
         {
-            AnsiConsole.MarkupLine($"Reading config from [grey]{pathToConfigFile}[/]");
+            _console.MarkupLine($"Reading config from [grey]{pathToConfigFile}[/]");
         }
 
         settings = SettingsService.CombineSettingsWithConfig(settings, config);
@@ -59,7 +57,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
                 return -1;
             }
 
-            PrintInfo();
+            OutputService.PrintInfo(_console);
             Console.WriteLine();
 
             return 0;
@@ -81,7 +79,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
                 }
             }
 
-            PrintSolutionInfo();
+            OutputService.PrintSolutionInfo(_console);
             Console.WriteLine();
 
             return 0;
@@ -102,7 +100,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
                 }
             }
 
-            PrintSolutionInfo();
+            OutputService.PrintSolutionInfo(_console);
             Console.WriteLine();
 
             return 0;
@@ -119,7 +117,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
                 return -1;
             }
 
-            PrintInfo();
+            OutputService.PrintInfo(_console);
             Console.WriteLine();
 
             return 0;
@@ -136,7 +134,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
                 return -1;
             }
 
-            PrintInfo();
+            OutputService.PrintInfo(_console);
             Console.WriteLine();
 
             return 0;
@@ -152,7 +150,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
                 return -1;
             }
 
-            PrintInfo();
+            OutputService.PrintInfo(_console);
             Console.WriteLine();
 
             return 0;
@@ -174,7 +172,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
                 }
             }
 
-            PrintSolutionInfo();
+            OutputService.PrintSolutionInfo(_console);
             Console.WriteLine();
 
             return 0;
@@ -195,7 +193,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
                 }
             }
 
-            PrintSolutionInfo();
+            OutputService.PrintSolutionInfo(_console);
             Console.WriteLine();
 
             return 0;
@@ -208,7 +206,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
             return -1;
         }
 
-        PrintInfo();
+        OutputService.PrintInfo(_console);
         Console.WriteLine();
 
         return 0;
@@ -246,7 +244,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
 
         packages = PackagesService.CalculateUpgradeType(packages, settings);
 
-        PrintResult(packages, settings);
+        OutputService.PrintResult(_console, packages, settings);
         Console.WriteLine();
 
         return Result.Success;
@@ -284,7 +282,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
 
         packages = PackagesService.CalculateUpgradeType(packages, settings);
 
-        PrintResult(packages, settings);
+        OutputService.PrintResult(_console, packages, settings);
         Console.WriteLine();
 
         return Result.Success;
@@ -322,121 +320,10 @@ public class CheckCommand : AsyncCommand<CheckSettings>
 
         packages = PackagesService.CalculateUpgradeType(packages, settings);
 
-        PrintResult(packages, settings);
+        OutputService.PrintResult(_console, packages, settings);
         Console.WriteLine();
 
         return Result.Success;
     }
 
-    private void PrintResult(List<Package> packages, CheckSettings? settings)
-    {
-        if (settings is { Format: "group" })
-        {
-            var returnEarly = false;
-            var query = packages.GroupBy(p => p.UpgradeType);
-
-            var patch = query.FirstOrDefault(group => group.Key == EUpgradeType.Patch);
-            var minor = query.FirstOrDefault(group => group.Key == EUpgradeType.Minor);
-            var major = query.FirstOrDefault(group => group.Key == EUpgradeType.Major);
-
-            if (patch is not null)
-            {
-                var patchPackages = patch.ToList();
-                AnsiConsole.MarkupLine("[green]Patch[/] [dim]Backwards compatible - bug fixes[/]");
-
-                PrintTable(patchPackages, settings);
-                Console.WriteLine();
-                returnEarly = true;
-            }
-
-            if (minor is not null)
-            {
-                var minorPackages = minor.ToList();
-                AnsiConsole.MarkupLine("[yellow]Minor[/] [dim]Backwards compatible - new features[/]");
-
-                PrintTable(minorPackages, settings);
-                Console.WriteLine();
-                returnEarly = true;
-            }
-
-            if (major is not null)
-            {
-                var majorPackages = major.ToList();
-                AnsiConsole.MarkupLine("[red]Major[/] [dim]Possibly breaking changes - check Changelog[/]");
-
-                PrintTable(majorPackages, settings);
-                Console.WriteLine();
-                returnEarly = true;
-            }
-
-            // If we printed something, we return early to avoid printing the table again below. If nothing was printed,
-            // it means there are no updates available from the current to the stable version. So we print the full table below
-            // to see potential pre-release versions.
-            if (returnEarly)
-            {
-                return;
-            }
-        }
-
-        PrintTable(packages, settings);
-    }
-
-    private void PrintTable(List<Package> packages, CheckSettings? settings = null)
-    {
-        var table = new Table();
-
-        table.AddColumn("Package Name");
-        table.AddColumn("Current Version");
-        table.AddColumn("Latest Stable Version");
-
-        if (settings?.ShowLatestVersion == true)
-        {
-            table.AddColumn("Latest Version");
-        }
-
-        foreach (Package p in packages)
-        {
-            if (settings?.ShowLatestVersion == true)
-            {
-                table.AddRow(
-                    p.PackageName,
-                    p.CurrentVersion.ToString(),
-                    PackageVersionHighlighterService.HighlightLatestStableVersion(p),
-                    PackageVersionHighlighterService.HighlightLatestVersion(p)
-                );
-            }
-            else
-            {
-                table.AddRow(
-                    p.PackageName,
-                    p.CurrentVersion.ToString(),
-                    PackageVersionHighlighterService.HighlightLatestStableVersion(p)
-                );
-            }
-        }
-
-        table.Columns[1].RightAligned();
-        table.Columns[2].RightAligned();
-
-        if (settings?.ShowLatestVersion == true)
-        {
-            table.Columns[3].RightAligned();
-        }
-
-        AnsiConsole.Write(table);
-    }
-
-    private void PrintInfo()
-    {
-        AnsiConsole.MarkupLine(
-            "[dim]INFO:[/] Run [blue]packcheck upgrade[/] to upgrade to the latest stable versions.");
-        AnsiConsole.MarkupLine("[dim]INFO:[/] Run [blue]packcheck --help[/] for more options.");
-    }
-
-    private void PrintSolutionInfo()
-    {
-        AnsiConsole.MarkupLine(
-            "[dim]INFO:[/] Run [blue]packcheck upgrade[/] to upgrade all .csproj files with the latest stable versions.");
-        AnsiConsole.MarkupLine("[dim]INFO:[/] Run [blue]packcheck --help[/] for more options.");
-    }
 }

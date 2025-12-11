@@ -13,5 +13,5 @@ public sealed class CheckSettings : CommonSettings
 
     [CommandOption("--pre")]
     [Description("Show the latest version of packages (prerelease).")]
-    public bool? ShowLatestVersion { get; set; }
+    public bool? Pre { get; set; }
 }

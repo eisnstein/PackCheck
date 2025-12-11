@@ -222,7 +222,7 @@ public class FileBasedAppServiceTests
         var packages = FileBasedAppService.GetPackagesDataFromFbaFile(fbaFilePath);
 
         await Assert.That(packages).IsNotEmpty();
-        await Assert.That(packages).HasCount(1);
+        await Assert.That(packages).Count().IsEqualTo(1);
         await Assert.That(packages[0].PackageName).IsEqualTo("Humanizer");
         await Assert.That(packages[0].CurrentVersion.ToString()).IsEqualTo("2.14.1");
 
@@ -247,7 +247,7 @@ public class FileBasedAppServiceTests
         var updatedPackages = FileBasedAppService.GetPackagesDataFromFbaFile(fbaFilePath);
 
         await Assert.That(updatedPackages).IsNotEmpty();
-        await Assert.That(updatedPackages).HasCount(1);
+        await Assert.That(updatedPackages).Count().IsEqualTo(1);
         await Assert.That(updatedPackages[0].PackageName).IsEqualTo("Humanizer");
         await Assert.That(updatedPackages[0].CurrentVersion.ToString()).IsEqualTo("2.15.0");
 

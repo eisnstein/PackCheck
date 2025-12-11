@@ -21,11 +21,11 @@ public static class SettingsService
         settings.Exclude ??= config.Exclude?.ToArray();
         settings.Format ??= config.Format;
 
-        // If ShowLatestVersion is not set in CLI,
+        // If Pre is not set in CLI,
         // take the value from config which is false by default.
-        if (settings.ShowLatestVersion is null)
+        if (settings.Pre is null)
         {
-            settings.ShowLatestVersion = config.Pre;
+            settings.Pre = config.Pre;
         }
 
         return settings;

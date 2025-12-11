@@ -37,7 +37,7 @@ public class PackagesServiceTest
 
         var newPackages = PackagesService.ApplySettings(packages, settings);
 
-        await Assert.That(newPackages).HasCount(1);
+        await Assert.That(newPackages).Count().IsEqualTo(1);
         await Assert.That(newPackages[0].PackageName).IsEqualTo("Pack1");
     }
 
@@ -56,7 +56,7 @@ public class PackagesServiceTest
 
         var newPackages = PackagesService.ApplySettings(packages, settings);
 
-        await Assert.That(newPackages).HasCount(1);
+        await Assert.That(newPackages).Count().IsEqualTo(1);
         await Assert.That(newPackages[0].PackageName).IsEqualTo("Pack2");
     }
 
@@ -108,7 +108,7 @@ public class PackagesServiceTest
 
         var preparedPackages = PackagesService.PreparePackagesForUpgrade(packages, Target.Stable);
 
-        await Assert.That(preparedPackages).HasCount(4);
+        await Assert.That(preparedPackages).Count().IsEqualTo(4);
         await Assert.That(preparedPackages[0]!.NewVersion!.ToString()).IsEqualTo("6.2.2");
         await Assert.That(preparedPackages[1]!.NewVersion!.ToString()).IsEqualTo("6.3.0");
         await Assert.That(preparedPackages[2]!.NewVersion!.ToString()).IsEqualTo("0.4.1");
@@ -132,7 +132,7 @@ public class PackagesServiceTest
 
         var preparedPackages = PackagesService.PreparePackagesForUpgrade(packages, Target.Latest);
 
-        await Assert.That(preparedPackages).HasCount(1);
+        await Assert.That(preparedPackages).Count().IsEqualTo(1);
         await Assert.That(preparedPackages[0]!.NewVersion!.ToString()).IsEqualTo("6.2.2");
         await Assert.That(preparedPackages[0]!.PackageName).IsEqualTo("Pack1");
         await Assert.That(preparedPackages[0]!.UpgradeTo).IsEqualTo(Target.Latest);
@@ -151,7 +151,7 @@ public class PackagesServiceTest
 
         var preparedPackages = PackagesService.PreparePackagesForUpgrade(packages, Target.Latest);
 
-        await Assert.That(preparedPackages).HasCount(4);
+        await Assert.That(preparedPackages).Count().IsEqualTo(4);
         await Assert.That(preparedPackages[0]!.NewVersion!.ToString()).IsEqualTo("6.2.2");
         await Assert.That(preparedPackages[1]!.NewVersion!.ToString()).IsEqualTo("7.0.0-preview1");
         await Assert.That(preparedPackages[2]!.NewVersion!.ToString()).IsEqualTo("0.4.1");

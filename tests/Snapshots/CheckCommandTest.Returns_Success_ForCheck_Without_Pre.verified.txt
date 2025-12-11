@@ -1,0 +1,23 @@
+﻿{
+  Output:
+┌────────────────────────────────────────────┬─────────────────┬───────────────────────┐
+│ Package Name                               │ Current Version │ Latest Stable Version │
+├────────────────────────────────────────────┼─────────────────┼───────────────────────┤
+│ NuGet.Protocol                             │           6.2.1 │                 7.0.1 │
+│ NuGet.Versioning                           │           6.2.1 │                 7.0.1 │
+│ Spectre.Cli.Extensions.DependencyInjection │           0.4.0 │                 0.4.0 │
+│ Spectre.Console                            │          0.44.0 │                0.54.0 │
+└────────────────────────────────────────────┴─────────────────┴───────────────────────┘
+INFO: Run packcheck upgrade to upgrade to the latest stable versions.
+INFO: Run packcheck --help for more options.,
+  Context: {
+    Remaining: {},
+    Arguments: [
+      check
+    ],
+    Name: check
+  },
+  Settings: {
+    Target: stable
+  }
+}

@@ -42,15 +42,25 @@ packcheck c
 packcheck check
 ```
 
-To check versions of a file-based app you need to provide the path to the file:
+This should give you something like this:
+
+![PackCheck check example](https://github.com/eisnstein/PackCheck/blob/main/src/Assets/packcheck-check-without-pre.png)
+
+If you also want to see the _latest version_, which includes prereleases, use the `--pre` flag:
 
 ```sh
-packcheck --fbaFile app.cs
+packcheck --pre
 ```
 
 This should give you something like this:
 
 ![PackCheck check example](https://github.com/eisnstein/PackCheck/blob/main/src/Assets/packcheck-check.png)
+
+To check versions of a file-based app you need to provide the path to the file:
+
+```sh
+packcheck --fbaFile app.cs
+```
 
 After that you can upgrade the package versions in the _.csproj_ file (or _.csproj_ files in a solution, the _Directory.Packages.props_ file or the given file-based app file) to their corresponding stable versions by running:
 
@@ -63,7 +73,7 @@ packcheck upgrade
 
 packcheck u
 
-# for file-based app you need to provide the path to the file
+# For file-based app you need to provide the path to the file
 packcheck u --fbaFile app.cs
 ```
 
