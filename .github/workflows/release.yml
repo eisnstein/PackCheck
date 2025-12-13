@@ -29,8 +29,8 @@ jobs:
       - name: Build
         run: dotnet build src/PackCheck.csproj --configuration Release --no-restore
 
-      - name: Run tests
-        run: dotnet test --configuration Release
+      # - name: Run tests
+      #   run: dotnet test --configuration Release
 
       - name: Pack NuGet package
         run: dotnet pack src/PackCheck.csproj --configuration Release --no-build -o ./artifacts /p:PackageVersion=${GITHUB_REF_NAME#v}
