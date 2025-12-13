@@ -4,7 +4,7 @@
 
 ### Enhancements
 
-- Add the `--pre` flag to the `check` command which defines if the `latest` version column should be shown. Default is `true`. You can also add the `"Pre": false` to your `.packcheckrc` file to not show prerelease versions.
+- Add the `--pre` flag to the `check` command which defines if the `latest` version column should be shown. Default is `false`. You can also add the `"Pre": true` to your `.packcheckrc` file to show prerelease versions.
 - Switch from `xUnit` to `TUnit` test framework
 - Update dependencies
 
