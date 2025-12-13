@@ -35,8 +35,8 @@ public class SolutionFileServiceTests
     {
         TestHelper.LoadSolution();
         List<string> expectedPaths = [
-            @"SolProj\SolProj.csproj",
-            @"SolProj.Tests\SolProj.Tests.csproj"
+            Path.Combine("SolProj", "SolProj.csproj"),
+            Path.Combine("SolProj.Tests", "SolProj.Tests.csproj")
         ];
 
         var projectDefinitions = SolutionFileService.GetProjectDefinitions("testSolution.sln");

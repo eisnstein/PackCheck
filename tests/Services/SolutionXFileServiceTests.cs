@@ -19,8 +19,8 @@ public class SolutionXFileServiceTests
     {
         TestHelper.LoadSolutionX();
         List<string> expectedPaths = [
-            @"src\SolProj.csproj",
-            @"tests\SolProj.Tests.csproj"
+            Path.Combine("src", "SolProj.csproj"),
+            Path.Combine("tests", "SolProj.Tests.csproj")
         ];
 
         var projectPaths = SolutionXFileService.ParseProjectDefinitions("testSolution.slnx");
