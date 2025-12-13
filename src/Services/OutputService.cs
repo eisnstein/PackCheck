@@ -65,12 +65,12 @@ public static class OutputService
         var table = new Table();
 
         table.AddColumn("Package Name");
-        table.AddColumn("Current Version");
-        table.AddColumn("Latest Stable Version");
+        table.AddColumn("Current");
+        table.AddColumn("Latest Stable");
 
         if (settings?.Pre == true)
         {
-            table.AddColumn("Latest Version");
+            table.AddColumn("Latest");
         }
 
         foreach (Package p in packages)

@@ -1,10 +1,10 @@
 ﻿{
   Output:
-┌─────────────────┬─────────────────┬───────────────────────┐
-│ Package Name    │ Current Version │ Latest Stable Version │
-├─────────────────┼─────────────────┼───────────────────────┤
-│ Spectre.Console │          0.44.0 │                0.54.0 │
-└─────────────────┴─────────────────┴───────────────────────┘
+┌─────────────────┬─────────┬───────────────┐
+│ Package Name    │ Current │ Latest Stable │
+├─────────────────┼─────────┼───────────────┤
+│ Spectre.Console │  0.44.0 │        0.54.0 │
+└─────────────────┴─────────┴───────────────┘
 INFO: Run packcheck upgrade to upgrade to the latest stable versions.
 INFO: Run packcheck --help for more options.,
   Context: {

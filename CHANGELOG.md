@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.1.1 (2025-12-13)
+
+### Enhancements
+
+- Remove the word _Version_ from the header in the columns to make them more narrow.
+- Update dependencies
+
 ## 3.1.0 (2025-12-07)
 
 ### Enhancements

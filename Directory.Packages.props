@@ -8,8 +8,8 @@
     <PackageVersion Include="NuGet.Versioning" Version="7.0.1" />
     <PackageVersion Include="Spectre.Console" Version="0.54.0" />
     <PackageVersion Include="Spectre.Console.Cli" Version="0.53.1" />
-    <PackageVersion Include="Spectre.Console.Cli.Testing" Version="1.0.0-alpha.0.7" />
-    <PackageVersion Include="TUnit" Version="1.5.42" />
+    <PackageVersion Include="Spectre.Console.Cli.Testing" Version="1.0.0-alpha.0.12" />
+    <PackageVersion Include="TUnit" Version="1.5.53" />
     <PackageVersion Include="Verify.TUnit" Version="31.8.0" />
   </ItemGroup>
 </Project>
