@@ -1,11 +1,6 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Threading.Tasks;
 using NuGet.Versioning;
 using PackCheck.Data;
 using PackCheck.Exceptions;
-using Spectre.Console.Rendering;
 
 namespace PackCheck.Services;
 

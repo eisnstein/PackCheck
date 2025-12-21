@@ -1,10 +1,4 @@
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
 using System.Xml;
-using NuGet.Versioning;
-using PackCheck.Data;
 using PackCheck.Exceptions;
 
 namespace PackCheck.Services;

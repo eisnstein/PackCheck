@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using NuGet.Versioning;
 using PackCheck.Data;
 using Spectre.Console;
@@ -9,6 +6,8 @@ namespace PackCheck.Services;
 
 public class NuGetPackagesService(NuGetApiService nuGetApiService)
 {
+    private readonly object _lock = new();
+
     public async Task GetPackagesDataFromNugetRepositoryAsync(List<Package> packages)
     {
         await AnsiConsole.Progress()
@@ -26,10 +25,14 @@ public class NuGetPackagesService(NuGetApiService nuGetApiService)
     private async Task FetchPackagesDataAsync(ProgressTask task, List<Package> packages)
     {
         var incrementBy = 100.0 / packages.Count;
-
-        foreach (var package in packages)
+        var options = new ParallelOptions
         {
-            IEnumerable<NuGetVersion> result = await nuGetApiService.GetPackageVersions(package.PackageName);
+            MaxDegreeOfParallelism = 4
+        };
+
+        await Parallel.ForEachAsync(packages, options, async (package, cancellationToken) =>
+        {
+            IEnumerable<NuGetVersion> result = await nuGetApiService.GetPackageVersions(package.PackageName, cancellationToken);
             List<NuGetVersion> versions = result.ToList();
             if (versions is { Count: > 0 })
             {
@@ -37,7 +40,10 @@ public class NuGetPackagesService(NuGetApiService nuGetApiService)
                 package.LatestVersion = NuGetVersionService.GetLatestVersion(versions);
             }
 
-            task.Increment(incrementBy);
-        }
+            lock (_lock)
+            {
+                task.Increment(incrementBy);
+            }
+        });
     }
 }

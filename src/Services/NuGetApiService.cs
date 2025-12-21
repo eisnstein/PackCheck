@@ -1,6 +1,3 @@
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using NuGet.Common;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
@@ -21,8 +18,8 @@ public class NuGetApiService
         _resource = repository.GetResource<FindPackageByIdResource>(_cancellationToken);
     }
 
-    public Task<IEnumerable<NuGetVersion>> GetPackageVersions(string packageName)
+    public Task<IEnumerable<NuGetVersion>> GetPackageVersions(string packageName, CancellationToken cancellationToken)
     {
-        return _resource.GetAllVersionsAsync(packageName, _cache, _logger, _cancellationToken);
+        return _resource.GetAllVersionsAsync(packageName, _cache, _logger, cancellationToken);
     }
 }

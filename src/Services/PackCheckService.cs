@@ -9,7 +9,7 @@ public static class PackCheckService
 {
     public static async Task CheckForNewPackCheckVersion(NuGetApiService nuGetApiService)
     {
-        IEnumerable<NuGetVersion> result = await nuGetApiService.GetPackageVersions("PackCheck");
+        IEnumerable<NuGetVersion> result = await nuGetApiService.GetPackageVersions("PackCheck", CancellationToken.None);
         ImmutableList<NuGetVersion> versions = result.ToImmutableList();
 
         if (versions is { Count: 0 })

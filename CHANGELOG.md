@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.1.2 (2025-12-21)
+
+### Enhancements
+
+- Make HTTP requests to the NuGet registry in parallel
+- Update dependencies
+
 ## 3.1.1 (2025-12-13)
 
 ### Enhancements
