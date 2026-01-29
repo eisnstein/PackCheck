@@ -1,7 +1,9 @@
+using Spectre.Console;
+using System.Reflection;
+using NuGet.Versioning;
 using PackCheck.Commands.Settings;
 using PackCheck.Data;
 using PackCheck.Services;
-using Spectre.Console;
 
 namespace RouteCheck.Services;
 
@@ -68,14 +70,14 @@ public static class OutputService
         table.AddColumn("Current");
         table.AddColumn("Latest Stable");
 
-        if (settings?.Pre == true)
+        if (settings?.Pre == true || settings?.Target == Target.Latest)
         {
             table.AddColumn("Latest");
         }
 
         foreach (Package p in packages)
         {
-            if (settings?.Pre == true)
+            if (settings?.Pre == true || settings?.Target == Target.Latest)
             {
                 table.AddRow(
                     p.PackageName,
@@ -97,7 +99,7 @@ public static class OutputService
         table.Columns[1].RightAligned();
         table.Columns[2].RightAligned();
 
-        if (settings?.Pre == true)
+        if (settings?.Pre == true || settings?.Target == Target.Latest)
         {
             table.Columns[3].RightAligned();
         }
@@ -117,5 +119,23 @@ public static class OutputService
         console.MarkupLine(
             "[dim]INFO:[/] Run [blue]packcheck upgrade[/] to upgrade all .csproj files with the latest stable versions.");
         console.MarkupLine("[dim]INFO:[/] Run [blue]packcheck --help[/] for more options.");
+    }
+
+    public static void PrintVersionInfo(IAnsiConsole console)
+    {
+        var assembly = typeof(OutputService).Assembly;
+        var currentVersionStr = assembly
+            .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
+            .InformationalVersion;
+
+        if (currentVersionStr is null)
+        {
+            console.MarkupLine("unknown");
+            return;
+        }
+
+        var currentVersion = NuGetVersion.Parse(currentVersionStr);
+
+        console.MarkupLine($"{currentVersion}");
     }
 }

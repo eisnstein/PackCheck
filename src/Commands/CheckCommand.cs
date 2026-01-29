@@ -24,6 +24,12 @@ public class CheckCommand : AsyncCommand<CheckSettings>
 
     public override async Task<int> ExecuteAsync(CommandContext context, CheckSettings settings, CancellationToken _cancellationToken)
     {
+        if (settings.Version == true)
+        {
+            OutputService.PrintVersionInfo(_console);
+            return 0;
+        }
+
         await PackCheckService.CheckForNewPackCheckVersion(_nuGetApiService);
 
         Result? result;
@@ -243,6 +249,12 @@ public class CheckCommand : AsyncCommand<CheckSettings>
         await _nuGetPackagesService.GetPackagesDataFromNugetRepositoryAsync(packages);
 
         packages = PackagesService.CalculateUpgradeType(packages, settings);
+        packages = PackagesService.PreparePackagesForOutput(packages);
+        if (packages.Count == 0)
+        {
+            AnsiConsole.MarkupLine($"All packages are up to date.");
+            return Result.Success;
+        }
 
         OutputService.PrintResult(_console, packages, settings);
         Console.WriteLine();
@@ -281,6 +293,12 @@ public class CheckCommand : AsyncCommand<CheckSettings>
         await _nuGetPackagesService.GetPackagesDataFromNugetRepositoryAsync(packages);
 
         packages = PackagesService.CalculateUpgradeType(packages, settings);
+        packages = PackagesService.PreparePackagesForOutput(packages);
+        if (packages.Count == 0)
+        {
+            AnsiConsole.MarkupLine($"All packages are up to date.");
+            return Result.Success;
+        }
 
         OutputService.PrintResult(_console, packages, settings);
         Console.WriteLine();
@@ -319,6 +337,12 @@ public class CheckCommand : AsyncCommand<CheckSettings>
         await _nuGetPackagesService.GetPackagesDataFromNugetRepositoryAsync(packages);
 
         packages = PackagesService.CalculateUpgradeType(packages, settings);
+        packages = PackagesService.PreparePackagesForOutput(packages);
+        if (packages.Count == 0)
+        {
+            AnsiConsole.MarkupLine($"All packages are up to date.");
+            return Result.Success;
+        }
 
         OutputService.PrintResult(_console, packages, settings);
         Console.WriteLine();

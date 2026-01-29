@@ -6,6 +6,10 @@ namespace PackCheck.Commands.Settings;
 
 public class CommonSettings : CommandSettings
 {
+    [CommandOption("--version")]
+    [Description(@"Show version information.")]
+    public bool? Version { get; set; }
+
     [CommandOption("--csprojFile <Path>")]
     [Description(@"Path to *.csproj file. (default .\*.csproj)")]
     public string? PathToCsProjFile { get; set; }

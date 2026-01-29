@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.1.3 (2026-01-29)
+
+### Enhancements
+
+- Only show packages if versions differ
+- Add `--version` flag to get the current installed version of PackCheck
+- Update dependencies
+
 ## 3.1.2 (2025-12-21)
 
 ### Enhancements

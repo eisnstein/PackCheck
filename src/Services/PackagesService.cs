@@ -37,7 +37,8 @@ public static class PackagesService
             var currentVersion = p.CurrentVersion;
             var upgradeToVersion = settings.Target switch
             {
-                Target.Stable => p.LatestStableVersion,
+                // If target is stable, but pre-releases are allowed, use latest version (which may be a pre-release); otherwise use latest stable version
+                Target.Stable => settings.Pre == true ? p.LatestVersion : p.LatestStableVersion,
                 Target.Latest => p.LatestVersion ?? p.LatestStableVersion,
                 _ => throw new ArgumentException(nameof(settings.Target))
             };
@@ -70,6 +71,11 @@ public static class PackagesService
         }
 
         return packages;
+    }
+
+    public static List<Package> PreparePackagesForOutput(List<Package> packages)
+    {
+        return packages.Where(p => p.UpgradeType != EUpgradeType.NoUpgrade).ToList();
     }
 
     public static List<Package> PreparePackagesForUpgrade(List<Package> packages, string upgradeTo)

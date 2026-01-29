@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace PackCheck.Data;
 
 public record Config
@@ -12,5 +10,5 @@ public record Config
     public List<string>? Exclude { get; init; }
     public List<string>? Filter { get; init; }
     public string? Format { get; init; }
-    public bool Pre { get; init; } = true;
+    public bool Pre { get; init; } = false;
 }
