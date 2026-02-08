@@ -161,4 +161,61 @@ public class PackagesServiceTest
             await Assert.That(package.UpgradeTo).IsEqualTo(Target.Latest);
         }
     }
+
+    [Test]
+    public async Task StableCurrentVersion_IgnoresNewPrerelease_When_NoNewStable()
+    {
+        List<Package> packages = new()
+        {
+            // Current is stable, only a prerelease exists beyond the stable.
+            PackageFactory.Create(
+                packageName: "Pack1",
+                currentVersion: "1.0.0",
+                latestStableVersion: "1.0.0",
+                latestPrereleaseVersion: "1.1.0-preview.1",
+                latestVersion: "1.1.0-preview.1"),
+        };
+
+        var calculated = PackagesService.CalculateUpgradeType(packages, new CheckSettings { Target = Target.Stable });
+
+        await Assert.That(calculated[0].UpgradeType).IsEqualTo(EUpgradeType.NoUpgrade);
+    }
+
+    [Test]
+    public async Task PrereleaseCurrentVersion_ShowsUpgrade_When_NewPrereleaseAvailable_SamePatch()
+    {
+        List<Package> packages = new()
+        {
+            // Same major/minor/patch, but newer prerelease label.
+            PackageFactory.Create(
+                packageName: "Pack1",
+                currentVersion: "2.0.0-preview.1",
+                latestStableVersion: null,
+                latestPrereleaseVersion: "2.0.0-preview.2",
+                latestVersion: "2.0.0-preview.2"),
+        };
+
+        var calculated = PackagesService.CalculateUpgradeType(packages, new CheckSettings { Target = Target.Stable });
+
+        await Assert.That(calculated[0].UpgradeType).IsEqualTo(EUpgradeType.Patch);
+    }
+
+    [Test]
+    public async Task StableUpgrade_UsesLatestPrerelease_When_CurrentIsPrerelease_And_NoStableExists()
+    {
+        List<Package> packages = new()
+        {
+            PackageFactory.Create(
+                packageName: "Pack1",
+                currentVersion: "1.0.0-alpha.1",
+                latestStableVersion: null,
+                latestPrereleaseVersion: "1.0.0-alpha.3",
+                latestVersion: "1.0.0-alpha.3"),
+        };
+
+        var prepared = PackagesService.PreparePackagesForUpgrade(packages, Target.Stable);
+
+        await Assert.That(prepared).Count().IsEqualTo(1);
+        await Assert.That(prepared[0].NewVersion!.ToString()).IsEqualTo("1.0.0-alpha.3");
+    }
 }

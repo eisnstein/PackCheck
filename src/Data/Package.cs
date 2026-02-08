@@ -10,5 +10,6 @@ public class Package(string name, NuGetVersion version)
     public NuGetVersion CurrentVersion { get; } = version;
     public NuGetVersion? NewVersion { get; set; }
     public NuGetVersion? LatestStableVersion { get; set; }
+    public NuGetVersion? LatestPrereleaseVersion { get; set; }
     public NuGetVersion? LatestVersion { get; set; }
 }

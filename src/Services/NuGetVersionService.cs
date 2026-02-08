@@ -12,6 +12,14 @@ public static class NuGetVersionService
             .LastOrDefault();
     }
 
+    public static NuGetVersion? GetLatestPrereleaseVersion(IReadOnlyList<NuGetVersion> versions)
+    {
+        // ReSharper disable once ReplaceWithSingleCallToLastOrDefault
+        return versions
+            .Where(v => v.IsPrerelease)
+            .LastOrDefault();
+    }
+
     public static NuGetVersion GetLatestVersion(IReadOnlyList<NuGetVersion> versions)
     {
         return versions.Last();

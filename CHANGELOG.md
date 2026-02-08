@@ -1,5 +1,13 @@
 # Changelog
 
+## 3.1.4 (2026-02-08)
+
+### Enhancements
+
+- Show prerelease version if installed version is prerelease. Thanks to @zgabi. (https://github.com/eisnstein/PackCheck/issues/4)
+- Only use listed package versions. Thanks to @zgabi. (https://github.com/eisnstein/PackCheck/issues/5)
+- Update dependencies
+
 ## 3.1.3 (2026-01-29)
 
 ### Enhancements

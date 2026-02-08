@@ -9,12 +9,14 @@ public static class PackageFactory
         string packageName,
         string currentVersion,
         string? latestStableVersion = null,
-        string? latestVersion = null)
+        string? latestVersion = null,
+        string? latestPrereleaseVersion = null)
     {
         return new Package(packageName, NuGetVersion.Parse(currentVersion))
         {
             LatestStableVersion = latestStableVersion is not null ? NuGetVersion.Parse(latestStableVersion) : null,
-            LatestVersion = latestVersion is not null ? NuGetVersion.Parse(latestVersion) : null
+            LatestVersion = latestVersion is not null ? NuGetVersion.Parse(latestVersion) : null,
+            LatestPrereleaseVersion = latestPrereleaseVersion is not null ? NuGetVersion.Parse(latestPrereleaseVersion) : null,
         };
     }
 }

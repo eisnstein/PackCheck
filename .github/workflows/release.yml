@@ -28,13 +28,13 @@ jobs:
         run: dotnet restore
 
       - name: Build
-        run: dotnet build src/PackCheck.csproj --configuration Release --no-restore
+        run: dotnet build src/PackCheck.csproj --configuration Release --no-restore /p:Version=${GITHUB_REF_NAME#v}
 
       # - name: Run tests
       #   run: dotnet test --configuration Release
 
       - name: Pack NuGet package
-        run: dotnet pack src/PackCheck.csproj --configuration Release --no-build -o ./artifacts /p:PackageVersion=${GITHUB_REF_NAME#v}
+        run: dotnet pack src/PackCheck.csproj --configuration Release --no-build -o ./artifacts /p:Version=${GITHUB_REF_NAME#v}
 
       # Get a short-lived NuGet API key
       - name: NuGet login (OIDC → temp API key)

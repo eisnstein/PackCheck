@@ -37,6 +37,7 @@ public class NuGetPackagesService(NuGetApiService nuGetApiService)
             if (versions is { Count: > 0 })
             {
                 package.LatestStableVersion = NuGetVersionService.GetLatestStableVersion(versions);
+                package.LatestPrereleaseVersion = NuGetVersionService.GetLatestPrereleaseVersion(versions);
                 package.LatestVersion = NuGetVersionService.GetLatestVersion(versions);
             }
 
