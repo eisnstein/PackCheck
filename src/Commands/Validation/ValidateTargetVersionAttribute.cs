@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using PackCheck.Data;
 using Spectre.Console;
 using Spectre.Console.Cli;

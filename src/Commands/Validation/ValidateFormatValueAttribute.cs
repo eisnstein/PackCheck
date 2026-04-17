@@ -1,5 +1,3 @@
-using System;
-using System.Linq;
 using Spectre.Console;
 using Spectre.Console.Cli;
 

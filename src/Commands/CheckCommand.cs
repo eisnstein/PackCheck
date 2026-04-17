@@ -22,7 +22,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
         _nuGetPackagesService = new NuGetPackagesService(_nuGetApiService);
     }
 
-    public override async Task<int> ExecuteAsync(CommandContext context, CheckSettings settings, CancellationToken _cancellationToken)
+    protected override async Task<int> ExecuteAsync(CommandContext context, CheckSettings settings, CancellationToken _cancellationToken)
     {
         if (settings.Version == true)
         {
