@@ -1,5 +1,11 @@
 # Changelog
 
+## 3.1.5 (2026-04-17)
+
+### Enhancements
+
+- Update dependencies
+
 ## 3.1.4 (2026-02-08)
 
 ### Enhancements
