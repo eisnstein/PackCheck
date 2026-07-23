@@ -115,12 +115,20 @@ To select packages which should be checked or upgraded, run:
 
 ```sh
 packcheck --filter "NuGet.Version" -f "Microsoft.Logging"
+
+# or use a wildcard
+
+packcheck --filter "Microsoft.*"
 ```
 
 To exclude packages which should not be checked or upgraded, run:
 
 ```sh
 packcheck --exclude "NuGet.Version" -x "Microsoft.Logging"
+
+# or use a wildcard
+
+packcheck --exclude "Microsoft.*"
 ```
 
 To format the output of the `check` command, use the `--format` option. Currently only `group` is supported, which groups the packages by _patch_, _minor_ and _major_ versions.
@@ -146,12 +154,15 @@ You can configure PackCheck via a `.packcheckrc.{json}` file. Example:
   "SlnxFile": "path/to/Project.slnx",
   "CpmFile": "path/to/Directory.Packages.props",
   "FbaFile": "path/to/file-based-app.cs",
-  "Filter": ["NuGet.Version"],
-  "Exclude": ["Microsoft.Logging"],
+  "Filter": ["NuGet.Version", "Microsoft.*"],
+  "Exclude": ["Microsoft.Logging", "Telerik.*"],
   "Format": "group",
   "Pre": true
 }
 ```
+
+`Filter` supports wildcard patterns via `*` or `%`, for example `"Microsoft.*"` to include all Telerik packages.
+`Exclude` supports wildcard patterns via `*` or `%`, for example `"Telerik.*"` to exclude all Telerik packages.
 
 For help run:
 

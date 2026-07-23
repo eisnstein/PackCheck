@@ -36,10 +36,10 @@ public class CommonSettings : CommandSettings
     public string? Target { get; set; } = "stable";
 
     [CommandOption("-f|--filter <Package_Name>")]
-    [Description("Include only packages matching the given name (can be used multiple times)")]
+    [Description("Include only packages matching the given name or wildcard pattern (* or %) (can be used multiple times)")]
     public string[]? Filter { get; set; }
 
     [CommandOption("-x|--exclude <Package_Name>")]
-    [Description("Exclude packages matching the given name (can be used multiple times)")]
+    [Description("Exclude packages matching the given name or wildcard pattern (* or %) (can be used multiple times)")]
     public string[]? Exclude { get; set; }
 }

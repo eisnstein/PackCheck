@@ -42,6 +42,46 @@ public class PackagesServiceTest
     }
 
     [Test]
+    public async Task Returns_ChangedPackagesList_When_FilterWildcardAsteriskIsSet()
+    {
+        List<Package> packages = new()
+        {
+            PackageFactory.Create("Telerik.DataSource", "6.2.1", "6.2.2"),
+            PackageFactory.Create("Telerik.UI.for.AspNet.Core", "6.2.1", "6.2.2"),
+            PackageFactory.Create("Newtonsoft.Json", "6.2.1", "6.2.2"),
+        };
+        CheckSettings settings = new()
+        {
+            Filter = ["Telerik.*"]
+        };
+
+        var newPackages = PackagesService.ApplySettings(packages, settings);
+
+        await Assert.That(newPackages).Count().IsEqualTo(2);
+        await Assert.That(newPackages.Select(p => p.PackageName)).IsEquivalentTo(["Telerik.DataSource", "Telerik.UI.for.AspNet.Core"]);
+    }
+
+    [Test]
+    public async Task Returns_ChangedPackagesList_When_FilterWildcardPercentIsSet()
+    {
+        List<Package> packages = new()
+        {
+            PackageFactory.Create("Telerik.DataSource", "6.2.1", "6.2.2"),
+            PackageFactory.Create("Telerik.UI.for.AspNet.Core", "6.2.1", "6.2.2"),
+            PackageFactory.Create("Newtonsoft.Json", "6.2.1", "6.2.2"),
+        };
+        CheckSettings settings = new()
+        {
+            Filter = ["Telerik.%"]
+        };
+
+        var newPackages = PackagesService.ApplySettings(packages, settings);
+
+        await Assert.That(newPackages).Count().IsEqualTo(2);
+        await Assert.That(newPackages.Select(p => p.PackageName)).IsEquivalentTo(["Telerik.DataSource", "Telerik.UI.for.AspNet.Core"]);
+    }
+
+    [Test]
     public async Task Returns_ChangedPackagesList_When_ExcludeIsSet()
     {
         List<Package> packages = new()
@@ -58,6 +98,65 @@ public class PackagesServiceTest
 
         await Assert.That(newPackages).Count().IsEqualTo(1);
         await Assert.That(newPackages[0].PackageName).IsEqualTo("Pack2");
+    }
+
+    [Test]
+    public async Task Returns_ChangedPackagesList_When_ExcludeWildcardAsteriskIsSet()
+    {
+        List<Package> packages = new()
+        {
+            PackageFactory.Create("Telerik.DataSource", "6.2.1", "6.2.2"),
+            PackageFactory.Create("Telerik.UI.for.AspNet.Core", "6.2.1", "6.2.2"),
+            PackageFactory.Create("Newtonsoft.Json", "6.2.1", "6.2.2"),
+        };
+        CheckSettings settings = new()
+        {
+            Exclude = ["Telerik.*"]
+        };
+
+        var newPackages = PackagesService.ApplySettings(packages, settings);
+
+        await Assert.That(newPackages).Count().IsEqualTo(1);
+        await Assert.That(newPackages[0].PackageName).IsEqualTo("Newtonsoft.Json");
+    }
+
+    [Test]
+    public async Task Returns_ChangedPackagesList_When_ExcludeWildcardPercentIsSet()
+    {
+        List<Package> packages = new()
+        {
+            PackageFactory.Create("Telerik.DataSource", "6.2.1", "6.2.2"),
+            PackageFactory.Create("Telerik.UI.for.AspNet.Core", "6.2.1", "6.2.2"),
+            PackageFactory.Create("Newtonsoft.Json", "6.2.1", "6.2.2"),
+        };
+        CheckSettings settings = new()
+        {
+            Exclude = ["Telerik.%"]
+        };
+
+        var newPackages = PackagesService.ApplySettings(packages, settings);
+
+        await Assert.That(newPackages).Count().IsEqualTo(1);
+        await Assert.That(newPackages[0].PackageName).IsEqualTo("Newtonsoft.Json");
+    }
+
+    [Test]
+    public async Task Returns_ChangedPackagesList_When_ExcludeWildcardAsteriskOnlyIsSet()
+    {
+        List<Package> packages = new()
+        {
+            PackageFactory.Create("Telerik.DataSource", "6.2.1", "6.2.2"),
+            PackageFactory.Create("Telerik.UI.for.AspNet.Core", "6.2.1", "6.2.2"),
+            PackageFactory.Create("Newtonsoft.Json", "6.2.1", "6.2.2"),
+        };
+        CheckSettings settings = new()
+        {
+            Exclude = ["*"]
+        };
+
+        var newPackages = PackagesService.ApplySettings(packages, settings);
+
+        await Assert.That(newPackages).Count().IsEqualTo(0);
     }
 
     [Test]

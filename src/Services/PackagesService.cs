@@ -1,5 +1,6 @@
 using PackCheck.Commands.Settings;
 using PackCheck.Data;
+using System.Text.RegularExpressions;
 
 namespace PackCheck.Services;
 
@@ -14,15 +15,26 @@ public static class PackagesService
 
         if (settings is { Filter: { Length: > 0 } })
         {
-            packages = packages.Where(p => settings.Filter.Contains(p.PackageName)).ToList();
+            packages = packages.Where(p => settings.Filter.Any(filterPattern => MatchesPackageName(p.PackageName, filterPattern))).ToList();
         }
 
         if (settings is { Exclude: { Length: > 0 } })
         {
-            packages = packages.Where(p => !settings.Exclude.Contains(p.PackageName)).ToList();
+            packages = packages.Where(p => !settings.Exclude.Any(excludePattern => MatchesPackageName(p.PackageName, excludePattern))).ToList();
         }
 
         return packages;
+    }
+
+    private static bool MatchesPackageName(string packageName, string pattern)
+    {
+        if (!pattern.Contains('*') && !pattern.Contains('%'))
+        {
+            return packageName == pattern;
+        }
+
+        var regexPattern = "^" + Regex.Escape(pattern).Replace("\\*", ".*").Replace("%", ".*") + "$";
+        return Regex.IsMatch(packageName, regexPattern);
     }
 
     public static List<Package> CalculateUpgradeType(List<Package> packages, CheckSettings? settings)

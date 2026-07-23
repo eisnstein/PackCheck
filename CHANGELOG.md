@@ -1,5 +1,12 @@
 # Changelog
 
+## 3.2.0 (2026-07-23)
+
+### Enhancements
+
+- Add wildcard support for `filter` and `exclude` settings and options using `*` or `%` (for example `Telerik.*`) to match package name patterns. Thanks to @zgabi. (https://github.com/eisnstein/PackCheck/issues/6)
+- Update dependencies
+
 ## 3.1.5 (2026-04-17)
 
 ### Enhancements

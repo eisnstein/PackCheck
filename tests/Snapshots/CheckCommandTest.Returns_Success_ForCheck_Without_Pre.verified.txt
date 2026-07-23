@@ -3,9 +3,9 @@
 ┌──────────────────┬─────────┬───────────────┐
 │ Package Name     │ Current │ Latest Stable │
 ├──────────────────┼─────────┼───────────────┤
-│ NuGet.Protocol   │   6.2.1 │         7.3.1 │
-│ NuGet.Versioning │   6.2.1 │         7.3.1 │
-│ Spectre.Console  │  0.44.0 │        0.55.2 │
+│ NuGet.Protocol   │   6.2.1 │         7.6.0 │
+│ NuGet.Versioning │   6.2.1 │         7.6.0 │
+│ Spectre.Console  │  0.44.0 │        0.57.2 │
 └──────────────────┴─────────┴───────────────┘
 INFO: Run packcheck upgrade to upgrade to the latest stable versions.
 INFO: Run packcheck --help for more options.,
