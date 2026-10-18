@@ -30,6 +30,18 @@ public class SettingsServiceTests
     }
 
     [Test]
+    public async Task Applies_FbaFileFromConfig_ForCheckAndUpgrade()
+    {
+        var config = new Config() { FbaFile = "app.cs" };
+
+        var checkSettings = SettingsService.CombineSettingsWithConfig(new CheckSettings(), config);
+        var upgradeSettings = SettingsService.CombineSettingsWithConfig(new UpgradeSettings(), config);
+
+        await Assert.That(checkSettings.PathToFbaFile).IsEqualTo("app.cs");
+        await Assert.That(upgradeSettings.PathToFbaFile).IsEqualTo("app.cs");
+    }
+
+    [Test]
     public async Task Returns_CheckSettingsUnchanged_When_SameConfigValuesAreSet()
     {
         var settings = new CheckSettings()

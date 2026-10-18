@@ -16,26 +16,30 @@ public static class PackagesService
 
         if (settings is { Filter: { Length: > 0 } })
         {
-            packages = packages.Where(p => settings.Filter.Any(filterPattern => MatchesPackageName(p.PackageName, filterPattern))).ToList();
+            var filters = settings.Filter.Select(CreatePackageNameMatcher).ToList();
+            packages = packages.Where(p => filters.Any(matches => matches(p.PackageName))).ToList();
         }
 
         if (settings is { Exclude: { Length: > 0 } })
         {
-            packages = packages.Where(p => !settings.Exclude.Any(excludePattern => MatchesPackageName(p.PackageName, excludePattern))).ToList();
+            var excludes = settings.Exclude.Select(CreatePackageNameMatcher).ToList();
+            packages = packages.Where(p => !excludes.Any(matches => matches(p.PackageName))).ToList();
         }
 
         return packages;
     }
 
-    private static bool MatchesPackageName(string packageName, string pattern)
+    // NuGet package IDs are case-insensitive, so matching is too.
+    private static Func<string, bool> CreatePackageNameMatcher(string pattern)
     {
         if (!pattern.Contains('*') && !pattern.Contains('%'))
         {
-            return packageName == pattern;
+            return packageName => string.Equals(packageName, pattern, StringComparison.OrdinalIgnoreCase);
         }
 
         var regexPattern = "^" + Regex.Escape(pattern).Replace("\\*", ".*").Replace("%", ".*") + "$";
-        return Regex.IsMatch(packageName, regexPattern);
+        var regex = new Regex(regexPattern, RegexOptions.IgnoreCase | RegexOptions.CultureInvariant);
+        return regex.IsMatch;
     }
 
     /// <summary>

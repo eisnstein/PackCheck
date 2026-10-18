@@ -33,6 +33,28 @@ public class UpgradeCommand : AsyncCommand<UpgradeSettings>
     private async Task<int> UpgradeAsync(UpgradeSettings settings)
     {
         Result? result = null;
+        string? pathToConfigFile;
+        Config? config;
+
+        // Merge the config before deciding what to upgrade, so paths
+        // from the config file are taken into account (like in check).
+        try
+        {
+            (pathToConfigFile, config) = PackCheckConfigService.GetConfig();
+        }
+        catch (JsonException e)
+        {
+            AnsiConsole.MarkupLine(
+                $"[dim]WARN:[/] Your .packcheckrc[.json] configuration file seems to be invalid: {e.Message}");
+            return -1;
+        }
+
+        if (config is not null)
+        {
+            AnsiConsole.MarkupLine($"Reading config from [grey]{pathToConfigFile}[/]");
+        }
+
+        settings = SettingsService.CombineSettingsWithConfig(settings, config);
 
         // Check if a path to a specific project is given
         if (!string.IsNullOrEmpty(settings.PathToCsProjFile))
@@ -178,26 +200,6 @@ public class UpgradeCommand : AsyncCommand<UpgradeSettings>
     private async Task<Result> UpgradeProject(UpgradeSettings settings)
     {
         var pathToCsProjFile = "";
-        string? pathToConfigFile = null;
-        Config? config = null;
-
-        try
-        {
-            (pathToConfigFile, config) = PackCheckConfigService.GetConfig();
-        }
-        catch (JsonException e)
-        {
-            AnsiConsole.MarkupLine(
-                $"[dim]WARN:[/] Your .packcheckrc.json configuration file seems to be invalid: ${e.Message}");
-            return Result.Error;
-        }
-
-        if (config is not null)
-        {
-            AnsiConsole.MarkupLine($"Reading config from [grey]{pathToConfigFile}[/]");
-        }
-
-        settings = SettingsService.CombineSettingsWithConfig(settings, config);
 
         // Get the path to the *.csproj file
         try
@@ -230,7 +232,7 @@ public class UpgradeCommand : AsyncCommand<UpgradeSettings>
         // ignore all the others
         if (!string.IsNullOrEmpty(settings.PackageToUpgrade))
         {
-            packages.RemoveAll(p => p.PackageName != settings.PackageToUpgrade);
+            packages.RemoveAll(p => !string.Equals(p.PackageName, settings.PackageToUpgrade, StringComparison.OrdinalIgnoreCase));
         }
 
         // Fetch data for each package from nuget and store data on each package
@@ -288,26 +290,6 @@ public class UpgradeCommand : AsyncCommand<UpgradeSettings>
     private async Task<Result> UpgradeCpm(UpgradeSettings settings)
     {
         var pathToCpmFile = "";
-        string? pathToConfigFile = null;
-        Config? config = null;
-
-        try
-        {
-            (pathToConfigFile, config) = PackCheckConfigService.GetConfig();
-        }
-        catch (JsonException e)
-        {
-            AnsiConsole.MarkupLine(
-                $"[dim]WARN:[/] Your .packcheckrc.json configuration file seems to be invalid: ${e.Message}");
-            return Result.Error;
-        }
-
-        if (config is not null)
-        {
-            AnsiConsole.MarkupLine($"Reading config from [grey]{pathToConfigFile}[/]");
-        }
-
-        settings = SettingsService.CombineSettingsWithConfig(settings, config);
 
         // Get the path to the *.csproj file
         try
@@ -340,7 +322,7 @@ public class UpgradeCommand : AsyncCommand<UpgradeSettings>
         // ignore all the others
         if (!string.IsNullOrEmpty(settings.PackageToUpgrade))
         {
-            packages.RemoveAll(p => p.PackageName != settings.PackageToUpgrade);
+            packages.RemoveAll(p => !string.Equals(p.PackageName, settings.PackageToUpgrade, StringComparison.OrdinalIgnoreCase));
         }
 
         // Fetch data for each package from nuget and store data on each package
@@ -398,26 +380,6 @@ public class UpgradeCommand : AsyncCommand<UpgradeSettings>
     private async Task<Result> UpgradeFbaFile(UpgradeSettings settings)
     {
         var pathToFbaFile = "";
-        string? pathToConfigFile = null;
-        Config? config = null;
-
-        try
-        {
-            (pathToConfigFile, config) = PackCheckConfigService.GetConfig();
-        }
-        catch (JsonException e)
-        {
-            AnsiConsole.MarkupLine(
-                $"[dim]WARN:[/] Your .packcheckrc.json configuration file seems to be invalid: ${e.Message}");
-            return Result.Error;
-        }
-
-        if (config is not null)
-        {
-            AnsiConsole.MarkupLine($"Reading config from [grey]{pathToConfigFile}[/]");
-        }
-
-        settings = SettingsService.CombineSettingsWithConfig(settings, config);
 
         // Get the path to the file-based app file
         try
@@ -450,7 +412,7 @@ public class UpgradeCommand : AsyncCommand<UpgradeSettings>
         // ignore all the others
         if (!string.IsNullOrEmpty(settings.PackageToUpgrade))
         {
-            packages.RemoveAll(p => p.PackageName != settings.PackageToUpgrade);
+            packages.RemoveAll(p => !string.Equals(p.PackageName, settings.PackageToUpgrade, StringComparison.OrdinalIgnoreCase));
         }
 
         // Fetch data for each package from nuget and store data on each package

@@ -1,5 +1,4 @@
 using System.Xml;
-using System.Xml.Linq;
 using NuGet.Versioning;
 using PackCheck.Data;
 using PackCheck.Exceptions;
@@ -91,80 +90,8 @@ public static class CsProjFileService
         return packages;
     }
 
-    public static async Task UpgradePackageVersionsAsync(string pathToCsProjFile, IReadOnlyList<Package> packages, bool dryRun)
+    public static Task UpgradePackageVersionsAsync(string pathToCsProjFile, IReadOnlyList<Package> packages, bool dryRun)
     {
-        XmlReaderSettings readerSettings = new XmlReaderSettings { Async = true };
-        XElement csProjFile;
-        using (XmlReader reader = XmlReader.Create(pathToCsProjFile, readerSettings))
-        {
-            csProjFile = await XElement.LoadAsync(
-                reader, LoadOptions.PreserveWhitespace, CancellationToken.None
-            );
-        }
-
-        // Find all <PackageReference .../> items
-        IEnumerable<XElement> packageReferences = csProjFile
-            .Descendants("PackageReference")
-            .Select(el => el);
-
-        foreach (var packageReference in packageReferences)
-        {
-            // Get name of current package
-            var packageName = packageReference.Attribute("Include")?.Value;
-            if (string.IsNullOrEmpty(packageName))
-            {
-                continue;
-            }
-
-            // Get version of current package
-            var currentVersionStr = packageReference.Attribute("Version")?.Value;
-            if (string.IsNullOrEmpty(currentVersionStr))
-            {
-                continue;
-            }
-
-            if (!NuGetVersion.TryParse(currentVersionStr, out var currentVersion))
-            {
-                continue;
-            }
-
-            // Find corresponding package information for the current package reference.
-            // Match the version too, a package can be referenced more than once,
-            // e.g. in conditional ItemGroups per target framework.
-            var package = packages.FirstOrDefault(p => p.PackageName == packageName && p.CurrentVersion == currentVersion);
-            if (package is null)
-            {
-                continue;
-            }
-
-            // If no version is available
-            // we skip that package
-            if (package.NewVersion is null)
-            {
-                continue;
-            }
-
-            // If the current version and new version are equal
-            // we dont need to proceed here
-            if (currentVersion == package.NewVersion)
-            {
-                continue;
-            }
-
-            // Set the new package version
-            packageReference.SetAttributeValue("Version", package.NewVersion);
-        }
-
-        if (dryRun)
-        {
-            Console.WriteLine(csProjFile);
-            return;
-        }
-
-        XmlWriterSettings wSettings = new XmlWriterSettings { Async = true, OmitXmlDeclaration = true };
-        await using XmlWriter writer = XmlWriter.Create(pathToCsProjFile, wSettings);
-
-        await csProjFile.SaveAsync(writer, CancellationToken.None);
-        await writer.FlushAsync();
+        return PackageXmlFileService.UpgradePackageVersionsAsync(pathToCsProjFile, "PackageReference", packages, dryRun);
     }
 }

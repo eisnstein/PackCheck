@@ -17,6 +17,7 @@ public static class SettingsService
         settings.PathToSlnFile ??= config.SlnFile;
         settings.PathToSlnxFile ??= config.SlnxFile;
         settings.PathToCpmFile ??= config.CpmFile;
+        settings.PathToFbaFile ??= config.FbaFile;
         settings.Filter ??= config.Filter?.ToArray();
         settings.Exclude ??= config.Exclude?.ToArray();
         settings.Format ??= config.Format;
@@ -43,6 +44,7 @@ public static class SettingsService
         settings.PathToSlnFile ??= config.SlnFile;
         settings.PathToSlnxFile ??= config.SlnxFile;
         settings.PathToCpmFile ??= config.CpmFile;
+        settings.PathToFbaFile ??= config.FbaFile;
         settings.Filter ??= config.Filter?.ToArray();
         settings.Exclude ??= config.Exclude?.ToArray();
 

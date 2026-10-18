@@ -160,6 +160,26 @@ public class PackagesServiceTest
     }
 
     [Test]
+    public async Task FilterAndExclude_IgnoreCase()
+    {
+        List<Package> packages = new()
+        {
+            PackageFactory.Create("Telerik.DataSource", "6.2.1", "6.2.2"),
+            PackageFactory.Create("Telerik.UI.for.AspNet.Core", "6.2.1", "6.2.2"),
+            PackageFactory.Create("Newtonsoft.Json", "6.2.1", "6.2.2"),
+        };
+        CheckSettings settings = new()
+        {
+            Filter = ["telerik.*", "NEWTONSOFT.JSON"],
+            Exclude = ["telerik.ui.%"]
+        };
+
+        var newPackages = PackagesService.ApplySettings(packages, settings);
+
+        await Assert.That(newPackages.Select(p => p.PackageName)).IsEquivalentTo(["Telerik.DataSource", "Newtonsoft.Json"]);
+    }
+
+    [Test]
     public async Task Returns_EmptyPackagesList_When_FilterAndExcludeIsSet()
     {
         List<Package> packages = new()

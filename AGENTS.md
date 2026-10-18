@@ -32,8 +32,9 @@ Each target type has its own private method (`CheckProject`, `CheckCpm`, `CheckF
 **Pipeline per target:** read packages from the file → `PackagesService.ApplySettings` (filter/exclude, wildcards `*`/`%`) → `NuGetPackagesService` fetches versions in parallel (max 4) with a progress bar → `PackagesService.CalculateUpgradeType` (check) or `PreparePackagesForUpgrade` (upgrade) → `OutputService` renders the table, or the file service writes the new versions.
 
 **Services** (`src/Services/`) are mostly static classes, one for each file format:
-- `CsProjFileService`: XML `<PackageReference Include Version>`, rewritten with `XElement` (whitespace preserved).
+- `CsProjFileService`: XML `<PackageReference Include Version>`.
 - `CentralPackageMgmtService`: `<PackageVersion>` in `Directory.Packages.props`.
+- `PackageXmlFileService`: does the upgrade for both. It uses `XmlReader` only to locate each `Version` attribute and replaces just that text in the original content. Never re-serialize the XML, because that changes the declaration, BOM, line endings, final newline and attribute layout. `XmlFormattingTests` checks this byte for byte.
 - `SolutionFileService`: parses `Project(...)` lines in `.sln` with a regex and converts `\` to the platform separator outside Windows. `SolutionXFileService` handles `.slnx`.
 - `FileBasedAppService`: `#:package Name@Version` directives in a single `.cs` file.
 - `NuGetApiService` (behind `INuGetApiService`): the only network access. The commands get it through their constructors; `Program.cs` registers it with Spectre's type registrar. It queries nuget.org v3 `PackageMetadataResource` with `includeUnlisted: false` and falls back to `FindPackageByIdResource`.

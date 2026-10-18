@@ -32,8 +32,8 @@ packcheck upgrade
 
 # upgrade command - to latest version
 
-packcheck u --version latest
-packcheck upgrade --version latest
+packcheck u --target latest
+packcheck upgrade --target latest
 
 # upgrade command - to stable version - interactive
 
@@ -42,8 +42,8 @@ packcheck upgrade -i
 
 # upgrade command - to latest version - interactive
 
-packcheck u --version latest -i
-packcheck upgrade --version latest -i
+packcheck u --target latest -i
+packcheck upgrade --target latest -i
 
 # upgrade command - to stable version - a specific package
 
@@ -52,6 +52,6 @@ packcheck upgrade Nuget.Protocol
 
 # upgrade command - to latest version - a specific package
 
-packcheck u Nuget.Protocol --version latest
-packcheck upgrade Nuget.Protocol --version latest
+packcheck u Nuget.Protocol --target latest
+packcheck upgrade Nuget.Protocol --target latest
 ```

@@ -3,9 +3,8 @@ using System.Reflection;
 using NuGet.Versioning;
 using PackCheck.Commands.Settings;
 using PackCheck.Data;
-using PackCheck.Services;
 
-namespace RouteCheck.Services;
+namespace PackCheck.Services;
 
 public static class OutputService
 {
