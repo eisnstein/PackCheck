@@ -123,6 +123,84 @@ public class CsProjFileServiceTests
         TestHelper.LoadTestCsProjFile();
     }
 
+    [Test]
+    public async Task SkipsVersionsThatAreNotPlainVersions()
+    {
+        var pathToCsProjFile = Path.Combine(Directory.GetCurrentDirectory(), "versions.csproj");
+        await File.WriteAllTextAsync(pathToCsProjFile, """
+            <Project Sdk="Microsoft.NET.Sdk">
+              <ItemGroup>
+                <PackageReference Include="Pack.Property" Version="$(PackVersion)" />
+                <PackageReference Include="Pack.Range" Version="[1.0,2.0)" />
+                <PackageReference Include="Pack.Floating" Version="1.*" />
+                <PackageReference Include="Pack.Plain" Version="1.0.0" />
+              </ItemGroup>
+            </Project>
+            """);
+
+        try
+        {
+            var packages = await CsProjFileService.GetPackagesDataFromCsProjFileAsync(pathToCsProjFile);
+
+            await Assert.That(packages.Select(p => p.PackageName)).IsEquivalentTo(["Pack.Plain"]);
+
+            packages[0].LatestStableVersion = new("1.1.0");
+            var preparedPackages = PackagesService.PreparePackagesForUpgrade(packages, Target.Stable);
+            await CsProjFileService.UpgradePackageVersionsAsync(pathToCsProjFile, preparedPackages, false);
+
+            var fileContent = await File.ReadAllTextAsync(pathToCsProjFile);
+            await Assert.That(fileContent).Contains("<PackageReference Include=\"Pack.Plain\" Version=\"1.1.0\" />");
+            await Assert.That(fileContent).Contains("<PackageReference Include=\"Pack.Property\" Version=\"$(PackVersion)\" />");
+            await Assert.That(fileContent).Contains("<PackageReference Include=\"Pack.Range\" Version=\"[1.0,2.0)\" />");
+            await Assert.That(fileContent).Contains("<PackageReference Include=\"Pack.Floating\" Version=\"1.*\" />");
+        }
+        finally
+        {
+            File.Delete(pathToCsProjFile);
+        }
+    }
+
+    [Test]
+    public async Task UpgradesOnlySelectedEntry_When_PackageIsReferencedMoreThanOnce()
+    {
+        var pathToCsProjFile = Path.Combine(Directory.GetCurrentDirectory(), "duplicates.csproj");
+        await File.WriteAllTextAsync(pathToCsProjFile, """
+            <Project Sdk="Microsoft.NET.Sdk">
+              <ItemGroup Condition="'$(TargetFramework)' == 'net8.0'">
+                <PackageReference Include="Pack1" Version="8.0.0" />
+              </ItemGroup>
+              <ItemGroup Condition="'$(TargetFramework)' == 'net9.0'">
+                <PackageReference Include="Pack1" Version="9.0.0" />
+              </ItemGroup>
+            </Project>
+            """);
+
+        try
+        {
+            var packages = await CsProjFileService.GetPackagesDataFromCsProjFileAsync(pathToCsProjFile);
+            await Assert.That(packages).Count().IsEqualTo(2);
+
+            foreach (var package in packages)
+            {
+                package.LatestStableVersion = new("9.0.1");
+            }
+
+            // Like in interactive mode: only the net9.0 entry is selected
+            var preparedPackages = PackagesService.PreparePackagesForUpgrade(packages, Target.Stable)
+                .Where(p => p.CurrentVersion.Major == 9)
+                .ToList();
+            await CsProjFileService.UpgradePackageVersionsAsync(pathToCsProjFile, preparedPackages, false);
+
+            var fileContent = await File.ReadAllTextAsync(pathToCsProjFile);
+            await Assert.That(fileContent).Contains("<PackageReference Include=\"Pack1\" Version=\"8.0.0\" />");
+            await Assert.That(fileContent).Contains("<PackageReference Include=\"Pack1\" Version=\"9.0.1\" />");
+        }
+        finally
+        {
+            File.Delete(pathToCsProjFile);
+        }
+    }
+
     private List<Package> GeneratePackagesList()
     {
         // Packages und versions correspond to those in the test.csproj file

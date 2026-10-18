@@ -9,16 +9,23 @@ public class NuGetApiService : INuGetApiService
 {
     private readonly ILogger _logger = NullLogger.Instance;
     private readonly SourceCacheContext _cache = new();
-    private readonly FindPackageByIdResource _findPackageByIdResource;
-    private readonly PackageMetadataResource _packageMetadataResource;
+    private readonly Lazy<Task<FindPackageByIdResource>> _findPackageByIdResource;
+    private readonly Lazy<Task<PackageMetadataResource>> _packageMetadataResource;
 
     public NuGetApiService()
     {
+        // Getting a resource downloads the feed's service index, so it is done lazily
+        // on first use. Otherwise creating this service (and with it every command)
+        // would already fail when the feed is unreachable.
         var repository = Repository.Factory.GetCoreV3("https://api.nuget.org/v3/index.json");
-        _findPackageByIdResource = repository.GetResource<FindPackageByIdResource>(CancellationToken.None)
-            ?? throw new InvalidOperationException("The NuGet feed does not provide a FindPackageByIdResource.");
-        _packageMetadataResource = repository.GetResource<PackageMetadataResource>(CancellationToken.None)
-            ?? throw new InvalidOperationException("The NuGet feed does not provide a PackageMetadataResource.");
+        _findPackageByIdResource = new(() => GetResourceAsync<FindPackageByIdResource>(repository));
+        _packageMetadataResource = new(() => GetResourceAsync<PackageMetadataResource>(repository));
+    }
+
+    private static async Task<T> GetResourceAsync<T>(SourceRepository repository) where T : class, INuGetResource
+    {
+        return await repository.GetResourceAsync<T>(CancellationToken.None)
+            ?? throw new InvalidOperationException($"The NuGet feed does not provide a {typeof(T).Name}.");
     }
 
     public async Task<IEnumerable<NuGetVersion>> GetPackageVersions(string packageName, CancellationToken cancellationToken)
@@ -30,7 +37,8 @@ public class NuGetApiService : INuGetApiService
 
         // NOTE: FindPackageByIdResource.GetAllVersionsAsync may return unlisted versions.
         // PackageMetadataResource supports excluding unlisted packages via includeUnlisted: false.
-        var metadata = await _packageMetadataResource.GetMetadataAsync(
+        var packageMetadataResource = await _packageMetadataResource.Value;
+        var metadata = await packageMetadataResource.GetMetadataAsync(
             packageName,
             includePrerelease: true,
             includeUnlisted: false,
@@ -50,6 +58,7 @@ public class NuGetApiService : INuGetApiService
         }
 
         // Fallback: should be rare, but keep behavior for feeds that don't support metadata resource well.
-        return await _findPackageByIdResource.GetAllVersionsAsync(packageName, _cache, _logger, cancellationToken);
+        var findPackageByIdResource = await _findPackageByIdResource.Value;
+        return await findPackageByIdResource.GetAllVersionsAsync(packageName, _cache, _logger, cancellationToken);
     }
 }

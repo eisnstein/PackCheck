@@ -51,7 +51,7 @@ public static class CentralPackageMgmtService
     {
         List<Package> packages = new();
         var settings = new XmlReaderSettings { Async = true };
-        var reader = XmlReader.Create(pathToCpmFile, settings);
+        using var reader = XmlReader.Create(pathToCpmFile, settings);
 
         while (await reader.ReadAsync())
         {
@@ -86,10 +86,15 @@ public static class CentralPackageMgmtService
                 continue;
             }
 
-            packages.Add(new Package(packageName, NuGetVersion.Parse(currentVersion)));
-        }
+            // Skip values that are not a plain version, e.g. ranges [1.0,2.0),
+            // floating versions 1.* or MSBuild properties $(FooVersion)
+            if (!NuGetVersion.TryParse(currentVersion, out var version))
+            {
+                continue;
+            }
 
-        reader.Close();
+            packages.Add(new Package(packageName, version));
+        }
 
         return packages;
     }
@@ -97,13 +102,13 @@ public static class CentralPackageMgmtService
     public static async Task UpgradePackageVersionsAsync(string pathToCpmFile, IReadOnlyList<Package> packages, bool dryRun)
     {
         XmlReaderSettings readerSettings = new XmlReaderSettings { Async = true };
-        XmlReader reader = XmlReader.Create(pathToCpmFile, readerSettings);
-
-        XElement csProjFile = await XElement.LoadAsync(
-            reader, LoadOptions.PreserveWhitespace, CancellationToken.None
-        );
-
-        reader.Close();
+        XElement csProjFile;
+        using (XmlReader reader = XmlReader.Create(pathToCpmFile, readerSettings))
+        {
+            csProjFile = await XElement.LoadAsync(
+                reader, LoadOptions.PreserveWhitespace, CancellationToken.None
+            );
+        }
 
         // Find all <PackageVersion .../> items
         IEnumerable<XElement> packageVersions = csProjFile
@@ -126,14 +131,19 @@ public static class CentralPackageMgmtService
                 continue;
             }
 
-            // Find corresponding package information for the current package reference
-            var package = packages.SingleOrDefault(p => p.PackageName == packageName);
-            if (package is null)
+            if (!NuGetVersion.TryParse(currentVersionStr, out var currentVersion))
             {
                 continue;
             }
 
-            var currentVersion = NuGetVersion.Parse(currentVersionStr);
+            // Find corresponding package information for the current package version.
+            // Match the version too, a package can be listed more than once,
+            // e.g. with different conditions.
+            var package = packages.FirstOrDefault(p => p.PackageName == packageName && p.CurrentVersion == currentVersion);
+            if (package is null)
+            {
+                continue;
+            }
 
             // If no version is available
             // we skip that package
@@ -160,10 +170,9 @@ public static class CentralPackageMgmtService
         }
 
         XmlWriterSettings wSettings = new XmlWriterSettings { Async = true, OmitXmlDeclaration = true };
-        XmlWriter writer = XmlWriter.Create(pathToCpmFile, wSettings);
+        await using XmlWriter writer = XmlWriter.Create(pathToCpmFile, wSettings);
 
         await csProjFile.SaveAsync(writer, CancellationToken.None);
         await writer.FlushAsync();
-        writer.Close();
     }
 }

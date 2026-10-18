@@ -22,7 +22,20 @@ public class CheckCommand : AsyncCommand<CheckSettings>
         _nuGetPackagesService = new NuGetPackagesService(_nuGetApiService);
     }
 
-    public override async Task<int> ExecuteAsync(CommandContext context, CheckSettings settings, CancellationToken _cancellationToken)
+    public override async Task<int> ExecuteAsync(CommandContext context, CheckSettings settings, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await CheckAsync(settings);
+        }
+        catch (Exception ex) when (ex is SolutionFileException or SolutionXFileException)
+        {
+            AnsiConsole.MarkupLine($"[dim]WARN:[/] [red]{ex.Message}[/]");
+            return -1;
+        }
+    }
+
+    private async Task<int> CheckAsync(CheckSettings settings)
     {
         if (settings.Version == true)
         {
@@ -115,9 +128,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
         // Check if a path to a Central Packages Mgmt file is given
         if (!string.IsNullOrEmpty(settings.PathToCpmFile))
         {
-            var pathToCpmFile = CentralPackageMgmtService.GetPathToCpmFile(settings.PathToCpmFile);
-
-            result = await CheckCpm(pathToCpmFile, settings);
+            result = await CheckCpm(settings.PathToCpmFile, settings);
             if (result != Result.Success)
             {
                 return -1;
@@ -132,9 +143,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
         // Check if a path to a file-based app file is given
         if (!string.IsNullOrEmpty(settings.PathToFbaFile))
         {
-            var pathToFileBasedAppFile = FileBasedAppService.GetPathToFileBasedAppFile(settings.PathToFbaFile);
-
-            result = await CheckFba(pathToFileBasedAppFile, settings);
+            result = await CheckFba(settings.PathToFbaFile, settings);
             if (result != Result.Success)
             {
                 return -1;

@@ -43,7 +43,7 @@ public static class CsProjFileService
     {
         List<Package> packages = new();
         var settings = new XmlReaderSettings { Async = true };
-        var reader = XmlReader.Create(pathToCsProjFile, settings);
+        using var reader = XmlReader.Create(pathToCsProjFile, settings);
 
         while (await reader.ReadAsync())
         {
@@ -78,10 +78,15 @@ public static class CsProjFileService
                 continue;
             }
 
-            packages.Add(new Package(packageName, NuGetVersion.Parse(currentVersion)));
-        }
+            // Skip values that are not a plain version, e.g. ranges [1.0,2.0),
+            // floating versions 1.* or MSBuild properties $(FooVersion)
+            if (!NuGetVersion.TryParse(currentVersion, out var version))
+            {
+                continue;
+            }
 
-        reader.Close();
+            packages.Add(new Package(packageName, version));
+        }
 
         return packages;
     }
@@ -89,13 +94,13 @@ public static class CsProjFileService
     public static async Task UpgradePackageVersionsAsync(string pathToCsProjFile, IReadOnlyList<Package> packages, bool dryRun)
     {
         XmlReaderSettings readerSettings = new XmlReaderSettings { Async = true };
-        XmlReader reader = XmlReader.Create(pathToCsProjFile, readerSettings);
-
-        XElement csProjFile = await XElement.LoadAsync(
-            reader, LoadOptions.PreserveWhitespace, CancellationToken.None
-        );
-
-        reader.Close();
+        XElement csProjFile;
+        using (XmlReader reader = XmlReader.Create(pathToCsProjFile, readerSettings))
+        {
+            csProjFile = await XElement.LoadAsync(
+                reader, LoadOptions.PreserveWhitespace, CancellationToken.None
+            );
+        }
 
         // Find all <PackageReference .../> items
         IEnumerable<XElement> packageReferences = csProjFile
@@ -118,14 +123,19 @@ public static class CsProjFileService
                 continue;
             }
 
-            // Find corresponding package information for the current package reference
-            var package = packages.SingleOrDefault(p => p.PackageName == packageName);
-            if (package is null)
+            if (!NuGetVersion.TryParse(currentVersionStr, out var currentVersion))
             {
                 continue;
             }
 
-            var currentVersion = NuGetVersion.Parse(currentVersionStr);
+            // Find corresponding package information for the current package reference.
+            // Match the version too, a package can be referenced more than once,
+            // e.g. in conditional ItemGroups per target framework.
+            var package = packages.FirstOrDefault(p => p.PackageName == packageName && p.CurrentVersion == currentVersion);
+            if (package is null)
+            {
+                continue;
+            }
 
             // If no version is available
             // we skip that package
@@ -152,10 +162,9 @@ public static class CsProjFileService
         }
 
         XmlWriterSettings wSettings = new XmlWriterSettings { Async = true, OmitXmlDeclaration = true };
-        XmlWriter writer = XmlWriter.Create(pathToCsProjFile, wSettings);
+        await using XmlWriter writer = XmlWriter.Create(pathToCsProjFile, wSettings);
 
         await csProjFile.SaveAsync(writer, CancellationToken.None);
         await writer.FlushAsync();
-        writer.Close();
     }
 }

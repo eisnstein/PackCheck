@@ -9,7 +9,18 @@ public static class PackCheckService
 {
     public static async Task CheckForNewPackCheckVersion(INuGetApiService nuGetApiService)
     {
-        IEnumerable<NuGetVersion> result = await nuGetApiService.GetPackageVersions("PackCheck", CancellationToken.None);
+        IEnumerable<NuGetVersion> result;
+        try
+        {
+            result = await nuGetApiService.GetPackageVersions("PackCheck", CancellationToken.None);
+        }
+        catch (Exception)
+        {
+            // This check is optional, so it must never stop the actual command,
+            // e.g. when offline or behind a proxy.
+            return;
+        }
+
         ImmutableList<NuGetVersion> versions = result.ToImmutableList();
 
         if (versions is { Count: 0 })
@@ -27,12 +38,10 @@ public static class PackCheckService
         var currentVersionStr = assembly
             .GetCustomAttribute<AssemblyInformationalVersionAttribute>()?
             .InformationalVersion;
-        if (currentVersionStr is null)
+        if (!NuGetVersion.TryParse(currentVersionStr, out var currentVersion))
         {
             return;
         }
-
-        var currentVersion = NuGetVersion.Parse(currentVersionStr);
 
         // If there is a newer version available, show information
         if (latestVersion > currentVersion)

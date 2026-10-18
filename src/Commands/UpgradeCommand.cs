@@ -17,7 +17,20 @@ public class UpgradeCommand : AsyncCommand<UpgradeSettings>
         _nuGetPackagesService = new NuGetPackagesService(nuGetApiService);
     }
 
-    public override async Task<int> ExecuteAsync(CommandContext context, UpgradeSettings settings, CancellationToken _cancellationToken)
+    public override async Task<int> ExecuteAsync(CommandContext context, UpgradeSettings settings, CancellationToken cancellationToken)
+    {
+        try
+        {
+            return await UpgradeAsync(settings);
+        }
+        catch (Exception ex) when (ex is SolutionFileException or SolutionXFileException)
+        {
+            AnsiConsole.MarkupLine($"[dim]WARN:[/] [red]{ex.Message}[/]");
+            return -1;
+        }
+    }
+
+    private async Task<int> UpgradeAsync(UpgradeSettings settings)
     {
         Result? result = null;
 
@@ -411,7 +424,7 @@ public class UpgradeCommand : AsyncCommand<UpgradeSettings>
         {
             pathToFbaFile = FileBasedAppService.GetPathToFileBasedAppFile(settings.PathToFbaFile!);
         }
-        catch (CpmFileException ex)
+        catch (FileBasedAppFileException ex)
         {
             AnsiConsole.Markup($"[dim]WARN:[/] [red]{ex.Message}[/]");
             return Result.Error;

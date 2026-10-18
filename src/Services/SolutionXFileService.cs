@@ -23,7 +23,7 @@ public static class SolutionXFileService
             var fullPath = Path.Combine(cwd, pathToSolutionXFile);
             if (!File.Exists(fullPath))
             {
-                throw new SolutionFileException(
+                throw new SolutionXFileException(
                     $"File [white]{pathToSolutionXFile}[/] does not exist in the current directory [white]{cwd}[/]"
                 );
             }
@@ -46,7 +46,7 @@ public static class SolutionXFileService
     {
         List<string> projectPaths = new();
         var settings = new XmlReaderSettings { Async = false };
-        var reader = XmlReader.Create(pathToSolutionXFile, settings);
+        using var reader = XmlReader.Create(pathToSolutionXFile, settings);
 
         while (reader.Read())
         {
@@ -77,8 +77,6 @@ public static class SolutionXFileService
 
             projectPaths.Add(path);
         }
-
-        reader.Close();
 
         return projectPaths;
     }
