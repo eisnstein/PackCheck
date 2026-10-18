@@ -1,3 +1,4 @@
+using Spectre.Console;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -28,7 +29,7 @@ public static class SolutionFileService
             if (!File.Exists(fullPath))
             {
                 throw new SolutionFileException(
-                    $"File [white]{pathToSolutionFile}[/] does not exist in the current directory [white]{cwd}[/]"
+                    $"File [white]{pathToSolutionFile.EscapeMarkup()}[/] does not exist in the current directory [white]{cwd.EscapeMarkup()}[/]"
                 );
             }
 
@@ -40,8 +41,8 @@ public static class SolutionFileService
 
         return files.Length switch
         {
-            0 => throw new SolutionFileException($"Could not find a .sln file in the current directory [white]{cwd}[/]"),
-            > 1 => throw new SolutionFileException($"Found more than 1 .sln file. Please provide the .sln file to use via the --slnFile argument. [white]{cwd}[/]"),
+            0 => throw new SolutionFileException($"Could not find a .sln file in the current directory [white]{cwd.EscapeMarkup()}[/]"),
+            > 1 => throw new SolutionFileException($"Found more than 1 .sln file. Please provide the .sln file to use via the --slnFile argument. [white]{cwd.EscapeMarkup()}[/]"),
             _ => Path.Combine(cwd, files[0])
         };
     }

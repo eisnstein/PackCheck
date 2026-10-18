@@ -1,3 +1,4 @@
+using Spectre.Console;
 using System.Xml;
 using NuGet.Versioning;
 using PackCheck.Data;
@@ -20,7 +21,7 @@ public static class CsProjFileService
             if (!File.Exists(fullPath))
             {
                 throw new CsProjFileException(
-                    $"File [white]{pathToCsProjFile}[/] does not exist in the current directory [white]{cwd}[/]"
+                    $"File [white]{pathToCsProjFile.EscapeMarkup()}[/] does not exist in the current directory [white]{cwd.EscapeMarkup()}[/]"
                 );
             }
 
@@ -32,8 +33,8 @@ public static class CsProjFileService
 
         return files.Length switch
         {
-            0 => throw new CsProjFileException($"Could not find a .csproj file in the current directory [white]{cwd}[/]"),
-            > 1 => throw new CsProjFileException($"Found more than 1 .csproj file. Please provide the .csproj file to use via the --csprojFile argument. [white]{cwd}[/]"),
+            0 => throw new CsProjFileException($"Could not find a .csproj file in the current directory [white]{cwd.EscapeMarkup()}[/]"),
+            > 1 => throw new CsProjFileException($"Found more than 1 .csproj file. Please provide the .csproj file to use via the --csprojFile argument. [white]{cwd.EscapeMarkup()}[/]"),
             _ => Path.Combine(cwd, files[0])
         };
     }

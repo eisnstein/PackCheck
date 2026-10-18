@@ -1,3 +1,4 @@
+using Spectre.Console;
 using System.Xml;
 using PackCheck.Exceptions;
 
@@ -24,7 +25,7 @@ public static class SolutionXFileService
             if (!File.Exists(fullPath))
             {
                 throw new SolutionXFileException(
-                    $"File [white]{pathToSolutionXFile}[/] does not exist in the current directory [white]{cwd}[/]"
+                    $"File [white]{pathToSolutionXFile.EscapeMarkup()}[/] does not exist in the current directory [white]{cwd.EscapeMarkup()}[/]"
                 );
             }
 
@@ -36,8 +37,8 @@ public static class SolutionXFileService
 
         return files.Length switch
         {
-            0 => throw new SolutionXFileException($"Could not find a .slnx file in the current directory [white]{cwd}[/]"),
-            > 1 => throw new SolutionXFileException($"Found more than 1 .slnx file. Please provide the .slnx file to use via the --slnxFile argument. [white]{cwd}[/]"),
+            0 => throw new SolutionXFileException($"Could not find a .slnx file in the current directory [white]{cwd.EscapeMarkup()}[/]"),
+            > 1 => throw new SolutionXFileException($"Found more than 1 .slnx file. Please provide the .slnx file to use via the --slnxFile argument. [white]{cwd.EscapeMarkup()}[/]"),
             _ => Path.Combine(cwd, files[0])
         };
     }

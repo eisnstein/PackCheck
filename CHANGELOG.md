@@ -1,5 +1,14 @@
 # Changelog
 
+## 4.0.1 (2026-10-18)
+
+### Bug fixes
+
+- Show a clear warning instead of an exception when nuget.org cannot be reached, e.g. when offline.
+- `upgrade` now keeps the BOM of file-based app files.
+- Paths with `[` or `]` in warnings and messages no longer break the output.
+- An invalid `.packcheckrc` config file now shows the intended warning instead of an error about the warning itself.
+
 ## 4.0.0 (2026-10-18)
 
 ### Breaking Changes

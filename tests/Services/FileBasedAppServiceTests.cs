@@ -255,10 +255,15 @@ public class FileBasedAppServiceTests
     }
 
     [Test]
-    [Arguments("\n")]
-    [Arguments("\r\n")]
-    public async Task PreservesIndentationAndLineEndingsWhenUpgrading(string newLine)
+    [MatrixDataSource]
+    public async Task PreservesIndentationLineEndingsAndBomWhenUpgrading(
+        [Matrix("\n", "\r\n")] string newLine,
+        [Matrix(true, false)] bool withBom)
     {
+        byte[] Encode(string content) => withBom
+            ? [.. System.Text.Encoding.UTF8.GetPreamble(), .. System.Text.Encoding.UTF8.GetBytes(content)]
+            : System.Text.Encoding.UTF8.GetBytes(content);
+
         string[] lines =
         [
             "#:package Humanizer@2.14.1",
@@ -270,7 +275,7 @@ public class FileBasedAppServiceTests
             "",
         ];
         var fbaFilePath = Path.Combine(Directory.GetCurrentDirectory(), "indented.cs");
-        File.WriteAllText(fbaFilePath, string.Join(newLine, lines));
+        File.WriteAllBytes(fbaFilePath, Encode(string.Join(newLine, lines)));
 
         try
         {
@@ -281,7 +286,8 @@ public class FileBasedAppServiceTests
             FileBasedAppService.UpgradePackageVersions(fbaFilePath, packages, false);
 
             lines[0] = "#:package Humanizer@2.15.0";
-            await Assert.That(File.ReadAllText(fbaFilePath)).IsEqualTo(string.Join(newLine, lines));
+            // Compare bytes, File.ReadAllText would hide a missing BOM
+            await Assert.That(File.ReadAllBytes(fbaFilePath)).IsEquivalentTo(Encode(string.Join(newLine, lines)));
         }
         finally
         {

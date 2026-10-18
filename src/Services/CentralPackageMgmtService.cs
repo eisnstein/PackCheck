@@ -1,3 +1,4 @@
+using Spectre.Console;
 using System.Xml;
 using NuGet.Versioning;
 using PackCheck.Data;
@@ -29,7 +30,7 @@ public static class CentralPackageMgmtService
             if (!File.Exists(fullPath))
             {
                 throw new CpmFileException(
-                    $"File [white]{pathToCpmFile}[/] does not exist in the current directory [white]{cwd}[/]"
+                    $"File [white]{pathToCpmFile.EscapeMarkup()}[/] does not exist in the current directory [white]{cwd.EscapeMarkup()}[/]"
                 );
             }
 
@@ -40,7 +41,7 @@ public static class CentralPackageMgmtService
         var cpmFilePath = Path.Combine(cwd, CpmFileName);
         if (!File.Exists(cpmFilePath))
         {
-            throw new CpmFileException($"Could not find a {CpmFileName} file in the current directory [white]{cwd}[/]");
+            throw new CpmFileException($"Could not find a {CpmFileName} file in the current directory [white]{cwd.EscapeMarkup()}[/]");
         }
 
         return cpmFilePath;

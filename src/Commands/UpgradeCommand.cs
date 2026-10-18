@@ -23,7 +23,7 @@ public class UpgradeCommand : AsyncCommand<UpgradeSettings>
         {
             return await UpgradeAsync(settings);
         }
-        catch (Exception ex) when (ex is SolutionFileException or SolutionXFileException)
+        catch (Exception ex) when (ex is SolutionFileException or SolutionXFileException or NuGetFeedException)
         {
             AnsiConsole.MarkupLine($"[dim]WARN:[/] [red]{ex.Message}[/]");
             return -1;
@@ -45,13 +45,13 @@ public class UpgradeCommand : AsyncCommand<UpgradeSettings>
         catch (JsonException e)
         {
             AnsiConsole.MarkupLine(
-                $"[dim]WARN:[/] Your .packcheckrc[.json] configuration file seems to be invalid: {e.Message}");
+                $"[dim]WARN:[/] Your .packcheckrc[[.json]] configuration file seems to be invalid: {e.Message.EscapeMarkup()}");
             return -1;
         }
 
         if (config is not null)
         {
-            AnsiConsole.MarkupLine($"Reading config from [grey]{pathToConfigFile}[/]");
+            AnsiConsole.MarkupLine($"Reading config from [grey]{pathToConfigFile.EscapeMarkup()}[/]");
         }
 
         settings = SettingsService.CombineSettingsWithConfig(settings, config);
@@ -210,12 +210,12 @@ public class UpgradeCommand : AsyncCommand<UpgradeSettings>
             return Result.Error;
         }
 
-        AnsiConsole.MarkupLine($"Upgrading to [grey]{settings.Target}[/] versions in [grey]{pathToCsProjFile}[/]");
+        AnsiConsole.MarkupLine($"Upgrading to [grey]{settings.Target}[/] versions in [grey]{pathToCsProjFile.EscapeMarkup()}[/]");
 
         List<Package> packages = await CsProjFileService.GetPackagesDataFromCsProjFileAsync(pathToCsProjFile);
         if (packages.Count == 0)
         {
-            AnsiConsole.MarkupLine($"Could not find any packages in [grey]{pathToCsProjFile}[/]");
+            AnsiConsole.MarkupLine($"Could not find any packages in [grey]{pathToCsProjFile.EscapeMarkup()}[/]");
             return Result.Warning;
         }
 
@@ -300,12 +300,12 @@ public class UpgradeCommand : AsyncCommand<UpgradeSettings>
             return Result.Error;
         }
 
-        AnsiConsole.MarkupLine($"Upgrading to [grey]{settings.Target}[/] versions in [grey]{pathToCpmFile}[/]");
+        AnsiConsole.MarkupLine($"Upgrading to [grey]{settings.Target}[/] versions in [grey]{pathToCpmFile.EscapeMarkup()}[/]");
 
         List<Package> packages = await CentralPackageMgmtService.GetPackagesDataFromCpmFileAsync(pathToCpmFile);
         if (packages.Count == 0)
         {
-            AnsiConsole.MarkupLine($"Could not find any packages in [grey]{pathToCpmFile}[/]");
+            AnsiConsole.MarkupLine($"Could not find any packages in [grey]{pathToCpmFile.EscapeMarkup()}[/]");
             return Result.Warning;
         }
 
@@ -390,12 +390,12 @@ public class UpgradeCommand : AsyncCommand<UpgradeSettings>
             return Result.Error;
         }
 
-        AnsiConsole.MarkupLine($"Upgrading to [grey]{settings.Target}[/] versions in [grey]{pathToFbaFile}[/]");
+        AnsiConsole.MarkupLine($"Upgrading to [grey]{settings.Target}[/] versions in [grey]{pathToFbaFile.EscapeMarkup()}[/]");
 
         List<Package> packages = FileBasedAppService.GetPackagesDataFromFbaFile(pathToFbaFile);
         if (packages.Count == 0)
         {
-            AnsiConsole.MarkupLine($"Could not find any packages in [grey]{pathToFbaFile}[/]");
+            AnsiConsole.MarkupLine($"Could not find any packages in [grey]{pathToFbaFile.EscapeMarkup()}[/]");
             return Result.Warning;
         }
 

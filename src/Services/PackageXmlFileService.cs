@@ -17,9 +17,7 @@ public static class PackageXmlFileService
     public static async Task UpgradePackageVersionsAsync(
         string path, string elementName, IReadOnlyList<Package> packages, bool dryRun)
     {
-        var bytes = await File.ReadAllBytesAsync(path);
-        var encoding = DetectEncoding(bytes, out var preambleLength);
-        var content = encoding.GetString(bytes, preambleLength, bytes.Length - preambleLength);
+        var (content, encoding, preamble) = TextFileService.Decode(await File.ReadAllBytesAsync(path));
 
         var replacements = FindVersionReplacements(content, elementName, packages);
 
@@ -36,7 +34,7 @@ public static class PackageXmlFileService
             return;
         }
 
-        await File.WriteAllBytesAsync(path, [.. bytes.AsSpan(0, preambleLength), .. encoding.GetBytes(newContent.ToString())]);
+        await File.WriteAllBytesAsync(path, TextFileService.Encode(newContent.ToString(), encoding, preamble));
     }
 
     private static List<(int Start, int Length, string Value)> FindVersionReplacements(
@@ -113,29 +111,5 @@ public static class PackageXmlFileService
         }
 
         return lineStarts;
-    }
-
-    private static Encoding DetectEncoding(byte[] bytes, out int preambleLength)
-    {
-        if (bytes is [0xEF, 0xBB, 0xBF, ..])
-        {
-            preambleLength = 3;
-            return new UTF8Encoding(false);
-        }
-
-        if (bytes is [0xFF, 0xFE, ..])
-        {
-            preambleLength = 2;
-            return new UnicodeEncoding(bigEndian: false, byteOrderMark: false);
-        }
-
-        if (bytes is [0xFE, 0xFF, ..])
-        {
-            preambleLength = 2;
-            return new UnicodeEncoding(bigEndian: true, byteOrderMark: false);
-        }
-
-        preambleLength = 0;
-        return new UTF8Encoding(false);
     }
 }

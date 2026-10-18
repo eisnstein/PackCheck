@@ -7,10 +7,10 @@ namespace PackCheck.Tests;
 
 public static class TestHelper
 {
-    public static CommandAppTester CreateCommandAppTester()
+    public static CommandAppTester CreateCommandAppTester(INuGetApiService? nuGetApiService = null)
     {
         var registrar = new TestTypeRegistrar();
-        registrar.RegisterInstance(typeof(INuGetApiService), new FakeNuGetApiService());
+        registrar.RegisterInstance(typeof(INuGetApiService), nuGetApiService ?? new FakeNuGetApiService());
 
         return new CommandAppTester(registrar);
     }

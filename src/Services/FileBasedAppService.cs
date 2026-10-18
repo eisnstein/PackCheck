@@ -1,3 +1,4 @@
+using Spectre.Console;
 using NuGet.Versioning;
 using PackCheck.Data;
 using PackCheck.Exceptions;
@@ -18,7 +19,7 @@ public static class FileBasedAppService
         if (!File.Exists(fullPath))
         {
             throw new FileBasedAppFileException(
-                $"File [white]{pathToFbaFile}[/] does not exist in the current directory [white]{cwd}[/]"
+                $"File [white]{pathToFbaFile.EscapeMarkup()}[/] does not exist in the current directory [white]{cwd.EscapeMarkup()}[/]"
             );
         }
 
@@ -84,9 +85,10 @@ public static class FileBasedAppService
     {
         var newLines = new List<string>();
 
-        // Split on '\n' only, so each line keeps a trailing '\r' (if any) and
-        // the file is written back with its original line endings and indentation.
-        var lines = File.ReadAllText(fbaFilePath).Split('\n');
+        // Keep the encoding and BOM. Split on '\n' only, so each line keeps a trailing
+        // '\r' (if any) and the file is written back with its original line endings and indentation.
+        var (content, encoding, preamble) = TextFileService.Decode(File.ReadAllBytes(fbaFilePath));
+        var lines = content.Split('\n');
         foreach (var line in lines)
         {
             var currentLine = line;
@@ -124,6 +126,6 @@ public static class FileBasedAppService
         }
 
         // Write the updated lines back to the file
-        File.WriteAllText(fbaFilePath, string.Join('\n', newLines));
+        File.WriteAllBytes(fbaFilePath, TextFileService.Encode(string.Join('\n', newLines), encoding, preamble));
     }
 }

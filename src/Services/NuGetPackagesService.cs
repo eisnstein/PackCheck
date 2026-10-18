@@ -1,5 +1,6 @@
 using NuGet.Versioning;
 using PackCheck.Data;
+using PackCheck.Exceptions;
 using Spectre.Console;
 
 namespace PackCheck.Services;
@@ -10,16 +11,31 @@ public class NuGetPackagesService(INuGetApiService nuGetApiService)
 
     public async Task GetPackagesDataFromNugetRepositoryAsync(List<Package> packages)
     {
-        await AnsiConsole.Progress()
-            .Columns(new TaskDescriptionColumn(), new ProgressBarColumn(), new PercentageColumn())
-            .StartAsync(async ctx =>
-            {
-                var task = ctx.AddTask(">");
+        try
+        {
+            await AnsiConsole.Progress()
+                .Columns(new TaskDescriptionColumn(), new ProgressBarColumn(), new PercentageColumn())
+                .StartAsync(async ctx =>
+                {
+                    var task = ctx.AddTask(">");
 
-                await FetchPackagesDataAsync(task, packages);
+                    await FetchPackagesDataAsync(task, packages);
 
-                task.StopTask();
-            });
+                    task.StopTask();
+                });
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            // E.g. offline, behind a proxy or nuget.org is down. The message is
+            // printed as markup by the commands, so the details are escaped.
+            var baseMessage = ex.GetBaseException().Message;
+            var details = ex.Message.Contains(baseMessage)
+                ? ex.Message
+                : $"{ex.Message} {baseMessage}";
+
+            throw new NuGetFeedException(
+                $"Could not fetch package versions from NuGet. {details.EscapeMarkup()}", ex);
+        }
     }
 
     private async Task FetchPackagesDataAsync(ProgressTask task, List<Package> packages)

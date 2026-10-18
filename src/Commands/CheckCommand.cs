@@ -27,7 +27,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
         {
             return await CheckAsync(settings);
         }
-        catch (Exception ex) when (ex is SolutionFileException or SolutionXFileException)
+        catch (Exception ex) when (ex is SolutionFileException or SolutionXFileException or NuGetFeedException)
         {
             AnsiConsole.MarkupLine($"[dim]WARN:[/] [red]{ex.Message}[/]");
             return -1;
@@ -55,13 +55,13 @@ public class CheckCommand : AsyncCommand<CheckSettings>
         catch (JsonException e)
         {
             _console.MarkupLine(
-                $"[dim]WARN:[/] Your .packcheckrc[.json] configuration file seems to be invalid: {e.Message}");
+                $"[dim]WARN:[/] Your .packcheckrc[[.json]] configuration file seems to be invalid: {e.Message.EscapeMarkup()}");
             return -1;
         }
 
         if (config is not null)
         {
-            _console.MarkupLine($"Reading config from [grey]{pathToConfigFile}[/]");
+            _console.MarkupLine($"Reading config from [grey]{pathToConfigFile.EscapeMarkup()}[/]");
         }
 
         settings = SettingsService.CombineSettingsWithConfig(settings, config);
@@ -236,12 +236,12 @@ public class CheckCommand : AsyncCommand<CheckSettings>
             return Result.Error;
         }
 
-        AnsiConsole.MarkupLine($"Checking versions for [grey]{pathToCsProjFile}[/]");
+        AnsiConsole.MarkupLine($"Checking versions for [grey]{pathToCsProjFile.EscapeMarkup()}[/]");
 
         List<Package> packages = await CsProjFileService.GetPackagesDataFromCsProjFileAsync(pathToCsProjFile);
         if (packages.Count == 0)
         {
-            AnsiConsole.MarkupLine($"Could not find any packages in [grey]{pathToCsProjFile}[/]");
+            AnsiConsole.MarkupLine($"Could not find any packages in [grey]{pathToCsProjFile.EscapeMarkup()}[/]");
             return Result.Warning;
         }
 
@@ -280,12 +280,12 @@ public class CheckCommand : AsyncCommand<CheckSettings>
             return Result.Error;
         }
 
-        AnsiConsole.MarkupLine($"Checking versions for [grey]{pathToCpmFile}[/]");
+        AnsiConsole.MarkupLine($"Checking versions for [grey]{pathToCpmFile.EscapeMarkup()}[/]");
 
         List<Package> packages = await CentralPackageMgmtService.GetPackagesDataFromCpmFileAsync(pathToCpmFile);
         if (packages.Count == 0)
         {
-            AnsiConsole.MarkupLine($"Could not find any packages in [grey]{pathToCpmFile}[/]");
+            AnsiConsole.MarkupLine($"Could not find any packages in [grey]{pathToCpmFile.EscapeMarkup()}[/]");
             return Result.Warning;
         }
 
@@ -324,12 +324,12 @@ public class CheckCommand : AsyncCommand<CheckSettings>
             return Result.Error;
         }
 
-        AnsiConsole.MarkupLine($"Checking versions for [grey]{pathToFbaFile}[/]");
+        AnsiConsole.MarkupLine($"Checking versions for [grey]{pathToFbaFile.EscapeMarkup()}[/]");
 
         List<Package> packages = FileBasedAppService.GetPackagesDataFromFbaFile(pathToFbaFile);
         if (packages.Count == 0)
         {
-            AnsiConsole.MarkupLine($"Could not find any packages in [grey]{pathToFbaFile}[/]");
+            AnsiConsole.MarkupLine($"Could not find any packages in [grey]{pathToFbaFile.EscapeMarkup()}[/]");
             return Result.Warning;
         }
 
