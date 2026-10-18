@@ -1,5 +1,29 @@
 # Changelog
 
+## 4.0.0 (2026-10-18)
+
+### Breaking Changes
+
+- `filter`, `exclude` and the package name given to `upgrade` now ignore case, like NuGet package IDs do. For example, `-x newtonsoft.json` now excludes `Newtonsoft.Json`.
+- `upgrade` now uses the `CsProjFile`, `SlnFile`, `SlnxFile` and `CpmFile` paths from the `.packcheckrc` config file, like `check` already did. Before, it ignored them when choosing what to upgrade.
+- If the installed version is a prerelease, the _latest stable_ column now shows the newest prerelease when there is no newer stable version yet. This is the version `upgrade` moves to.
+
+### Enhancements
+
+- `upgrade` now only changes the version numbers. The XML declaration, BOM, line endings, final newline and attribute layout of `.csproj` and `Directory.Packages.props` files stay as they were.
+- `upgrade` no longer changes the indentation and line endings of file-based apps.
+- Versions that are not plain versions, like `$(FooVersion)`, `[1.0,2.0)` or `1.*`, are skipped instead of stopping PackCheck.
+- Update dependencies
+
+### Bug fixes
+
+- A prerelease is now offered its stable release, e.g. `3.0.0-rc.1` -> `3.0.0`.
+- `upgrade` never moves a package to a lower version, e.g. when the installed version was unlisted.
+- `upgrade` no longer crashes when a package is referenced more than once, e.g. in conditional `ItemGroup`s per target framework. In interactive mode only the selected entry is upgraded.
+- PackCheck no longer crashes when the check for a new PackCheck version fails, e.g. when offline.
+- A missing or ambiguous `.sln`, `.slnx`, `Directory.Packages.props` or file-based app file now shows a warning instead of crashing.
+- `FbaFile` from the config file is now used.
+
 ## 3.2.0 (2026-07-23)
 
 ### Enhancements

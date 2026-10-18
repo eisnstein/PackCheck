@@ -143,6 +143,8 @@ To show the _latest_ versions in the output of the `check` command, use the `--p
 packcheck --pre
 ```
 
+If the installed version is a prerelease and there is no newer stable version yet, the _latest stable_ column shows the newest prerelease. That is the version `packcheck upgrade` upgrades to.
+
 ## Configuration
 
 You can configure PackCheck via a `.packcheckrc.{json}` file. Example:
@@ -161,8 +163,9 @@ You can configure PackCheck via a `.packcheckrc.{json}` file. Example:
 }
 ```
 
-`Filter` supports wildcard patterns via `*` or `%`, for example `"Microsoft.*"` to include all Telerik packages.
+`Filter` supports wildcard patterns via `*` or `%`, for example `"Microsoft.*"` to include all Microsoft packages.
 `Exclude` supports wildcard patterns via `*` or `%`, for example `"Telerik.*"` to exclude all Telerik packages.
+Both ignore case, like NuGet package IDs.
 
 For help run:
 
