@@ -12,13 +12,13 @@ namespace PackCheck.Commands;
 public class CheckCommand : AsyncCommand<CheckSettings>
 {
     private readonly IAnsiConsole _console;
-    private readonly NuGetApiService _nuGetApiService;
+    private readonly INuGetApiService _nuGetApiService;
     private readonly NuGetPackagesService _nuGetPackagesService;
 
-    public CheckCommand(IAnsiConsole console)
+    public CheckCommand(IAnsiConsole console, INuGetApiService nuGetApiService)
     {
         _console = console;
-        _nuGetApiService = new NuGetApiService();
+        _nuGetApiService = nuGetApiService;
         _nuGetPackagesService = new NuGetPackagesService(_nuGetApiService);
     }
 

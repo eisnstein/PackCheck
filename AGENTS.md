@@ -36,7 +36,7 @@ Each target type has its own private method (`CheckProject`, `CheckCpm`, `CheckF
 - `CentralPackageMgmtService`: `<PackageVersion>` in `Directory.Packages.props`.
 - `SolutionFileService`: parses `Project(...)` lines in `.sln` with a regex and converts `\` to the platform separator outside Windows. `SolutionXFileService` handles `.slnx`.
 - `FileBasedAppService`: `#:package Name@Version` directives in a single `.cs` file.
-- `NuGetApiService`: the only network access. It queries nuget.org v3 `PackageMetadataResource` with `includeUnlisted: false` and falls back to `FindPackageByIdResource`.
+- `NuGetApiService` (behind `INuGetApiService`): the only network access. The commands get it through their constructors; `Program.cs` registers it with Spectre's type registrar. It queries nuget.org v3 `PackageMetadataResource` with `includeUnlisted: false` and falls back to `FindPackageByIdResource`.
 - `NuGetVersionService`: picks latest stable, latest prerelease and latest overall.
 - `PackCheckService`: on every `check` run, tells the user when a newer PackCheck version exists on NuGet.
 - `PackCheckConfigService` / `SettingsService`: load `.packcheckrc` or `.packcheckrc.json` from the cwd (case-insensitive JSON → `Data/Config`). They merge it into the settings, and CLI values take precedence via `??=`.
@@ -51,7 +51,8 @@ Each target type has its own private method (`CheckProject`, `CheckCpm`, `CheckF
 
 - TUnit + Verify (snapshot) + `Spectre.Console.Cli.Testing` (`CommandAppTester`).
 - Tests run **sequentially** (`[assembly: NotInParallel]`) because they copy fixtures from `tests/TestData/` into the test output directory (the cwd) through `TestHelper.Load*/Delete*`, and the services read from cwd. A new test that touches files has to use the same Load/Delete pattern in `[Before(Test)]`/`[After(Test)]`.
-- Tests hit **live nuget.org**. This is why `[assembly: Retry(3)]` is set, and why the `CheckCommand` snapshots in `tests/Snapshots/` can break when an upstream package ships a new version. Where possible, assert on parsing/logic with `tests/Factories/PackageFactory.cs` instead of network results.
+- Tests never hit the network. Create command testers with `TestHelper.CreateCommandAppTester()`, never `new CommandAppTester()`. It registers `tests/Fakes/FakeNuGetApiService.cs`, which returns fixed versions for the packages in `TestData/test.csproj`, through `TestTypeRegistrar`. Spectre's `FakeTypeRegistrar` can't construct commands with constructor parameters. When you change the fake's versions, re-record the `CheckCommand` snapshots in `tests/Snapshots/`.
+- For logic tests, build packages with `tests/Factories/PackageFactory.cs`.
 - `.cs` files under `TestData/` are excluded from compilation, because they are fixtures.
 - Snapshot files (`*.verified.txt`) are UTF-8 with BOM and have no final newline (see `.editorconfig`).
 

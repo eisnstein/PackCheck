@@ -11,7 +11,7 @@ public class CheckSettingsTests
     [Test]
     public async Task PathToCsProjFileIsNotSet()
     {
-        var app = new CommandAppTester();
+        var app = TestHelper.CreateCommandAppTester();
         app.Configure(config =>
         {
             config.AddCommand<CheckCommand>("check");
@@ -28,7 +28,7 @@ public class CheckSettingsTests
     [Test]
     public async Task PathToCsProjFileIsSetButNoValueGiven()
     {
-        var app = new CommandAppTester();
+        var app = TestHelper.CreateCommandAppTester();
         app.Configure(config =>
         {
             config.AddCommand<CheckCommand>("check");
@@ -45,7 +45,7 @@ public class CheckSettingsTests
     [Test]
     public async Task PathToCsProjFileIsSet()
     {
-        var app = new CommandAppTester();
+        var app = TestHelper.CreateCommandAppTester();
         app.Configure(config =>
         {
             config.PropagateExceptions();
@@ -64,7 +64,7 @@ public class CheckSettingsTests
     [Test]
     public async Task PathToSolutionFileIsSetButNoValueGiven()
     {
-        var app = new CommandAppTester();
+        var app = TestHelper.CreateCommandAppTester();
         app.Configure(config =>
         {
             config.AddCommand<CheckCommand>("check");
@@ -81,7 +81,7 @@ public class CheckSettingsTests
     [Test]
     public async Task PathToSlnFileIsSet()
     {
-        var app = new CommandAppTester();
+        var app = TestHelper.CreateCommandAppTester();
         app.Configure(config =>
         {
             config.AddCommand<CheckCommand>("check");
@@ -99,7 +99,7 @@ public class CheckSettingsTests
     [Test]
     public async Task PathToSolutionXFileIsSetButNoValueGiven()
     {
-        var app = new CommandAppTester();
+        var app = TestHelper.CreateCommandAppTester();
         app.Configure(config =>
         {
             config.AddCommand<CheckCommand>("check");
@@ -116,7 +116,7 @@ public class CheckSettingsTests
     [Test]
     public async Task PathToSolutionXFileIsSet()
     {
-        var app = new CommandAppTester();
+        var app = TestHelper.CreateCommandAppTester();
         app.Configure(config =>
         {
             config.AddCommand<CheckCommand>("check");
@@ -134,7 +134,7 @@ public class CheckSettingsTests
     [Test]
     public async Task PathToCpmFileIsSetButNoValueGiven()
     {
-        var app = new CommandAppTester();
+        var app = TestHelper.CreateCommandAppTester();
         app.Configure(config =>
         {
             config.AddCommand<CheckCommand>("check");
@@ -152,7 +152,7 @@ public class CheckSettingsTests
     [Test]
     public async Task PathToCpmFileIsSet()
     {
-        var app = new CommandAppTester();
+        var app = TestHelper.CreateCommandAppTester();
         app.Configure(config =>
         {
             config.AddCommand<CheckCommand>("check");
@@ -170,7 +170,7 @@ public class CheckSettingsTests
     [Test]
     public async Task FilterIsSet()
     {
-        var app = new CommandAppTester();
+        var app = TestHelper.CreateCommandAppTester();
         app.Configure(config =>
         {
             config.AddCommand<CheckCommand>("check");
@@ -190,7 +190,7 @@ public class CheckSettingsTests
     [Test]
     public async Task Error_When_FilterOptionIsSetButNoValueGiven()
     {
-        var app = new CommandAppTester();
+        var app = TestHelper.CreateCommandAppTester();
         app.Configure(config =>
         {
             config.AddCommand<CheckCommand>("check");
@@ -207,7 +207,7 @@ public class CheckSettingsTests
     [Test]
     public async Task ExcludeIsSet()
     {
-        var app = new CommandAppTester();
+        var app = TestHelper.CreateCommandAppTester();
         app.Configure(config =>
         {
             config.AddCommand<CheckCommand>("check");
@@ -227,7 +227,7 @@ public class CheckSettingsTests
     [Test]
     public async Task Error_When_ExcludeOptionIsSetButNoValueGiven()
     {
-        var app = new CommandAppTester();
+        var app = TestHelper.CreateCommandAppTester();
         app.Configure(config =>
         {
             config.AddCommand<CheckCommand>("check");
@@ -244,7 +244,7 @@ public class CheckSettingsTests
     [Test]
     public async Task FormatOptionIsGiven()
     {
-        var app = new CommandAppTester();
+        var app = TestHelper.CreateCommandAppTester();
         app.Configure(config =>
         {
             config.AddCommand<CheckCommand>("check");
@@ -262,7 +262,7 @@ public class CheckSettingsTests
     [Test]
     public async Task Error_When_WrongFormatOptionIsGiven()
     {
-        var app = new CommandAppTester();
+        var app = TestHelper.CreateCommandAppTester();
         app.Configure(config =>
         {
             config.PropagateExceptions();

@@ -5,7 +5,7 @@ using NuGet.Versioning;
 
 namespace PackCheck.Services;
 
-public class NuGetApiService
+public class NuGetApiService : INuGetApiService
 {
     private readonly ILogger _logger = NullLogger.Instance;
     private readonly SourceCacheContext _cache = new();

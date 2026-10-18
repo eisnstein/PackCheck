@@ -4,7 +4,7 @@ using Spectre.Console;
 
 namespace PackCheck.Services;
 
-public class NuGetPackagesService(NuGetApiService nuGetApiService)
+public class NuGetPackagesService(INuGetApiService nuGetApiService)
 {
     private readonly object _lock = new();
 

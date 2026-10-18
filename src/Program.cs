@@ -1,4 +1,5 @@
 ﻿using PackCheck.Commands;
+using PackCheck.Services;
 using Spectre.Console.Cli;
 
 var app = new CommandApp();
@@ -9,6 +10,10 @@ app.Configure(
     config =>
     {
         config.SetApplicationName("packcheck");
+
+        // Registered as a type (not an instance), so the NuGet feed is only
+        // contacted when a command actually runs, e.g. not for --help.
+        config.Settings.Registrar.Register<INuGetApiService, NuGetApiService>();
 
 #if DEBUG
         config.PropagateExceptions();

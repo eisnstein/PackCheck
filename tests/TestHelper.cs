@@ -1,9 +1,20 @@
 using System.IO;
+using PackCheck.Services;
+using PackCheck.Tests.Fakes;
+using Spectre.Console.Cli.Testing;
 
 namespace PackCheck.Tests;
 
 public static class TestHelper
 {
+    public static CommandAppTester CreateCommandAppTester()
+    {
+        var registrar = new TestTypeRegistrar();
+        registrar.RegisterInstance(typeof(INuGetApiService), new FakeNuGetApiService());
+
+        return new CommandAppTester(registrar);
+    }
+
     public static void LoadTestCsProjFile()
     {
         File.Copy("TestData/test.csproj", "test.csproj", true);

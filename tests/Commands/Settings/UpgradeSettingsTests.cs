@@ -10,7 +10,7 @@ public class UpgradeSettingsTests
     [Test]
     public async Task DefaultTargetVersionIsSet()
     {
-        var app = new CommandAppTester();
+        var app = TestHelper.CreateCommandAppTester();
         app.Configure(config =>
         {
             config.AddCommand<UpgradeCommand>("upgrade");
@@ -28,7 +28,7 @@ public class UpgradeSettingsTests
     [Test]
     public async Task TargetVersionGetsSetToStable()
     {
-        var app = new CommandAppTester();
+        var app = TestHelper.CreateCommandAppTester();
         app.Configure(config =>
         {
             config.AddCommand<UpgradeCommand>("upgrade");
@@ -46,7 +46,7 @@ public class UpgradeSettingsTests
     [Test]
     public async Task TargetVersionGetsSetToLatest()
     {
-        var app = new CommandAppTester();
+        var app = TestHelper.CreateCommandAppTester();
         app.Configure(config =>
         {
             config.AddCommand<UpgradeCommand>("upgrade");
@@ -64,7 +64,7 @@ public class UpgradeSettingsTests
     [Test]
     public async Task ThrowsOnWrongTargetVersion()
     {
-        var app = new CommandAppTester();
+        var app = TestHelper.CreateCommandAppTester();
         app.Configure(config =>
         {
             config.PropagateExceptions();
@@ -77,7 +77,7 @@ public class UpgradeSettingsTests
     [Test]
     public async Task AllArgumentsWithoutDryRunGetSet()
     {
-        var app = new CommandAppTester();
+        var app = TestHelper.CreateCommandAppTester();
         app.Configure(config =>
         {
             config.AddCommand<UpgradeCommand>("upgrade");
@@ -104,7 +104,7 @@ public class UpgradeSettingsTests
     [Test]
     public async Task AllArgumentsWithDryRunGetSet()
     {
-        var app = new CommandAppTester();
+        var app = TestHelper.CreateCommandAppTester();
         app.Configure(config =>
         {
             config.AddCommand<UpgradeCommand>("upgrade");
@@ -131,7 +131,7 @@ public class UpgradeSettingsTests
     [Test]
     public async Task InteractiveIsNotSet()
     {
-        var app = new CommandAppTester();
+        var app = TestHelper.CreateCommandAppTester();
         app.Configure(config =>
         {
             config.AddCommand<UpgradeCommand>("upgrade");
@@ -148,7 +148,7 @@ public class UpgradeSettingsTests
     [Test]
     public async Task InteractiveIsSetByShortCode()
     {
-        var app = new CommandAppTester();
+        var app = TestHelper.CreateCommandAppTester();
         app.Configure(config =>
         {
             config.AddCommand<UpgradeCommand>("upgrade");
@@ -165,7 +165,7 @@ public class UpgradeSettingsTests
     [Test]
     public async Task InteractiveIsSetByLongCode()
     {
-        var app = new CommandAppTester();
+        var app = TestHelper.CreateCommandAppTester();
         app.Configure(config =>
         {
             config.AddCommand<UpgradeCommand>("upgrade");

@@ -10,7 +10,12 @@ namespace PackCheck.Commands;
 
 public class UpgradeCommand : AsyncCommand<UpgradeSettings>
 {
-    private readonly NuGetPackagesService _nuGetPackagesService = new(new NuGetApiService());
+    private readonly NuGetPackagesService _nuGetPackagesService;
+
+    public UpgradeCommand(INuGetApiService nuGetApiService)
+    {
+        _nuGetPackagesService = new NuGetPackagesService(nuGetApiService);
+    }
 
     public override async Task<int> ExecuteAsync(CommandContext context, UpgradeSettings settings, CancellationToken _cancellationToken)
     {

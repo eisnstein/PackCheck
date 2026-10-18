@@ -20,7 +20,7 @@ public class CheckCommandTest
     [Test]
     public Task Returns_Success_ForCheck_Without_Pre()
     {
-        var app = new CommandAppTester();
+        var app = TestHelper.CreateCommandAppTester();
         app.Configure(config =>
         {
             config.AddCommand<CheckCommand>("check");
@@ -34,7 +34,7 @@ public class CheckCommandTest
     [Test]
     public Task Returns_Success_ForCheck_With_Pre()
     {
-        var app = new CommandAppTester();
+        var app = TestHelper.CreateCommandAppTester();
         app.Configure(config =>
         {
             config.AddCommand<CheckCommand>("check");
@@ -48,7 +48,7 @@ public class CheckCommandTest
     [Test]
     public Task Returns_Success_ForCheckWithFilter_Without_Pre()
     {
-        var app = new CommandAppTester();
+        var app = TestHelper.CreateCommandAppTester();
         app.Configure(config =>
         {
             config.AddCommand<CheckCommand>("check");
