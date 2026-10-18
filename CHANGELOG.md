@@ -24,6 +24,7 @@
 - A missing or ambiguous `.sln`, `.slnx`, `Directory.Packages.props` or file-based app file now shows a warning instead of crashing.
 - `FbaFile` from the config file is now used.
 - Projects in `.slnx` files are now found on Linux and macOS.
+- Projects of a solution are now found relative to the solution file, so `--slnFile`/`--slnxFile` (or `SlnFile`/`SlnxFile` in the config file) can point to a solution in another directory.
 
 ## 3.2.0 (2026-07-23)
 

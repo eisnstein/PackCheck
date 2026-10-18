@@ -48,4 +48,18 @@ public class SolutionFileServiceTests
 
         TestHelper.DeleteSolution();
     }
+
+    [Test]
+    public async Task GetCsProjFiles_ResolvesPathsRelativeToSolutionFile()
+    {
+        // The solution is in a subdirectory, not in the current directory
+        var csProjFiles = SolutionFileService.GetCsProjFiles(Path.Combine("TestData", "solution", "testSolution.sln"));
+
+        var solutionDirectory = Path.GetFullPath(Path.Combine("TestData", "solution"));
+        await Assert.That(csProjFiles).IsEquivalentTo([
+            Path.Combine(solutionDirectory, "SolProj", "SolProj.csproj"),
+            Path.Combine(solutionDirectory, "SolProj.Tests", "SolProj.Tests.csproj"),
+        ]);
+        await Assert.That(csProjFiles.All(File.Exists)).IsTrue();
+    }
 }

@@ -85,8 +85,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
         if (!string.IsNullOrEmpty(settings.PathToSlnFile))
         {
             var pathToSolutionFile = SolutionFileService.GetPathToSolutionFile(settings.PathToSlnFile);
-            var projectDefinitions = SolutionFileService.GetProjectDefinitions(pathToSolutionFile);
-            var projectCsProjFiles = SolutionFileService.ParseProjectDefinitions(projectDefinitions);
+            var projectCsProjFiles = SolutionFileService.GetCsProjFiles(pathToSolutionFile);
 
             foreach (var projectCsProjFile in projectCsProjFiles)
             {
@@ -107,7 +106,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
         if (!string.IsNullOrEmpty(settings.PathToSlnxFile))
         {
             var pathToSolutionXFile = SolutionXFileService.GetPathToSolutionXFile(settings.PathToSlnxFile);
-            var projectCsProjFiles = SolutionXFileService.ParseProjectDefinitions(pathToSolutionXFile);
+            var projectCsProjFiles = SolutionXFileService.GetCsProjFiles(pathToSolutionXFile);
 
             foreach (var projectCsProjFile in projectCsProjFiles)
             {
@@ -174,8 +173,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
         if (SolutionFileService.HasSolution())
         {
             var pathToSolutionFile = SolutionFileService.GetPathToSolutionFile(settings.PathToSlnFile);
-            var projectDefinitions = SolutionFileService.GetProjectDefinitions(pathToSolutionFile);
-            var projectCsProjFiles = SolutionFileService.ParseProjectDefinitions(projectDefinitions);
+            var projectCsProjFiles = SolutionFileService.GetCsProjFiles(pathToSolutionFile);
 
             foreach (var projectCsProjFile in projectCsProjFiles)
             {
@@ -196,7 +194,7 @@ public class CheckCommand : AsyncCommand<CheckSettings>
         if (SolutionXFileService.HasSolutionX())
         {
             var pathToSolutionXFile = SolutionXFileService.GetPathToSolutionXFile(settings.PathToSlnxFile);
-            var projectCsProjFiles = SolutionXFileService.ParseProjectDefinitions(pathToSolutionXFile);
+            var projectCsProjFiles = SolutionXFileService.GetCsProjFiles(pathToSolutionXFile);
 
             foreach (var projectCsProjFile in projectCsProjFiles)
             {

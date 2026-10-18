@@ -42,6 +42,19 @@ public static class SolutionXFileService
         };
     }
 
+    /// <summary>
+    /// Returns the full paths of all .csproj files in the solution. The paths in
+    /// a .slnx file are relative to the solution file, not the current directory.
+    /// </summary>
+    public static List<string> GetCsProjFiles(string pathToSolutionXFile)
+    {
+        var solutionDirectory = Path.GetDirectoryName(Path.GetFullPath(pathToSolutionXFile))!;
+
+        return ParseProjectDefinitions(pathToSolutionXFile)
+            .Select(projectPath => Path.GetFullPath(Path.Combine(solutionDirectory, projectPath)))
+            .ToList();
+    }
+
     public static List<string> ParseProjectDefinitions(string pathToSolutionXFile)
     {
         List<string> projectPaths = new();

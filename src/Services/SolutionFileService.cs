@@ -46,6 +46,19 @@ public static class SolutionFileService
         };
     }
 
+    /// <summary>
+    /// Returns the full paths of all .csproj files in the solution. The paths in
+    /// a .sln file are relative to the solution file, not the current directory.
+    /// </summary>
+    public static List<string> GetCsProjFiles(string pathToSolutionFile)
+    {
+        var solutionDirectory = Path.GetDirectoryName(Path.GetFullPath(pathToSolutionFile))!;
+
+        return ParseProjectDefinitions(GetProjectDefinitions(pathToSolutionFile))
+            .Select(projectPath => Path.GetFullPath(Path.Combine(solutionDirectory, projectPath)))
+            .ToList();
+    }
+
     public static IEnumerable<string> GetProjectDefinitions(string pathToSolutionFile)
     {
         return File.ReadAllLines(pathToSolutionFile)
