@@ -84,14 +84,15 @@ public static class FileBasedAppService
     {
         var newLines = new List<string>();
 
-        // Read all lines from the file
-        var lines = File.ReadAllLines(fbaFilePath);
+        // Split on '\n' only, so each line keeps a trailing '\r' (if any) and
+        // the file is written back with its original line endings and indentation.
+        var lines = File.ReadAllText(fbaFilePath).Split('\n');
         foreach (var line in lines)
         {
-            var currentLine = line.Trim();
+            var currentLine = line;
 
             // Parse each line for package directives
-            var package = ParsePackageDirective(currentLine);
+            var package = ParsePackageDirective(currentLine.Trim());
             if (package is null)
             {
                 newLines.Add(currentLine);
@@ -110,7 +111,7 @@ public static class FileBasedAppService
 
             if (dryRun)
             {
-                Console.WriteLine(currentLine);
+                Console.WriteLine(currentLine.Trim());
             }
 
             newLines.Add(currentLine);
@@ -123,6 +124,6 @@ public static class FileBasedAppService
         }
 
         // Write the updated lines back to the file
-        File.WriteAllLines(fbaFilePath, newLines);
+        File.WriteAllText(fbaFilePath, string.Join('\n', newLines));
     }
 }

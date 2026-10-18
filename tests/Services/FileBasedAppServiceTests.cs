@@ -253,4 +253,39 @@ public class FileBasedAppServiceTests
 
         TestHelper.DeleteFba();
     }
+
+    [Test]
+    [Arguments("\n")]
+    [Arguments("\r\n")]
+    public async Task PreservesIndentationAndLineEndingsWhenUpgrading(string newLine)
+    {
+        string[] lines =
+        [
+            "#:package Humanizer@2.14.1",
+            "",
+            "if (args.Length > 0)",
+            "{",
+            "    Console.WriteLine(args[0]);",
+            "}",
+            "",
+        ];
+        var fbaFilePath = Path.Combine(Directory.GetCurrentDirectory(), "indented.cs");
+        File.WriteAllText(fbaFilePath, string.Join(newLine, lines));
+
+        try
+        {
+            var packages = FileBasedAppService.GetPackagesDataFromFbaFile(fbaFilePath);
+            packages[0].LatestStableVersion = new NuGetVersion("2.15.0");
+            PackagesService.PreparePackagesForUpgrade(packages, "stable");
+
+            FileBasedAppService.UpgradePackageVersions(fbaFilePath, packages, false);
+
+            lines[0] = "#:package Humanizer@2.15.0";
+            await Assert.That(File.ReadAllText(fbaFilePath)).IsEqualTo(string.Join(newLine, lines));
+        }
+        finally
+        {
+            File.Delete(fbaFilePath);
+        }
+    }
 }
