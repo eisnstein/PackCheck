@@ -12,7 +12,7 @@ public class UpgradeCommand : AsyncCommand<UpgradeSettings>
 {
     private readonly NuGetPackagesService _nuGetPackagesService = new(new NuGetApiService());
 
-    protected override async Task<int> ExecuteAsync(CommandContext context, UpgradeSettings settings, CancellationToken _cancellationToken)
+    public override async Task<int> ExecuteAsync(CommandContext context, UpgradeSettings settings, CancellationToken _cancellationToken)
     {
         Result? result = null;
 

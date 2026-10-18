@@ -7,6 +7,12 @@
     <OutputType>Exe</OutputType>
   </PropertyGroup>
 
+  <PropertyGroup Label="Verify Sponsorship">
+    <!-- PackCheck is a non-revenue open source project. Verify allows this exemption for at most 12 months, so renew it before it expires. -->
+    <Verify_SponsorshipExemption>OpenSource</Verify_SponsorshipExemption>
+    <Verify_SponsorshipExemptionUntil>2027-10</Verify_SponsorshipExemptionUntil>
+  </PropertyGroup>
+
   <ItemGroup>
     <PackageReference Include="Spectre.Console.Cli.Testing" />
     <PackageReference Include="TUnit" />

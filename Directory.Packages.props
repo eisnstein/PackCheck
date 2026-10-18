@@ -9,6 +9,7 @@
     <PackageVersion Include="Spectre.Console" Version="0.57.2" />
     <PackageVersion Include="Spectre.Console.Cli" Version="0.57.2" />
     <PackageVersion Include="Spectre.Console.Cli.Testing" Version="1.0.0-alpha.0.16" />
+    <PackageVersion Include="System.Security.Cryptography.Pkcs" Version="8.0.2" />
     <PackageVersion Include="TUnit" Version="1.75.0" />
     <PackageVersion Include="Verify.TUnit" Version="33.3.4" />
   </ItemGroup>

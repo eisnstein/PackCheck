@@ -15,8 +15,10 @@ public class NuGetApiService
     public NuGetApiService()
     {
         var repository = Repository.Factory.GetCoreV3("https://api.nuget.org/v3/index.json");
-        _findPackageByIdResource = repository.GetResource<FindPackageByIdResource>(CancellationToken.None);
-        _packageMetadataResource = repository.GetResource<PackageMetadataResource>(CancellationToken.None);
+        _findPackageByIdResource = repository.GetResource<FindPackageByIdResource>(CancellationToken.None)
+            ?? throw new InvalidOperationException("The NuGet feed does not provide a FindPackageByIdResource.");
+        _packageMetadataResource = repository.GetResource<PackageMetadataResource>(CancellationToken.None)
+            ?? throw new InvalidOperationException("The NuGet feed does not provide a PackageMetadataResource.");
     }
 
     public async Task<IEnumerable<NuGetVersion>> GetPackageVersions(string packageName, CancellationToken cancellationToken)
