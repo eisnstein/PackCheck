@@ -13,8 +13,25 @@ jobs:
       id-token: write
 
     steps:
+      # The whole history and its tags, for the previous tag in the release notes
       - name: Checkout repository
         uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - id: version
+        run: echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+
+      # Before anything is published (a version on NuGet cannot be replaced):
+      # the release notes come from the version's section in CHANGELOG.md.
+      - name: Check CHANGELOG.md has a section for the version
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          if ! grep -q "^## $VERSION " CHANGELOG.md; then
+            echo "::error::CHANGELOG.md has no section for $VERSION (\"## $VERSION (YYYY-MM-DD)\"). Rename \"## Unreleased\" before tagging."
+            exit 1
+          fi
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v5
@@ -46,9 +63,36 @@ jobs:
       - name: Push to NuGet
         run: dotnet nuget push "./artifacts/*.nupkg" --api-key ${{steps.login.outputs.NUGET_API_KEY}} --source https://api.nuget.org/v3/index.json
 
+      # The install command, the version's section of CHANGELOG.md and a link
+      # to the commits since the previous tag
+      - name: Write the release notes
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          previous=$(git describe --tags --abbrev=0 --match 'v*' "$GITHUB_REF_NAME^" 2>/dev/null || true)
+
+          {
+            echo '```sh'
+            echo "dotnet tool update --global PackCheck --version $VERSION"
+            echo '```'
+            echo
+            # The version's section, without its heading: up to the next "## "
+            awk -v heading="## $VERSION " '
+              /^## / { inside = index($0, heading) == 1; next }
+              inside
+            ' CHANGELOG.md
+
+            if [ -n "$previous" ]; then
+              echo
+              echo "**Commits:** https://github.com/$GITHUB_REPOSITORY/compare/$previous...$GITHUB_REF_NAME"
+            fi
+          } > "$RUNNER_TEMP/notes.md"
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
-          name: Release ${{ github.ref_name }}
+          name: PackCheck ${{ steps.version.outputs.version }}
+          body_path: ${{ runner.temp }}/notes.md
           files: ./artifacts/*.nupkg
+          prerelease: ${{ contains(github.ref_name, '-') }}

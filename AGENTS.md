@@ -68,8 +68,15 @@ The commands only implement the hooks. Behaviour that applies to both belongs in
 - Every member needs an explicit accessibility modifier.
 - Console output goes through Spectre (`AnsiConsole` / injected `IAnsiConsole`). Prefixes follow the `[dim]INFO:[/]` / `[dim]WARN:[/]` style.
 - When you add a CLI option: add it to `CommonSettings` (or `CheckSettings`/`UpgradeSettings`), add the property to `Data/Config.cs` if it should be configurable, merge it in `SettingsService.CombineSettingsWithConfig` (options that exist only for one command go in its `is CheckSettings` part), and update `README.md`.
-- Update `CHANGELOG.md` for user-visible changes. Format: `## x.y.z (YYYY-MM-DD)` with an `### Enhancements` / `### Fixes` section. Credit contributors and link the issue.
+- Add user-visible changes to `CHANGELOG.md` under `## Unreleased`, in the sections `### Breaking Changes` / `### Enhancements` / `### Bug fixes` (in that order, leave out empty ones). Credit contributors and link the issue.
 
 ## Release
 
-Push a tag `vX.Y.Z`. `.github/workflows/release.yml` builds and packs with `/p:Version` taken from the tag, pushes to NuGet via OIDC (`NuGet/login`), and creates a GitHub release. The version is **not** stored in the csproj. The test step in that workflow is currently commented out, so run `dotnet test` locally before tagging.
+1. In `CHANGELOG.md`, rename `## Unreleased` to `## X.Y.Z (YYYY-MM-DD)` and add a new empty `## Unreleased` above it. Commit.
+2. Push a tag `vX.Y.Z`.
+
+`.github/workflows/release.yml` then runs these steps:
+- It first checks that `CHANGELOG.md` has a `## X.Y.Z ` section and stops otherwise, before anything is published. A version on NuGet cannot be replaced.
+- It builds, tests and packs with `/p:Version` taken from the tag. The version is **not** stored in the csproj.
+- It pushes to NuGet via OIDC (`NuGet/login`).
+- It creates the GitHub release. The release notes are the install command, the version's changelog section and a link to the commits since the previous tag. Tags with a `-` (e.g. `v5.0.0-rc.1`) become prereleases.

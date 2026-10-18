@@ -1,5 +1,11 @@
 # Changelog
 
+New entries go under "Unreleased". For a release, rename it to `## x.y.z (YYYY-MM-DD)` and add a new empty "Unreleased" section. The release workflow takes the version's section as the GitHub release notes.
+
+Each version lists its changes in this order, leaving out empty sections: Breaking Changes, Enhancements, Bug fixes.
+
+## Unreleased
+
 ## 4.1.0 (2026-10-18)
 
 ### Enhancements
