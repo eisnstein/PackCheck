@@ -1,3 +1,4 @@
+using NuGet.Versioning;
 using PackCheck.Commands.Settings;
 using PackCheck.Data;
 using System.Text.RegularExpressions;
@@ -37,6 +38,28 @@ public static class PackagesService
         return Regex.IsMatch(packageName, regexPattern);
     }
 
+    /// <summary>
+    /// The version the "stable" target upgrades to, shown in the "Latest Stable" column.
+    /// - Current version is stable: the latest stable version.
+    /// - Current version is a prerelease: the latest stable version if it is newer
+    ///   (e.g. 3.0.0-rc.1 -> 3.0.0), otherwise the latest prerelease, so packages
+    ///   without a newer stable release stay on the prerelease lane.
+    /// </summary>
+    public static NuGetVersion? GetStableTargetVersion(Package p)
+    {
+        if (!p.CurrentVersion.IsPrerelease)
+        {
+            return p.LatestStableVersion;
+        }
+
+        if (p.LatestStableVersion is not null && p.LatestStableVersion > p.CurrentVersion)
+        {
+            return p.LatestStableVersion;
+        }
+
+        return p.LatestPrereleaseVersion ?? p.LatestStableVersion;
+    }
+
     public static List<Package> CalculateUpgradeType(List<Package> packages, CheckSettings? settings)
     {
         if (settings is null)
@@ -47,15 +70,11 @@ public static class PackagesService
         foreach (var p in packages)
         {
             var currentVersion = p.CurrentVersion;
-            // Determine which "lane" to compare against.
-            // - If currently on a stable version, default to stable updates only.
-            //   If user opted into latest/pre (Target=latest or --pre), include prerelease updates.
-            // - If currently on a prerelease, compare against the latest prerelease.
-            var upgradeToVersion = currentVersion.IsPrerelease
-                ? (p.LatestPrereleaseVersion ?? p.LatestVersion ?? p.LatestStableVersion)
-                : (settings.Target == Target.Latest || settings.Pre == true
-                    ? (p.LatestVersion ?? p.LatestStableVersion)
-                    : p.LatestStableVersion);
+            // Compare against the stable target, or against the latest version
+            // (including prereleases) if the user opted in via Target=latest or --pre.
+            var upgradeToVersion = settings.Target == Target.Latest || settings.Pre == true
+                ? (p.LatestVersion ?? GetStableTargetVersion(p))
+                : GetStableTargetVersion(p);
 
             if (upgradeToVersion is null || upgradeToVersion <= currentVersion)
             {
@@ -101,10 +120,7 @@ public static class PackagesService
             // Depending on the desired target version set the new version
             p.NewVersion = upgradeTo switch
             {
-                // If the current version is prerelease, "stable" upgrades keep you on the prerelease lane.
-                Target.Stable => p.CurrentVersion.IsPrerelease
-                    ? (p.LatestPrereleaseVersion ?? p.LatestStableVersion)
-                    : p.LatestStableVersion,
+                Target.Stable => GetStableTargetVersion(p),
                 Target.Latest => p.LatestVersion ?? p.LatestStableVersion ?? p.LatestPrereleaseVersion,
                 _ => throw new ArgumentException(nameof(upgradeTo))
             };
@@ -113,7 +129,8 @@ public static class PackagesService
 
             return p;
         })
-            // Filter out packages where nothing changes between current and new version
-            .Where(p => p.NewVersion is not null && p.CurrentVersion != p.NewVersion).ToList();
+            // Only keep real upgrades. A lower version can be the latest one,
+            // e.g. if the current version was unlisted, and must not cause a downgrade.
+            .Where(p => p.NewVersion is not null && p.NewVersion > p.CurrentVersion).ToList();
     }
 }

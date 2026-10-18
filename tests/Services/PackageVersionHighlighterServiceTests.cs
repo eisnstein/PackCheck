@@ -102,4 +102,16 @@ public class PackageVersionHighlighterServiceTests
         await Assert.That(highlightedStableVersion).IsEqualTo("[red]5.0.5[/]");
         await Assert.That(highlightedLatestVersion).IsEqualTo("6.0.0-preview.2.21154.6");
     }
+
+    [Test]
+    public async Task ShowsLatestPrereleaseAsStableWhenCurrentIsPrereleaseAndNoStableExists()
+    {
+        var package = new Package("test.package", new("2.0.0-preview.1"));
+        package.LatestPrereleaseVersion = new("2.0.0-preview.2");
+        package.LatestVersion = new("2.0.0-preview.2");
+
+        var highlightedStableVersion = PackageVersionHighlighterService.HighlightLatestStableVersion(package);
+
+        await Assert.That(highlightedStableVersion).IsEqualTo("2.0.0[green]-preview.2[/]");
+    }
 }

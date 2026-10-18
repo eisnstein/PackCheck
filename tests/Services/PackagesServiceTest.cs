@@ -245,7 +245,7 @@ public class PackagesServiceTest
             PackageFactory.Create("Pack1", "6.2.1", "6.2.2", "6.2.2"),
             PackageFactory.Create("Pack2", "6.2.1", "6.3.0", "7.0.0-preview1"),
             PackageFactory.Create("Pack3", "0.4.0", "0.4.1", "0.4.1"),
-            PackageFactory.Create("Pack4", "0.44.0", "0.44.1", "0.5.0-rc.1"),
+            PackageFactory.Create("Pack4", "0.44.0", "0.44.1", "0.45.0-rc.1"),
         };
 
         var preparedPackages = PackagesService.PreparePackagesForUpgrade(packages, Target.Latest);
@@ -254,7 +254,7 @@ public class PackagesServiceTest
         await Assert.That(preparedPackages[0]!.NewVersion!.ToString()).IsEqualTo("6.2.2");
         await Assert.That(preparedPackages[1]!.NewVersion!.ToString()).IsEqualTo("7.0.0-preview1");
         await Assert.That(preparedPackages[2]!.NewVersion!.ToString()).IsEqualTo("0.4.1");
-        await Assert.That(preparedPackages[3]!.NewVersion!.ToString()).IsEqualTo("0.5.0-rc.1");
+        await Assert.That(preparedPackages[3]!.NewVersion!.ToString()).IsEqualTo("0.45.0-rc.1");
         foreach (var package in preparedPackages)
         {
             await Assert.That(package.UpgradeTo).IsEqualTo(Target.Latest);
@@ -316,5 +316,67 @@ public class PackagesServiceTest
 
         await Assert.That(prepared).Count().IsEqualTo(1);
         await Assert.That(prepared[0].NewVersion!.ToString()).IsEqualTo("1.0.0-alpha.3");
+    }
+
+    [Test]
+    public async Task PrereleaseCurrentVersion_UpgradesToStable_When_NewerStableIsReleased()
+    {
+        // 3.0.0-rc.1 is installed and 3.0.0 has been released since.
+        List<Package> packages = new()
+        {
+            PackageFactory.Create(
+                packageName: "Pack1",
+                currentVersion: "3.0.0-rc.1",
+                latestStableVersion: "3.0.0",
+                latestPrereleaseVersion: "3.0.0-rc.1",
+                latestVersion: "3.0.0"),
+        };
+
+        var calculated = PackagesService.CalculateUpgradeType(packages, new CheckSettings { Target = Target.Stable });
+        await Assert.That(calculated[0].UpgradeType).IsEqualTo(EUpgradeType.Patch);
+
+        var prepared = PackagesService.PreparePackagesForUpgrade(packages, Target.Stable);
+        await Assert.That(prepared).Count().IsEqualTo(1);
+        await Assert.That(prepared[0].NewVersion!.ToString()).IsEqualTo("3.0.0");
+    }
+
+    [Test]
+    public async Task PrereleaseCurrentVersion_IgnoresOlderStable()
+    {
+        // The latest stable version is older than the installed prerelease.
+        List<Package> packages = new()
+        {
+            PackageFactory.Create(
+                packageName: "Pack1",
+                currentVersion: "3.0.0-rc.1",
+                latestStableVersion: "2.5.0",
+                latestPrereleaseVersion: "3.0.0-rc.1",
+                latestVersion: "3.0.0-rc.1"),
+        };
+
+        var calculated = PackagesService.CalculateUpgradeType(packages, new CheckSettings { Target = Target.Stable });
+        await Assert.That(calculated[0].UpgradeType).IsEqualTo(EUpgradeType.NoUpgrade);
+
+        var prepared = PackagesService.PreparePackagesForUpgrade(packages, Target.Stable);
+        await Assert.That(prepared).IsEmpty();
+    }
+
+    [Test]
+    public async Task Upgrade_NeverDowngrades_When_LatestVersionIsLowerThanCurrent()
+    {
+        // E.g. the installed version was unlisted, so the latest listed version is lower.
+        List<Package> packages = new()
+        {
+            PackageFactory.Create("Pack1", "2.0.0", latestStableVersion: "1.9.0", latestVersion: "1.9.0"),
+            PackageFactory.Create(
+                packageName: "Pack2",
+                currentVersion: "2.0.0-beta.3",
+                latestStableVersion: null,
+                latestPrereleaseVersion: "2.0.0-beta.2",
+                latestVersion: "2.0.0-beta.2"),
+        };
+
+        await Assert.That(PackagesService.PreparePackagesForUpgrade(packages, Target.Stable)).IsEmpty();
+        await Assert.That(PackagesService.PreparePackagesForUpgrade(packages, Target.Latest)).IsEmpty();
     }
 }

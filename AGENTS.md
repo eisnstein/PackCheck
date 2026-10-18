@@ -41,7 +41,7 @@ Each target type has its own private method (`CheckProject`, `CheckCpm`, `CheckF
 - `PackCheckService`: on every `check` run, tells the user when a newer PackCheck version exists on NuGet.
 - `PackCheckConfigService` / `SettingsService`: load `.packcheckrc` or `.packcheckrc.json` from the cwd (case-insensitive JSON → `Data/Config`). They merge it into the settings, and CLI values take precedence via `??=`.
 
-**Version "lanes":** a package whose current version is a prerelease is compared against prereleases, even when the target is "stable". A package on a stable version gets prereleases only with `--target latest` or `--pre`. This logic is in `PackagesService` and is covered by tests. Keep it consistent between check and upgrade.
+**Version "lanes":** `PackagesService.GetStableTargetVersion` is the single definition of "stable". The "Latest Stable" column, the check result and `upgrade --target stable` all use it. On a stable version it is the latest stable. On a prerelease it is the latest stable if that is newer (e.g. `3.0.0-rc.1` → `3.0.0`), otherwise the latest prerelease. A package on a stable version gets prereleases only with `--target latest` or `--pre`. Upgrades only go to higher versions, never down. All of this is covered by tests in `PackagesServiceTest`.
 
 **Data** (`src/Data/`): `Package` is mutable and gets filled in step by step along the pipeline. `Target` holds the string constants `stable`/`latest`. `Result` is Success/Warning/Error: Warning skips a project in a solution, Error aborts with exit code -1.
 

@@ -8,14 +8,16 @@ public static class PackageVersionHighlighterService
 {
     public static string HighlightLatestStableVersion(Package p)
     {
-        if (p.LatestStableVersion is null)
+        // For a prerelease without a newer stable version this is the latest prerelease.
+        var stableTargetVersion = PackagesService.GetStableTargetVersion(p);
+        if (stableTargetVersion is null)
         {
             return "-";
         }
 
-        return p.CurrentVersion == p.LatestStableVersion
+        return p.CurrentVersion == stableTargetVersion
             ? p.CurrentVersion.ToString()
-            : HighlightVersion(p.CurrentVersion, p.LatestStableVersion);
+            : HighlightVersion(p.CurrentVersion, stableTargetVersion);
     }
 
     public static string HighlightLatestVersion(Package p)
