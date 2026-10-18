@@ -7,7 +7,7 @@ namespace PackCheck.Services;
 
 public static class PackCheckService
 {
-    public static async Task CheckForNewPackCheckVersion(INuGetApiService nuGetApiService)
+    public static async Task CheckForNewPackCheckVersion(INuGetApiService nuGetApiService, IAnsiConsole console)
     {
         IEnumerable<NuGetVersion> result;
         try
@@ -46,10 +46,10 @@ public static class PackCheckService
         // If there is a newer version available, show information
         if (latestVersion > currentVersion)
         {
-            AnsiConsole.MarkupLine($"[dim]INFO:[/] A new version of PackCheck is available: {currentVersion} -> {latestVersion}");
-            AnsiConsole.MarkupLine($"[dim]INFO:[/] Changelog: [link]https://github.com/eisnstein/PackCheck/blob/main/CHANGELOG.md[/]");
-            AnsiConsole.MarkupLine("[dim]INFO:[/] Run [blue]dotnet tool update --global PackCheck[/] to update");
-            Console.WriteLine();
+            console.MarkupLine($"[dim]INFO:[/] A new version of PackCheck is available: {currentVersion} -> {latestVersion}");
+            console.MarkupLine($"[dim]INFO:[/] Changelog: [link]https://github.com/eisnstein/PackCheck/blob/main/CHANGELOG.md[/]");
+            console.MarkupLine("[dim]INFO:[/] Run [blue]dotnet tool update --global PackCheck[/] to update");
+            console.WriteLine();
         }
     }
 }

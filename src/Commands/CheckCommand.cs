@@ -1,359 +1,60 @@
 using PackCheck.Commands.Settings;
 using PackCheck.Data;
-using PackCheck.Exceptions;
+using PackCheck.PackageFiles;
 using PackCheck.Services;
 using Spectre.Console;
-using Spectre.Console.Cli;
-using System.Text.Json;
 
 namespace PackCheck.Commands;
 
-public class CheckCommand : AsyncCommand<CheckSettings>
+public class CheckCommand(IAnsiConsole console, INuGetApiService nuGetApiService)
+    : PackageCommand<CheckSettings>(console, nuGetApiService)
 {
-    private readonly IAnsiConsole _console;
-    private readonly INuGetApiService _nuGetApiService;
-    private readonly NuGetPackagesService _nuGetPackagesService;
-
-    public CheckCommand(IAnsiConsole console, INuGetApiService nuGetApiService)
-    {
-        _console = console;
-        _nuGetApiService = nuGetApiService;
-        _nuGetPackagesService = new NuGetPackagesService(_nuGetApiService);
-    }
-
-    public override async Task<int> ExecuteAsync(CommandContext context, CheckSettings settings, CancellationToken cancellationToken)
-    {
-        try
-        {
-            return await CheckAsync(settings);
-        }
-        catch (Exception ex) when (ex is SolutionFileException or SolutionXFileException or NuGetFeedException)
-        {
-            AnsiConsole.MarkupLine($"[dim]WARN:[/] [red]{ex.Message}[/]");
-            return -1;
-        }
-    }
-
-    private async Task<int> CheckAsync(CheckSettings settings)
+    protected override async Task<int?> BeforeRunAsync(CheckSettings settings)
     {
         if (settings.Version == true)
         {
-            OutputService.PrintVersionInfo(_console);
+            OutputService.PrintVersionInfo(Output);
             return 0;
         }
 
-        await PackCheckService.CheckForNewPackCheckVersion(_nuGetApiService);
+        await PackCheckService.CheckForNewPackCheckVersion(NuGetApiService, Output);
 
-        Result? result;
-        string? pathToConfigFile;
-        Config? config;
-
-        try
-        {
-            (pathToConfigFile, config) = PackCheckConfigService.GetConfig();
-        }
-        catch (JsonException e)
-        {
-            _console.MarkupLine(
-                $"[dim]WARN:[/] Your .packcheckrc[[.json]] configuration file seems to be invalid: {e.Message.EscapeMarkup()}");
-            return -1;
-        }
-
-        if (config is not null)
-        {
-            _console.MarkupLine($"Reading config from [grey]{pathToConfigFile.EscapeMarkup()}[/]");
-        }
-
-        settings = SettingsService.CombineSettingsWithConfig(settings, config);
-
-        // Check if a path to a specific project is given
-        if (!string.IsNullOrEmpty(settings.PathToCsProjFile))
-        {
-            result = await CheckProject(settings.PathToCsProjFile, settings);
-            if (result != Result.Success)
-            {
-                return -1;
-            }
-
-            OutputService.PrintInfo(_console);
-            Console.WriteLine();
-
-            return 0;
-        }
-
-        // Check if a path to a solution file is given
-        if (!string.IsNullOrEmpty(settings.PathToSlnFile))
-        {
-            var pathToSolutionFile = SolutionFileService.GetPathToSolutionFile(settings.PathToSlnFile);
-            var projectCsProjFiles = SolutionFileService.GetCsProjFiles(pathToSolutionFile);
-
-            foreach (var projectCsProjFile in projectCsProjFiles)
-            {
-                result = await CheckProject(projectCsProjFile, settings);
-                if (result == Result.Error)
-                {
-                    return -1;
-                }
-            }
-
-            OutputService.PrintSolutionInfo(_console);
-            Console.WriteLine();
-
-            return 0;
-        }
-
-        // Check if a path to a solution X file is given
-        if (!string.IsNullOrEmpty(settings.PathToSlnxFile))
-        {
-            var pathToSolutionXFile = SolutionXFileService.GetPathToSolutionXFile(settings.PathToSlnxFile);
-            var projectCsProjFiles = SolutionXFileService.GetCsProjFiles(pathToSolutionXFile);
-
-            foreach (var projectCsProjFile in projectCsProjFiles)
-            {
-                result = await CheckProject(projectCsProjFile, settings);
-                if (result == Result.Error)
-                {
-                    return -1;
-                }
-            }
-
-            OutputService.PrintSolutionInfo(_console);
-            Console.WriteLine();
-
-            return 0;
-        }
-
-        // Check if a path to a Central Packages Mgmt file is given
-        if (!string.IsNullOrEmpty(settings.PathToCpmFile))
-        {
-            result = await CheckCpm(settings.PathToCpmFile, settings);
-            if (result != Result.Success)
-            {
-                return -1;
-            }
-
-            OutputService.PrintInfo(_console);
-            Console.WriteLine();
-
-            return 0;
-        }
-
-        // Check if a path to a file-based app file is given
-        if (!string.IsNullOrEmpty(settings.PathToFbaFile))
-        {
-            result = await CheckFba(settings.PathToFbaFile, settings);
-            if (result != Result.Success)
-            {
-                return -1;
-            }
-
-            OutputService.PrintInfo(_console);
-            Console.WriteLine();
-
-            return 0;
-        }
-
-
-        // Check if Central Package Management is used
-        if (CentralPackageMgmtService.HasCentralPackageMgmt())
-        {
-            result = await CheckCpm(settings: settings);
-            if (result != Result.Success)
-            {
-                return -1;
-            }
-
-            OutputService.PrintInfo(_console);
-            Console.WriteLine();
-
-            return 0;
-        }
-
-        // Check if a solution file exists
-        if (SolutionFileService.HasSolution())
-        {
-            var pathToSolutionFile = SolutionFileService.GetPathToSolutionFile(settings.PathToSlnFile);
-            var projectCsProjFiles = SolutionFileService.GetCsProjFiles(pathToSolutionFile);
-
-            foreach (var projectCsProjFile in projectCsProjFiles)
-            {
-                result = await CheckProject(projectCsProjFile, settings);
-                if (result == Result.Error)
-                {
-                    return -1;
-                }
-            }
-
-            OutputService.PrintSolutionInfo(_console);
-            Console.WriteLine();
-
-            return 0;
-        }
-
-        // Check if a solution X file exists
-        if (SolutionXFileService.HasSolutionX())
-        {
-            var pathToSolutionXFile = SolutionXFileService.GetPathToSolutionXFile(settings.PathToSlnxFile);
-            var projectCsProjFiles = SolutionXFileService.GetCsProjFiles(pathToSolutionXFile);
-
-            foreach (var projectCsProjFile in projectCsProjFiles)
-            {
-                result = await CheckProject(projectCsProjFile, settings);
-                if (result == Result.Error)
-                {
-                    return -1;
-                }
-            }
-
-            OutputService.PrintSolutionInfo(_console);
-            Console.WriteLine();
-
-            return 0;
-        }
-
-        // Check if a project file exists
-        result = await CheckProject(settings: settings);
-        if (result != Result.Success)
-        {
-            return -1;
-        }
-
-        OutputService.PrintInfo(_console);
-        Console.WriteLine();
-
-        return 0;
+        return null;
     }
 
-    private async Task<Result> CheckProject(string? pathToCsProjFile = null, CheckSettings? settings = null)
+    protected override string DescribeFile(IPackageFile file, CheckSettings settings)
     {
-        try
-        {
-            pathToCsProjFile = CsProjFileService.GetPathToCsProjFile(pathToCsProjFile);
-        }
-        catch (CsProjFileException ex)
-        {
-            AnsiConsole.MarkupLine($"[dim]WARN:[/] [red]{ex.Message}[/]");
-            return Result.Error;
-        }
+        return $"Checking versions for [grey]{file.Path.EscapeMarkup()}[/]";
+    }
 
-        AnsiConsole.MarkupLine($"Checking versions for [grey]{pathToCsProjFile.EscapeMarkup()}[/]");
-
-        List<Package> packages = await CsProjFileService.GetPackagesDataFromCsProjFileAsync(pathToCsProjFile);
-        if (packages.Count == 0)
-        {
-            AnsiConsole.MarkupLine($"Could not find any packages in [grey]{pathToCsProjFile.EscapeMarkup()}[/]");
-            return Result.Warning;
-        }
-
-        packages = PackagesService.ApplySettings(packages, settings);
-        if (packages.Count == 0)
-        {
-            AnsiConsole.MarkupLine($"No packages to check. Check your 'filter' or 'exclude' in settings/config.");
-            return Result.Warning;
-        }
-
-        await _nuGetPackagesService.GetPackagesDataFromNugetRepositoryAsync(packages);
-
-        packages = PackagesService.CalculateUpgradeType(packages, settings);
+    protected override Task<Result> ProcessPackagesAsync(
+        IPackageFile file, List<Package> packages, PackCheckContext<CheckSettings> context)
+    {
+        packages = PackagesService.CalculateUpgradeType(packages, context.Settings);
         packages = PackagesService.PreparePackagesForOutput(packages);
         if (packages.Count == 0)
         {
-            AnsiConsole.MarkupLine($"All packages are up to date.");
-            return Result.Success;
+            Output.MarkupLine("All packages are up to date.");
+            return Task.FromResult(Result.Success);
         }
 
-        OutputService.PrintResult(_console, packages, settings);
-        Console.WriteLine();
+        OutputService.PrintResult(Output, packages, context.Settings);
+        Output.WriteLine();
 
-        return Result.Success;
+        return Task.FromResult(Result.Success);
     }
 
-    private async Task<Result> CheckCpm(string? pathToCpmFile = null, CheckSettings? settings = null)
+    protected override void AfterRun(PackCheckContext<CheckSettings> context)
     {
-        try
+        if (context.IsSolution)
         {
-            pathToCpmFile = CentralPackageMgmtService.GetPathToCpmFile(pathToCpmFile);
+            OutputService.PrintSolutionInfo(Output);
         }
-        catch (CpmFileException ex)
+        else
         {
-            AnsiConsole.MarkupLine($"[dim]WARN:[/] [red]{ex.Message}[/]");
-            return Result.Error;
-        }
-
-        AnsiConsole.MarkupLine($"Checking versions for [grey]{pathToCpmFile.EscapeMarkup()}[/]");
-
-        List<Package> packages = await CentralPackageMgmtService.GetPackagesDataFromCpmFileAsync(pathToCpmFile);
-        if (packages.Count == 0)
-        {
-            AnsiConsole.MarkupLine($"Could not find any packages in [grey]{pathToCpmFile.EscapeMarkup()}[/]");
-            return Result.Warning;
+            OutputService.PrintInfo(Output);
         }
 
-        packages = PackagesService.ApplySettings(packages, settings);
-        if (packages.Count == 0)
-        {
-            AnsiConsole.MarkupLine($"No packages to check. Check your 'filter' or 'exclude' in settings/config.");
-            return Result.Warning;
-        }
-
-        await _nuGetPackagesService.GetPackagesDataFromNugetRepositoryAsync(packages);
-
-        packages = PackagesService.CalculateUpgradeType(packages, settings);
-        packages = PackagesService.PreparePackagesForOutput(packages);
-        if (packages.Count == 0)
-        {
-            AnsiConsole.MarkupLine($"All packages are up to date.");
-            return Result.Success;
-        }
-
-        OutputService.PrintResult(_console, packages, settings);
-        Console.WriteLine();
-
-        return Result.Success;
+        Output.WriteLine();
     }
-
-    private async Task<Result> CheckFba(string pathToFbaFile, CheckSettings? settings = null)
-    {
-        try
-        {
-            pathToFbaFile = FileBasedAppService.GetPathToFileBasedAppFile(pathToFbaFile);
-        }
-        catch (FileBasedAppFileException ex)
-        {
-            AnsiConsole.MarkupLine($"[dim]WARN:[/] [red]{ex.Message}[/]");
-            return Result.Error;
-        }
-
-        AnsiConsole.MarkupLine($"Checking versions for [grey]{pathToFbaFile.EscapeMarkup()}[/]");
-
-        List<Package> packages = FileBasedAppService.GetPackagesDataFromFbaFile(pathToFbaFile);
-        if (packages.Count == 0)
-        {
-            AnsiConsole.MarkupLine($"Could not find any packages in [grey]{pathToFbaFile.EscapeMarkup()}[/]");
-            return Result.Warning;
-        }
-
-        packages = PackagesService.ApplySettings(packages, settings);
-        if (packages.Count == 0)
-        {
-            AnsiConsole.MarkupLine($"No packages to check. Check your 'filter' or 'exclude' in settings/config.");
-            return Result.Warning;
-        }
-
-        await _nuGetPackagesService.GetPackagesDataFromNugetRepositoryAsync(packages);
-
-        packages = PackagesService.CalculateUpgradeType(packages, settings);
-        packages = PackagesService.PreparePackagesForOutput(packages);
-        if (packages.Count == 0)
-        {
-            AnsiConsole.MarkupLine($"All packages are up to date.");
-            return Result.Success;
-        }
-
-        OutputService.PrintResult(_console, packages, settings);
-        Console.WriteLine();
-
-        return Result.Success;
-    }
-
 }

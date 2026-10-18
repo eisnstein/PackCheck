@@ -1,5 +1,6 @@
 ﻿{
   Output:
+Checking versions for {CurrentDirectory}test.csproj
 ┌──────────────────┬─────────┬───────────────┬──────────────────┐
 │ Package Name     │ Current │ Latest Stable │           Latest │
 ├──────────────────┼─────────┼───────────────┼──────────────────┤
@@ -7,6 +8,7 @@
 │ NuGet.Versioning │   6.2.1 │         6.3.0 │  6.4.0-preview.1 │
 │ Spectre.Console  │  0.44.0 │        0.44.1 │ 0.45.0-alpha.0.1 │
 └──────────────────┴─────────┴───────────────┴──────────────────┘
+
 INFO: Run packcheck upgrade to upgrade to the latest stable versions.
 INFO: Run packcheck --help for more options.,
   Context: {

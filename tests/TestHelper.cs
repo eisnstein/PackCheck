@@ -2,6 +2,7 @@ using System.IO;
 using PackCheck.Services;
 using PackCheck.Tests.Fakes;
 using Spectre.Console.Cli.Testing;
+using Spectre.Console.Testing;
 
 namespace PackCheck.Tests;
 
@@ -12,7 +13,11 @@ public static class TestHelper
         var registrar = new TestTypeRegistrar();
         registrar.RegisterInstance(typeof(INuGetApiService), nuGetApiService ?? new FakeNuGetApiService());
 
-        return new CommandAppTester(registrar);
+        // Wide enough that paths in the output are not wrapped,
+        // so Verify can replace them with {CurrentDirectory}
+        var console = new TestConsole().Width(1000);
+
+        return new CommandAppTester(registrar, console: console);
     }
 
     public static void LoadTestCsProjFile()

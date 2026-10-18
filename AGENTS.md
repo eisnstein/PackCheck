@@ -20,16 +20,20 @@ dotnet pack src/PackCheck.csproj -c Release    # outputs to src/nupkg
 
 `src/Program.cs` registers two commands. `check` (alias `c`) is the default; the other is `upgrade` (alias `u`). In DEBUG builds, exceptions propagate and examples are validated.
 
-**Commands** (`src/Commands/`): `CheckCommand` and `UpgradeCommand` contain the whole control flow. Both decide what to operate on in this fixed order:
+**Commands** (`src/Commands/`): `CheckCommand` and `UpgradeCommand` derive from `PackageCommand<TSettings>`, which holds the whole shared flow:
 
-1. Explicit CLI path: `--csprojFile`, `--slnFile`, `--slnxFile`, `--cpmFile`, `--fbaFile`
-2. Auto-detected `Directory.Packages.props` in the current directory (Central Package Management)
-3. Auto-detected `*.sln`, then `*.slnx`, in the current directory
-4. A single `*.csproj` in the current directory
+1. `BeforeRunAsync` hook (check: `--version`, self-update notice).
+2. Build the initial state, a `PackCheckContext<TSettings>` (`src/Data/`), once per run with `PackCheckContextBuilder`:
+   - `LoadSettings` reads the config and merges it into the CLI settings.
+   - `ResolveFiles` decides what to work on, in this fixed order: an explicit path (`--csprojFile`, `--slnFile`, `--slnxFile`, `--cpmFile`, `--fbaFile`, or the same from the config), then an auto-detected `Directory.Packages.props`, then `*.sln`, then `*.slnx`, then a single `*.csproj` in the current directory. Every file, including all projects of a solution, is checked to exist before anything is processed.
+3. For each file: print `DescribeFile` → read packages → `PackagesService.ApplySettings` (filter/exclude, wildcards `*`/`%`) → `SelectPackages` hook (upgrade: the package name argument) → `NuGetPackagesService` fetches versions in parallel (max 4) with a progress bar → `ProcessPackagesAsync` (check: upgrade type and table; upgrade: target versions, optional prompt, write).
+4. `AfterRun` hook (check: the INFO lines).
 
-Each target type has its own private method (`CheckProject`, `CheckCpm`, `CheckFba`, `UpgradeProject`, …). These methods are near-copies of each other. A behaviour change usually has to go into all three variants in a command, and often into both commands.
+The commands only implement the hooks. Behaviour that applies to both belongs in `PackageCommand` or `PackCheckContextBuilder`.
 
-**Pipeline per target:** read packages from the file → `PackagesService.ApplySettings` (filter/exclude, wildcards `*`/`%`) → `NuGetPackagesService` fetches versions in parallel (max 4) with a progress bar → `PackagesService.CalculateUpgradeType` (check) or `PreparePackagesForUpgrade` (upgrade) → `OutputService` renders the table, or the file service writes the new versions.
+**Package files** (`src/PackageFiles/`): `IPackageFile` (`Path`, `ReadPackagesAsync`, `WriteVersionsAsync`) with `CsProjPackageFile`, `CpmPackageFile` and `FbaPackageFile`. They are thin wrappers around the file services below, so the commands never need to know which kind of file they work on.
+
+**Output:** all command output goes through the injected `IAnsiConsole` (`PackageCommand.Output`), so tests see it. The exceptions are the NuGet progress bar and the raw dry-run output of the file services.
 
 **Services** (`src/Services/`) are mostly static classes, one for each file format:
 - `CsProjFileService`: XML `<PackageReference Include Version>`.
@@ -44,9 +48,9 @@ Each target type has its own private method (`CheckProject`, `CheckCpm`, `CheckF
 
 **Version "lanes":** `PackagesService.GetStableTargetVersion` is the single definition of "stable". The "Latest Stable" column, the check result and `upgrade --target stable` all use it. On a stable version it is the latest stable. On a prerelease it is the latest stable if that is newer (e.g. `3.0.0-rc.1` → `3.0.0`), otherwise the latest prerelease. A package on a stable version gets prereleases only with `--target latest` or `--pre`. Upgrades only go to higher versions, never down. All of this is covered by tests in `PackagesServiceTest`.
 
-**Data** (`src/Data/`): `Package` is mutable and gets filled in step by step along the pipeline. `Target` holds the string constants `stable`/`latest`. `Result` is Success/Warning/Error: Warning skips a project in a solution, Error aborts with exit code -1.
+**Data** (`src/Data/`): `Package` is mutable and gets filled in step by step along the pipeline. `Target` holds the string constants `stable`/`latest`. `Result` is Success/Warning/Error. A Warning ("nothing to do", e.g. no packages or all filtered out) does not stop the run and leads to exit code 0. An Error aborts with exit code -1. Exit code -1 is only for real errors: missing or ambiguous file, invalid config, feed unreachable.
 
-**Errors:** the file services throw specific exceptions (`src/Exceptions/`) whose messages contain Spectre markup (`[white]...[/]`). The commands catch them and print `[dim]WARN:[/] [red]{message}[/]`. Escape user-provided strings before you embed them in markup.
+**Errors:** the file services throw specific exceptions (`src/Exceptions/`) whose messages contain Spectre markup (`[white]...[/]`). `PackageCommand.ExecuteAsync` catches them and prints `[dim]WARN:[/] [red]{message}[/]`. Escape user-provided strings before you embed them in markup.
 
 ## Tests
 
@@ -63,7 +67,7 @@ Each target type has its own private method (`CheckProject`, `CheckCpm`, `CheckF
 - Use `var` when the type is apparent and explicit types otherwise. `.editorconfig` treats `csharp_style_var_elsewhere = false` as an error.
 - Every member needs an explicit accessibility modifier.
 - Console output goes through Spectre (`AnsiConsole` / injected `IAnsiConsole`). Prefixes follow the `[dim]INFO:[/]` / `[dim]WARN:[/]` style.
-- When you add a CLI option: add it to `CommonSettings` (or `CheckSettings`/`UpgradeSettings`), add the property to `Data/Config.cs` if it should be configurable, merge it in **both** overloads of `SettingsService.CombineSettingsWithConfig`, and update `README.md`.
+- When you add a CLI option: add it to `CommonSettings` (or `CheckSettings`/`UpgradeSettings`), add the property to `Data/Config.cs` if it should be configurable, merge it in `SettingsService.CombineSettingsWithConfig` (options that exist only for one command go in its `is CheckSettings` part), and update `README.md`.
 - Update `CHANGELOG.md` for user-visible changes. Format: `## x.y.z (YYYY-MM-DD)` with an `### Enhancements` / `### Fixes` section. Credit contributors and link the issue.
 
 ## Release

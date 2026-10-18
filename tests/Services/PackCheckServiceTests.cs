@@ -1,5 +1,6 @@
 using PackCheck.Services;
 using PackCheck.Tests.Fakes;
+using Spectre.Console.Testing;
 
 namespace PackCheck.Tests.Services;
 
@@ -10,6 +11,6 @@ public class PackCheckServiceTests
     {
         var nuGetApiService = new UnreachableNuGetApiService();
 
-        await Assert.That(() => PackCheckService.CheckForNewPackCheckVersion(nuGetApiService)).ThrowsNothing();
+        await Assert.That(() => PackCheckService.CheckForNewPackCheckVersion(nuGetApiService, new TestConsole())).ThrowsNothing();
     }
 }

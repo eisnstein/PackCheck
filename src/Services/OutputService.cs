@@ -22,30 +22,30 @@ public static class OutputService
             if (patch is not null)
             {
                 var patchPackages = patch.ToList();
-                AnsiConsole.MarkupLine("[green]Patch[/] [dim]Backwards compatible - bug fixes[/]");
+                console.MarkupLine("[green]Patch[/] [dim]Backwards compatible - bug fixes[/]");
 
                 PrintTable(console, patchPackages, settings);
-                Console.WriteLine();
+                console.WriteLine();
                 returnEarly = true;
             }
 
             if (minor is not null)
             {
                 var minorPackages = minor.ToList();
-                AnsiConsole.MarkupLine("[yellow]Minor[/] [dim]Backwards compatible - new features[/]");
+                console.MarkupLine("[yellow]Minor[/] [dim]Backwards compatible - new features[/]");
 
                 PrintTable(console, minorPackages, settings);
-                Console.WriteLine();
+                console.WriteLine();
                 returnEarly = true;
             }
 
             if (major is not null)
             {
                 var majorPackages = major.ToList();
-                AnsiConsole.MarkupLine("[red]Major[/] [dim]Possibly breaking changes - check Changelog[/]");
+                console.MarkupLine("[red]Major[/] [dim]Possibly breaking changes - check Changelog[/]");
 
                 PrintTable(console, majorPackages, settings);
-                Console.WriteLine();
+                console.WriteLine();
                 returnEarly = true;
             }
 
