@@ -1,4 +1,4 @@
-![PackCheck-Logo](https://github.com/eisnstein/PackCheck/blob/main/src/Assets/icon.png)
+![PackCheck-Logo](https://raw.githubusercontent.com/eisnstein/PackCheck/main/src/Assets/icon.png)
 
 # PackCheck
 
@@ -44,7 +44,7 @@ packcheck check
 
 This should give you something like this:
 
-![PackCheck check example](https://github.com/eisnstein/PackCheck/blob/main/src/Assets/packcheck-check-without-pre.png)
+![PackCheck check example](https://raw.githubusercontent.com/eisnstein/PackCheck/main/src/Assets/packcheck-check-without-pre.png)
 
 If you also want to see the _latest version_, which includes prereleases, use the `--pre` flag:
 
@@ -54,7 +54,7 @@ packcheck --pre
 
 This should give you something like this:
 
-![PackCheck check example](https://github.com/eisnstein/PackCheck/blob/main/src/Assets/packcheck-check.png)
+![PackCheck check example](https://raw.githubusercontent.com/eisnstein/PackCheck/main/src/Assets/packcheck-check.png)
 
 To check versions of a file-based app you need to provide the path to the file:
 
