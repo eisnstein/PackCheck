@@ -1,5 +1,17 @@
 # Changelog
 
+## 4.1.0 (2026-10-18)
+
+### Enhancements
+
+- All projects of a solution are checked to exist before any project is checked or upgraded. Before, PackCheck processed the projects up to the missing one and stopped there.
+- `check` and `upgrade` now share the same internal flow, so they behave the same when choosing and reading files.
+
+### Bug fixes
+
+- The exit code is now consistently `0` when there is nothing to do, i.e. a project has no packages or `filter`/`exclude` removes all of them. Before, `check` returned `-1` for a single project and `0` inside a solution, and `upgrade` returned `-1` only with `--csprojFile`. `-1` is now only used for errors like a missing file, an invalid config file or an unreachable NuGet feed.
+- Some warnings of `upgrade` were missing a line break.
+
 ## 4.0.1 (2026-10-18)
 
 ### Bug fixes
