@@ -75,7 +75,9 @@ public static class SolutionXFileService
                 continue;
             }
 
-            projectPaths.Add(path);
+            // Visual Studio writes the project paths with backslashes,
+            // which do not work as separators on unix like systems
+            projectPaths.Add(path.Replace('\\', Path.DirectorySeparatorChar));
         }
 
         return projectPaths;

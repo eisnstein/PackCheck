@@ -34,9 +34,10 @@ public class SolutionFileServiceTests
     public async Task ParseProjectDefinitions()
     {
         TestHelper.LoadSolution();
+        // The service converts the backslashes from the .sln file to the platform's separator
         List<string> expectedPaths = [
-            @"SolProj\SolProj.csproj",
-            @"SolProj.Tests\SolProj.Tests.csproj"
+            Path.Combine("SolProj", "SolProj.csproj"),
+            Path.Combine("SolProj.Tests", "SolProj.Tests.csproj")
         ];
 
         var projectDefinitions = SolutionFileService.GetProjectDefinitions("testSolution.sln");

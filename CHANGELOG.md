@@ -23,6 +23,7 @@
 - PackCheck no longer crashes when the check for a new PackCheck version fails, e.g. when offline.
 - A missing or ambiguous `.sln`, `.slnx`, `Directory.Packages.props` or file-based app file now shows a warning instead of crashing.
 - `FbaFile` from the config file is now used.
+- Projects in `.slnx` files are now found on Linux and macOS.
 
 ## 3.2.0 (2026-07-23)
 
