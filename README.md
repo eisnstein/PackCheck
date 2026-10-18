@@ -3,7 +3,7 @@
 # PackCheck
 
 [![NuGet Package](https://img.shields.io/nuget/vpre/PackCheck)](https://nuget.org/packages/PackCheck)
-[![License](https://img.shields.io/github/license/eisnstein/PackCheck)](https://github.com/eisnstein/PackCheck/blob/main/LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-yellow)](https://github.com/eisnstein/PackCheck/blob/main/LICENSE)
 
 Check for newer versions of installed NuGet Packages in your Terminal.
 

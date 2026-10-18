@@ -13,10 +13,12 @@
   <PropertyGroup Label="Package Information">
     <Authors>Daniel Höflehner</Authors>
     <Copyright>Copyright © Daniel Höflehner</Copyright>
+    <Title>PackCheck</Title>
     <Description>Check for newer versions of installed NuGet Packages in your Terminal.</Description>
     <PackageIcon>icon.png</PackageIcon>
     <PackageId>PackCheck</PackageId>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/eisnstein/PackCheck</RepositoryUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
