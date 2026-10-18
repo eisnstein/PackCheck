@@ -21,6 +21,7 @@ public static class SettingsService
         settings.PathToFbaFile ??= config.FbaFile;
         settings.Filter ??= config.Filter?.ToArray();
         settings.Exclude ??= config.Exclude?.ToArray();
+        settings.Output ??= config.Output;
 
         // Options that only exist for the check command
         if (settings is CheckSettings checkSettings)

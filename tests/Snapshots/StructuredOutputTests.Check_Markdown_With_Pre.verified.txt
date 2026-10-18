@@ -1,0 +1,7 @@
+﻿## `test.csproj`
+
+| Package | Current | Latest stable | Latest | Upgrade |
+|---|--:|--:|--:|---|
+| NuGet.Protocol | 6.2.1 | 7.6.0 | 7.6.0 | major |
+| NuGet.Versioning | 6.2.1 | 6.3.0 | 6.4.0-preview.1 | minor |
+| Spectre.Console | 0.44.0 | 0.44.1 | 0.45.0-alpha.0.1 | minor |

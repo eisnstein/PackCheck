@@ -1,0 +1,32 @@
+﻿{
+  "command": "check",
+  "files": [
+    {
+      "path": "test.csproj",
+      "packages": [
+        {
+          "name": "NuGet.Protocol",
+          "currentVersion": "6.2.1",
+          "latestStableVersion": "7.6.0",
+          "latestVersion": "7.6.0",
+          "upgradeType": "major"
+        },
+        {
+          "name": "NuGet.Versioning",
+          "currentVersion": "6.2.1",
+          "latestStableVersion": "6.3.0",
+          "latestVersion": "6.4.0-preview.1",
+          "upgradeType": "minor"
+        },
+        {
+          "name": "Spectre.Console",
+          "currentVersion": "0.44.0",
+          "latestStableVersion": "0.44.1",
+          "latestVersion": "0.45.0-alpha.0.1",
+          "upgradeType": "patch"
+        }
+      ]
+    }
+  ],
+  "error": null
+}

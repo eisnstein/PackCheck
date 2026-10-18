@@ -145,6 +145,42 @@ packcheck --pre
 
 If the installed version is a prerelease and there is no newer stable version yet, the _latest stable_ column shows the newest prerelease. That is the version `packcheck upgrade` upgrades to.
 
+### Output for scripts and LLM agents
+
+With `--output json` or `--output markdown`, `check` and `upgrade` print only the result, as one document: no progress bar, no status lines and no hints. This makes PackCheck easy to use from scripts, CI jobs and LLM agents.
+
+```shell
+packcheck --output json
+```
+
+```json
+{
+  "command": "check",
+  "files": [
+    {
+      "path": "src/App/App.csproj",
+      "packages": [
+        {
+          "name": "NuGet.Protocol",
+          "currentVersion": "6.2.1",
+          "latestStableVersion": "7.6.0",
+          "latestVersion": "7.6.0",
+          "upgradeType": "major"
+        }
+      ]
+    }
+  ],
+  "error": null
+}
+```
+
+- `check` lists the outdated packages of each file. `upgradeType` is `major`, `minor` or `patch` and follows `--pre` and `--target`, like the table.
+- `upgrade` lists the upgraded packages with `currentVersion` and `newVersion`, plus `target` and `dryRun`. With `--dry-run`, no file is changed and the document shows what would change. `--interactive` cannot be combined with `--output json` or `markdown`.
+- Paths are relative to the current directory. A file without anything to do has an empty `packages` list.
+- On an error, `error` contains the message and the exit code is `-1`. Otherwise `error` is `null` and the exit code is `0`.
+- `--output markdown` prints the same as Markdown tables, one section per file, e.g. for pull request comments or job summaries.
+- `--format group` only applies to the default `table` output.
+
 ## Configuration
 
 You can configure PackCheck via a `.packcheckrc.{json}` file. Example:
@@ -159,7 +195,8 @@ You can configure PackCheck via a `.packcheckrc.{json}` file. Example:
   "Filter": ["NuGet.Version", "Microsoft.*"],
   "Exclude": ["Microsoft.Logging", "Telerik.*"],
   "Format": "group",
-  "Pre": true
+  "Pre": true,
+  "Output": "json"
 }
 ```
 

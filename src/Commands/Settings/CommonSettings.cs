@@ -42,4 +42,9 @@ public class CommonSettings : CommandSettings
     [CommandOption("-x|--exclude <Package_Name>")]
     [Description("Exclude packages matching the given name or wildcard pattern (* or %) (can be used multiple times)")]
     public string[]? Exclude { get; set; }
+
+    [CommandOption("--output <Output>")]
+    [Description("Output of the result: table (default), json or markdown. With json and markdown only the result is printed, e.g. for scripts and LLM agents.")]
+    [ValidateOutputValue("Output value has to be 'table', 'json' or 'markdown'.")]
+    public string? Output { get; set; }
 }

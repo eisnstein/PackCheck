@@ -22,14 +22,21 @@ dotnet pack src/PackCheck.csproj -c Release    # outputs to src/nupkg
 
 **Commands** (`src/Commands/`): `CheckCommand` and `UpgradeCommand` derive from `PackageCommand<TSettings>`, which holds the whole shared flow:
 
-1. `BeforeRunAsync` hook (check: `--version`, self-update notice).
+1. `--version` (both commands).
 2. Build the initial state, a `PackCheckContext<TSettings>` (`src/Data/`), once per run with `PackCheckContextBuilder`:
-   - `LoadSettings` reads the config and merges it into the CLI settings.
+   - `LoadSettings` reads the config and merges it into the CLI settings. Then the `ValidateSettings` hook (upgrade: no `-i` with json/markdown) and the `BeforeRunAsync` hook (check: self-update notice) run.
    - `ResolveFiles` decides what to work on, in this fixed order: an explicit path (`--csprojFile`, `--slnFile`, `--slnxFile`, `--cpmFile`, `--fbaFile`, or the same from the config), then an auto-detected `Directory.Packages.props`, then `*.sln`, then `*.slnx`, then a single `*.csproj` in the current directory. Every file, including all projects of a solution, is checked to exist before anything is processed.
 3. For each file: print `DescribeFile` → read packages → `PackagesService.ApplySettings` (filter/exclude, wildcards `*`/`%`) → `SelectPackages` hook (upgrade: the package name argument) → `NuGetPackagesService` fetches versions in parallel (max 4) with a progress bar → `ProcessPackagesAsync` (check: upgrade type and table; upgrade: target versions, optional prompt, write).
-4. `AfterRun` hook (check: the INFO lines).
+4. `AfterRun` hook (check: the INFO lines), or the structured document (see below).
 
 The commands only implement the hooks. Behaviour that applies to both belongs in `PackageCommand` or `PackCheckContextBuilder`.
+
+**Structured output** (`--output json|markdown`, `Data/OutputFormat`): stdout must contain nothing but one document, also when stdout and stderr are merged.
+- Status lines go through `PackageCommand.Status`, which is silent in that mode. The progress bar, the self-update notice and the dry-run file contents are skipped.
+- `ProcessPackagesAsync` passes its result to `Report` instead of printing it. Files with nothing to do are reported with an empty list.
+- At the end, or on an error, `PackageCommand` calls `WriteStructuredOutput`, which uses `StructuredOutputService`. Errors become a plain-text `error` field (`Markup.Remove`).
+- The document is written to `Output.Profile.Out.Writer`, not with `Output.WriteLine`, because Spectre wraps long lines at the console width.
+- New output in a command must go through `Status`, or be guarded by `IsStructuredOutput`.
 
 **Package files** (`src/PackageFiles/`): `IPackageFile` (`Path`, `ReadPackagesAsync`, `WriteVersionsAsync`) with `CsProjPackageFile`, `CpmPackageFile` and `FbaPackageFile`. They are thin wrappers around the file services below, so the commands never need to know which kind of file they work on.
 

@@ -9,10 +9,16 @@ public class NuGetPackagesService(INuGetApiService nuGetApiService)
 {
     private readonly object _lock = new();
 
-    public async Task GetPackagesDataFromNugetRepositoryAsync(List<Package> packages)
+    public async Task GetPackagesDataFromNugetRepositoryAsync(List<Package> packages, bool showProgress = true)
     {
         try
         {
+            if (!showProgress)
+            {
+                await FetchPackagesDataAsync(null, packages);
+                return;
+            }
+
             await AnsiConsole.Progress()
                 .Columns(new TaskDescriptionColumn(), new ProgressBarColumn(), new PercentageColumn())
                 .StartAsync(async ctx =>
@@ -38,7 +44,7 @@ public class NuGetPackagesService(INuGetApiService nuGetApiService)
         }
     }
 
-    private async Task FetchPackagesDataAsync(ProgressTask task, List<Package> packages)
+    private async Task FetchPackagesDataAsync(ProgressTask? task, List<Package> packages)
     {
         var incrementBy = 100.0 / packages.Count;
         var options = new ParallelOptions
@@ -57,9 +63,12 @@ public class NuGetPackagesService(INuGetApiService nuGetApiService)
                 package.LatestVersion = NuGetVersionService.GetLatestVersion(versions);
             }
 
-            lock (_lock)
+            if (task is not null)
             {
-                task.Increment(incrementBy);
+                lock (_lock)
+                {
+                    task.Increment(incrementBy);
+                }
             }
         });
     }

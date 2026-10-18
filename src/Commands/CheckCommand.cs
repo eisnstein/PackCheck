@@ -11,13 +11,11 @@ public class CheckCommand(IAnsiConsole console, INuGetApiService nuGetApiService
 {
     protected override async Task<int?> BeforeRunAsync(CheckSettings settings)
     {
-        if (settings.Version == true)
+        // The notice would not be part of the document anyway
+        if (!IsStructuredOutput)
         {
-            OutputService.PrintVersionInfo(Output);
-            return 0;
+            await PackCheckService.CheckForNewPackCheckVersion(NuGetApiService, Output);
         }
-
-        await PackCheckService.CheckForNewPackCheckVersion(NuGetApiService, Output);
 
         return null;
     }
@@ -32,6 +30,13 @@ public class CheckCommand(IAnsiConsole console, INuGetApiService nuGetApiService
     {
         packages = PackagesService.CalculateUpgradeType(packages, context.Settings);
         packages = PackagesService.PreparePackagesForOutput(packages);
+
+        if (IsStructuredOutput)
+        {
+            Report(file, packages);
+            return Task.FromResult(Result.Success);
+        }
+
         if (packages.Count == 0)
         {
             Output.MarkupLine("All packages are up to date.");
@@ -42,6 +47,12 @@ public class CheckCommand(IAnsiConsole console, INuGetApiService nuGetApiService
         Output.WriteLine();
 
         return Task.FromResult(Result.Success);
+    }
+
+    protected override void WriteStructuredOutput(
+        TextWriter writer, IReadOnlyList<FileReport> files, CheckSettings settings, string? error)
+    {
+        StructuredOutputService.WriteCheck(writer, files, settings, error);
     }
 
     protected override void AfterRun(PackCheckContext<CheckSettings> context)

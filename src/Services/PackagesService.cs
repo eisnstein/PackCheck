@@ -73,43 +73,38 @@ public static class PackagesService
 
         foreach (var p in packages)
         {
-            var currentVersion = p.CurrentVersion;
             // Compare against the stable target, or against the latest version
             // (including prereleases) if the user opted in via Target=latest or --pre.
             var upgradeToVersion = settings.Target == Target.Latest || settings.Pre == true
                 ? (p.LatestVersion ?? GetStableTargetVersion(p))
                 : GetStableTargetVersion(p);
 
-            if (upgradeToVersion is null || upgradeToVersion <= currentVersion)
-            {
-                p.UpgradeType = EUpgradeType.NoUpgrade;
-                continue;
-            }
-
-            if (upgradeToVersion.Major != currentVersion.Major)
-            {
-                p.UpgradeType = EUpgradeType.Major;
-                continue;
-            }
-
-            if (upgradeToVersion.Minor != currentVersion.Minor)
-            {
-                p.UpgradeType = EUpgradeType.Minor;
-                continue;
-            }
-
-            if (upgradeToVersion.Patch != currentVersion.Patch)
-            {
-                p.UpgradeType = EUpgradeType.Patch;
-                continue;
-            }
-
-            // At this point major/minor/patch are equal, but the version is still greater.
-            // This covers prerelease bumps like 1.0.0-preview.1 -> 1.0.0-preview.2.
-            p.UpgradeType = EUpgradeType.Patch;
+            p.UpgradeType = GetUpgradeType(p.CurrentVersion, upgradeToVersion);
         }
 
         return packages;
+    }
+
+    public static EUpgradeType GetUpgradeType(NuGetVersion currentVersion, NuGetVersion? upgradeToVersion)
+    {
+        if (upgradeToVersion is null || upgradeToVersion <= currentVersion)
+        {
+            return EUpgradeType.NoUpgrade;
+        }
+
+        if (upgradeToVersion.Major != currentVersion.Major)
+        {
+            return EUpgradeType.Major;
+        }
+
+        if (upgradeToVersion.Minor != currentVersion.Minor)
+        {
+            return EUpgradeType.Minor;
+        }
+
+        // Also covers versions that only differ in the prerelease part,
+        // like 1.0.0-preview.1 -> 1.0.0-preview.2.
+        return EUpgradeType.Patch;
     }
 
     public static List<Package> PreparePackagesForOutput(List<Package> packages)

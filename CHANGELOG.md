@@ -6,6 +6,14 @@ Each version lists its changes in this order, leaving out empty sections: Breaki
 
 ## Unreleased
 
+### Enhancements
+
+- New `--output` option (`table`, `json` or `markdown`) for `check` and `upgrade`, also configurable as `Output` in `.packcheckrc`. With `json` and `markdown`, only the result is printed, as one document, so PackCheck works well in scripts, CI jobs and with LLM agents. Errors are part of the document.
+
+### Bug fixes
+
+- `packcheck upgrade --version` now prints the version. Before, the flag was ignored and the packages were upgraded.
+
 ## 4.1.0 (2026-10-18)
 
 ### Enhancements

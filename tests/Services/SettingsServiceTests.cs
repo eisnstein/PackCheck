@@ -151,6 +151,20 @@ public class SettingsServiceTests
     }
 
     [Test]
+    public async Task Applies_OutputFromConfig_ForCheckAndUpgrade_UnlessGivenViaCli()
+    {
+        var config = new Config() { Output = "json" };
+
+        var checkSettings = SettingsService.CombineSettingsWithConfig(new CheckSettings(), config);
+        var upgradeSettings = SettingsService.CombineSettingsWithConfig(new UpgradeSettings(), config);
+        var cliSettings = SettingsService.CombineSettingsWithConfig(new CheckSettings() { Output = "markdown" }, config);
+
+        await Assert.That(checkSettings.Output).IsEqualTo("json");
+        await Assert.That(upgradeSettings.Output).IsEqualTo("json");
+        await Assert.That(cliSettings.Output).IsEqualTo("markdown");
+    }
+
+    [Test]
     public async Task Returns_UpgradeSettingsWithConfigValues_When_NoCliValuesGiven()
     {
         var settings = new UpgradeSettings();
