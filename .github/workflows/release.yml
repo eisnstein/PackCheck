@@ -44,11 +44,13 @@ jobs:
       - name: Restore dependencies
         run: dotnet restore
 
+      # Before the build: dotnet test rebuilds src without /p:Version, which
+      # would overwrite the versioned assemblies that pack --no-build uses
+      - name: Run tests
+        run: dotnet test --configuration Release --no-restore
+
       - name: Build
         run: dotnet build src/PackCheck.csproj --configuration Release --no-restore /p:Version=${GITHUB_REF_NAME#v}
-
-      - name: Run tests
-        run: dotnet test --configuration Release
 
       - name: Pack NuGet package
         run: dotnet pack src/PackCheck.csproj --configuration Release --no-build -o ./artifacts /p:Version=${GITHUB_REF_NAME#v}
