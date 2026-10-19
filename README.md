@@ -179,7 +179,7 @@ packcheck --output json
 - Paths are relative to the current directory. A file without anything to do has an empty `packages` list.
 - On an error, `error` contains the message and the exit code is `-1`. Otherwise `error` is `null` and the exit code is `0`.
 - `--output markdown` prints the same as Markdown tables, one section per file, e.g. for pull request comments or job summaries.
-- `--format group` only applies to the default `table` output.
+- `--format group` also groups the Markdown output, with a `### Patch` / `### Minor` / `### Major` section per file. It does not change the JSON document, where each package already has its `upgradeType`.
 
 ## Configuration
 

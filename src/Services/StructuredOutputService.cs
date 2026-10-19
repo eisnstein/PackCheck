@@ -54,25 +54,59 @@ public static class StructuredOutputService
                 continue;
             }
 
-            lines.Add(showLatest
-                ? "| Package | Current | Latest stable | Latest | Upgrade |"
-                : "| Package | Current | Latest stable | Upgrade |");
-            lines.Add(showLatest
-                ? "|---|--:|--:|--:|---|"
-                : "|---|--:|--:|---|");
+            var groups = settings.Format == "group"
+                ? CheckGroups
+                    .Select(g => (g.Title, g.Description, Packages: file.Packages.Where(p => p.UpgradeType == g.Type).ToList()))
+                    .Where(g => g.Packages.Count > 0)
+                    .ToList()
+                : [];
 
-            foreach (var p in file.Packages)
+            // Like the console output: without patch, minor or major upgrades, the full table is shown
+            // to see potential prerelease versions.
+            if (groups.Count == 0)
             {
-                var stable = PackagesService.GetStableTargetVersion(p)?.ToString() ?? "-";
-                lines.Add(showLatest
-                    ? Row(p.PackageName, p.CurrentVersion.ToString(), stable, p.LatestVersion?.ToString() ?? "-", Name(p.UpgradeType))
-                    : Row(p.PackageName, p.CurrentVersion.ToString(), stable, Name(p.UpgradeType)));
+                AddCheckTable(lines, file.Packages, showLatest);
+                continue;
             }
 
-            lines.Add("");
+            foreach (var group in groups)
+            {
+                lines.Add($"### {group.Title}");
+                lines.Add("");
+                lines.Add($"_{group.Description}_");
+                lines.Add("");
+                AddCheckTable(lines, group.Packages, showLatest);
+            }
         }
 
         WriteMarkdown(writer, lines, error);
+    }
+
+    private static readonly (EUpgradeType Type, string Title, string Description)[] CheckGroups =
+    [
+        (EUpgradeType.Patch, "Patch", "Backwards compatible - bug fixes"),
+        (EUpgradeType.Minor, "Minor", "Backwards compatible - new features"),
+        (EUpgradeType.Major, "Major", "Possibly breaking changes - check Changelog")
+    ];
+
+    private static void AddCheckTable(List<string> lines, IEnumerable<Package> packages, bool showLatest)
+    {
+        lines.Add(showLatest
+            ? "| Package | Current | Latest stable | Latest | Upgrade |"
+            : "| Package | Current | Latest stable | Upgrade |");
+        lines.Add(showLatest
+            ? "|---|--:|--:|--:|---|"
+            : "|---|--:|--:|---|");
+
+        foreach (var p in packages)
+        {
+            var stable = PackagesService.GetStableTargetVersion(p)?.ToString() ?? "-";
+            lines.Add(showLatest
+                ? Row(p.PackageName, p.CurrentVersion.ToString(), stable, p.LatestVersion?.ToString() ?? "-", Name(p.UpgradeType))
+                : Row(p.PackageName, p.CurrentVersion.ToString(), stable, Name(p.UpgradeType)));
+        }
+
+        lines.Add("");
     }
 
     public static void WriteUpgrade(

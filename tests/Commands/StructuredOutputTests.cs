@@ -48,6 +48,51 @@ public class StructuredOutputTests
     }
 
     [Test]
+    public async Task Check_Markdown_Grouped()
+    {
+        CommandAppResult result = CreateApp().Run(["check", "--output", "markdown", "--format", "group"]);
+
+        await Assert.That(result.ExitCode).IsEqualTo(0);
+        await Assert.That(result.Output.ReplaceLineEndings("\n")).IsEqualTo("""
+            ## `test.csproj`
+
+            ### Patch
+
+            _Backwards compatible - bug fixes_
+
+            | Package | Current | Latest stable | Upgrade |
+            |---|--:|--:|---|
+            | Spectre.Console | 0.44.0 | 0.44.1 | patch |
+
+            ### Minor
+
+            _Backwards compatible - new features_
+
+            | Package | Current | Latest stable | Upgrade |
+            |---|--:|--:|---|
+            | NuGet.Versioning | 6.2.1 | 6.3.0 | minor |
+
+            ### Major
+
+            _Possibly breaking changes - check Changelog_
+
+            | Package | Current | Latest stable | Upgrade |
+            |---|--:|--:|---|
+            | NuGet.Protocol | 6.2.1 | 7.6.0 | major |
+            """.ReplaceLineEndings("\n"));
+    }
+
+    [Test]
+    public async Task Check_Json_Grouped_IsNotChanged()
+    {
+        CommandAppResult grouped = CreateApp().Run(["check", "--output", "json", "--format", "group"]);
+        CommandAppResult flat = CreateApp().Run(["check", "--output", "json"]);
+
+        await Assert.That(grouped.ExitCode).IsEqualTo(0);
+        await Assert.That(grouped.Output).IsEqualTo(flat.Output);
+    }
+
+    [Test]
     public async Task Check_Json_IsTheOnlyOutput()
     {
         CommandAppResult result = CreateApp().Run(["check", "--output", "json"]);

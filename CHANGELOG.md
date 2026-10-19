@@ -6,6 +6,10 @@ Each version lists its changes in this order, leaving out empty sections: Breaki
 
 ## Unreleased
 
+### Enhancements
+
+- `check --format group` now also groups the packages by _patch_, _minor_ and _major_ in `--output markdown`. The JSON document is unchanged, as each package already has its `upgradeType`.
+
 ## 4.2.1 (2026-10-19)
 
 ### Bug fixes
