@@ -6,6 +6,12 @@ Each version lists its changes in this order, leaving out empty sections: Breaki
 
 ## Unreleased
 
+## 4.2.1 (2026-10-19)
+
+### Bug fixes
+
+- PackCheck no longer reports its own version as `1.0.0`, which showed "A new version of PackCheck is available: 1.0.0 -> x.y.z" on every run since 4.0.0.
+
 ## 4.2.0 (2026-10-18)
 
 ### Enhancements
