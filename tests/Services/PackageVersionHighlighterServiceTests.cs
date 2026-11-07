@@ -104,6 +104,46 @@ public class PackageVersionHighlighterServiceTests
     }
 
     [Test]
+    public async Task KeepsTheFourthPartWhenThePatchPartChanges()
+    {
+        var package = new Package("test.package", new("4.0.104.11"));
+        package.LatestStableVersion = new("4.0.105.2");
+        package.LatestVersion = new("4.1.0.3");
+
+        var highlightedStableVersion = PackageVersionHighlighterService.HighlightLatestStableVersion(package);
+        var highlightedLatestVersion = PackageVersionHighlighterService.HighlightLatestVersion(package);
+
+        await Assert.That(highlightedStableVersion).IsEqualTo("4.0.[green]105.2[/]");
+        await Assert.That(highlightedLatestVersion).IsEqualTo("4.[yellow]1.0.3[/]");
+    }
+
+    [Test]
+    public async Task HighlightsTheFourthPart()
+    {
+        var package = new Package("test.package", new("4.0.104.11"));
+        package.LatestStableVersion = new("4.0.104.12");
+        package.LatestVersion = new("4.0.104.12");
+
+        var highlightedStableVersion = PackageVersionHighlighterService.HighlightLatestStableVersion(package);
+        var highlightedLatestVersion = PackageVersionHighlighterService.HighlightLatestVersion(package);
+
+        await Assert.That(highlightedStableVersion).IsEqualTo("4.0.104.[green]12[/]");
+        await Assert.That(highlightedLatestVersion).IsEqualTo("4.0.104.[green]12[/]");
+    }
+
+    [Test]
+    public async Task HighlightsThePatchPartWhenTheNewVersionHasNoFourthPart()
+    {
+        var package = new Package("test.package", new("4.0.104.11"));
+        package.LatestStableVersion = new("4.0.105");
+        package.LatestVersion = new("4.0.105");
+
+        var highlightedStableVersion = PackageVersionHighlighterService.HighlightLatestStableVersion(package);
+
+        await Assert.That(highlightedStableVersion).IsEqualTo("4.0.[green]105[/]");
+    }
+
+    [Test]
     public async Task ShowsLatestPrereleaseAsStableWhenCurrentIsPrereleaseAndNoStableExists()
     {
         var package = new Package("test.package", new("2.0.0-preview.1"));

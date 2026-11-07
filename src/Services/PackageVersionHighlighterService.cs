@@ -1,4 +1,3 @@
-using System.Text;
 using NuGet.Versioning;
 using PackCheck.Data;
 
@@ -38,76 +37,38 @@ public static class PackageVersionHighlighterService
         // version we have a breaking change and can return all red.
         if (newer.Major != current.Major)
         {
-            return $"[red]{newer.ToString()}[/]";
+            return $"[red]{newer.ToNormalizedString()}[/]";
         }
 
-        var highlightedVersion = new StringBuilder();
-        highlightedVersion
-            .Append(newer.Major)
-            .Append('.');
+        // NuGet versions can have a fourth part (e.g. 4.0.104.11), which is
+        // part of the normalized version whenever it is not 0.
+        var revision = newer.Revision > 0 ? $".{newer.Revision}" : string.Empty;
+        var release = newer.IsPrerelease ? $"-{newer.Release}" : string.Empty;
 
         if (newer.Minor > current.Minor)
         {
-            highlightedVersion
-                .Append("[yellow]")
-                .Append(newer.Minor)
-                .Append('.')
-                .Append(newer.Patch);
-
-            if (newer.IsPrerelease)
-            {
-                highlightedVersion
-                    .Append('-')
-                    .Append(newer.Release);
-            }
-
-            highlightedVersion
-                .Append("[/]");
-
-            return highlightedVersion.ToString();
+            return $"{newer.Major}.[yellow]{newer.Minor}.{newer.Patch}{revision}{release}[/]";
         }
 
         if (newer.Patch > current.Patch)
         {
-            highlightedVersion
-                .Append(newer.Minor)
-                .Append('.')
-                .Append("[green]")
-                .Append(newer.Patch);
-
-            if (newer.IsPrerelease)
-            {
-                highlightedVersion
-                    .Append('-')
-                    .Append(newer.Release);
-            }
-
-            highlightedVersion
-                .Append("[/]");
-
-            return highlightedVersion.ToString();
+            return $"{newer.Major}.{newer.Minor}.[green]{newer.Patch}{revision}{release}[/]";
         }
 
-        highlightedVersion
-            .Append(newer.Minor)
-            .Append('.')
-            .Append(newer.Patch);
+        if (newer.Revision > current.Revision)
+        {
+            return $"{newer.Major}.{newer.Minor}.{newer.Patch}.[green]{newer.Revision}{release}[/]";
+        }
+
+        var numbers = $"{newer.Major}.{newer.Minor}.{newer.Patch}{revision}";
 
         if (newer.IsPrerelease)
         {
-            highlightedVersion
-                .Append("[green]")
-                .Append('-')
-                .Append(newer.Release)
-                .Append("[/]");
-        }
-        else if (current.IsPrerelease)
-        {
-            highlightedVersion
-                .Insert(0, "[green]")
-                .Append("[/]");
+            return $"{numbers}[green]{release}[/]";
         }
 
-        return highlightedVersion.ToString();
+        return current.IsPrerelease
+            ? $"[green]{numbers}[/]"
+            : numbers;
     }
 }
