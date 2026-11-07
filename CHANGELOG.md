@@ -6,6 +6,12 @@ Each version lists its changes in this order, leaving out empty sections: Breaki
 
 ## Unreleased
 
+## 4.2.3 (2026-11-07)
+
+### Enhancements
+
+- Update dependencies
+
 ### Bug fixes
 
 - The _Latest Stable_ and _Latest_ columns no longer drop the fourth part of a version (e.g. `4.0.104.11` was shown as `4.0.104`). A version that only changes in the fourth part is now highlighted as well.
