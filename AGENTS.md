@@ -11,8 +11,9 @@ dotnet run --project src --framework net10.0   # run locally; add args after `--
 dotnet pack src/PackCheck.csproj -c Release    # outputs to src/nupkg
 ```
 
-- The tool multi-targets `net8.0;net9.0;net10.0`, so `dotnet run` needs `--framework`. Tests target `net10.0` only.
-- SDK is pinned to 10.0.100 (`rollForward: latestFeature`).
+- The tool multi-targets `net8.0;net9.0;net10.0;net11.0`, so `dotnet run` needs `--framework`. Tests target `net10.0` only.
+- SDK is pinned to 11.0.100 (`rollForward: latestFeature`). The release workflow installs the SDKs for every target framework, so add a new one there as well.
+- NuGet.Protocol/NuGet.Versioning 8.x ship no `net8.0` assets, so `Directory.Packages.props` keeps net8.0/net9.0 on the 7.x line (and Pkcs 10.x) in a conditional `ItemGroup`. Update both groups when you bump these packages.
 - `TreatWarningsAsErrors` and `Nullable` are on for every project (`Directory.Build.props`). A nullable warning fails the build.
 - Package versions are managed centrally in `Directory.Packages.props`. `<PackageReference>` items in the csproj files have no `Version` attribute.
 
